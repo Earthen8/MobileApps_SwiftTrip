@@ -45,20 +45,29 @@ class DestinationPage extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 40),
                   _buildSearchBar(),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 40),
                   _buildCategories(),
-                  const SizedBox(height: 24),
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 20),
-                    child: Divider(color: Colors.black12),
+                  const SizedBox(height: 30),
+                  Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 20),
+                    height: 1,
+                    decoration: const ShapeDecoration(
+                      shape: RoundedRectangleBorder(
+                        side: BorderSide(
+                          width: 1,
+                          color: Colors.black12,
+                          strokeAlign: BorderSide.strokeAlignCenter,
+                        ),
+                      ),
+                    ),
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 30),
                   _buildSection('Discount', _mockDestinations),
                   _buildSection('People’s Favorites', _mockDestinations),
                   _buildSection('Hot Destinations', _mockDestinations),
-                  const SizedBox(height: 40),
+                  const SizedBox(height: 80),
                 ],
               ),
             ),
@@ -185,7 +194,7 @@ class DestinationPage extends StatelessWidget {
             ),
           ),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: 8),
         SizedBox(
           height: 160,
           child: ListView.builder(
@@ -194,13 +203,13 @@ class DestinationPage extends StatelessWidget {
             itemCount: items.length,
             itemBuilder: (context, index) {
               return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 4),
+                padding: const EdgeInsets.symmetric(horizontal: 5),
                 child: DestinationCard(destination: items[index]),
               );
             },
           ),
         ),
-        const SizedBox(height: 24),
+        const SizedBox(height: 10),
       ],
     );
   }
@@ -217,11 +226,19 @@ class _CategoryItem extends StatelessWidget {
     return Column(
       children: [
         Container(
-          width: 65,
-          height: 65,
-          decoration: const BoxDecoration(
+          width: 68,
+          height: 68,
+          decoration: ShapeDecoration(
             color: Colors.white,
-            shape: BoxShape.circle,
+            shape: OvalBorder(),
+            shadows: [
+              BoxShadow(
+                color: Color(0x26000000),
+                blurRadius: 20,
+                offset: Offset(0, 4),
+                spreadRadius: 0,
+              ),
+            ],
           ),
           child: Center(
             child: category.iconSvg != null
