@@ -25,6 +25,9 @@
 .DS_Store
 *.log
 
-# Ignore all generated plugin files
-**/generated_plugin_registrant.*
+# Ignore all generated plugin files in every platform
+**/generated_plugin_registrant.cc
 **/generated_plugins.cmake
+**/GeneratedPluginRegistrant.swift
+**/generated_plugin_registrant.h
+**/GeneratedPluginRegistrant.m
