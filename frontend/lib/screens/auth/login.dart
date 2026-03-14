@@ -4,6 +4,7 @@ import 'package:swifttrip_frontend/screens/home/home.dart';
 import 'package:swifttrip_frontend/screens/main/main_screen.dart';
 import 'signup.dart';
 import 'forgot_pass/forgot_pass.dart';
+import 'package:swifttrip_frontend/repositories/auth_repository.dart';
 
 void main() {
   runApp(const MyApp());
@@ -130,14 +131,35 @@ class _LoginPageState extends State<LoginPage> {
 
                 // ── Log In Button ──────────────────────────────────────
                 GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const MainScreen(),
-                      ),
-                    );
-                    // TODO: handle login
+                  onTap: () async {
+                    final email = _emailController.text;
+                    final password = _passwordController.text;
+                    if (email.isEmpty || password.isEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Please fill all fields')),
+                      );
+                      return;
+                    }
+
+                    try {
+                      final authRepo = AuthRepository();
+                      bool success = await authRepo.login(email, password);
+                      
+                      if (success && mounted) {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const MainScreen(),
+                          ),
+                        );
+                      }
+                    } catch (e) {
+                      if (mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text(e.toString().replaceAll('Exception: ', ''))),
+                        );
+                      }
+                    }
                   },
                   child: Container(
                     width: 315,
@@ -312,7 +334,7 @@ class _LoginPageState extends State<LoginPage> {
               ),
             ),
           ),
-          ?suffixIcon,
+          if (suffixIcon != null) suffixIcon,
         ],
       ),
     );

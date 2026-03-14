@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import '../login.dart';
+import 'package:swifttrip_frontend/repositories/auth_repository.dart';
 
 class VerificationPage extends StatefulWidget {
-  const VerificationPage({super.key});
+  final String email;
+  const VerificationPage({super.key, required this.email});
 
   @override
   State<VerificationPage> createState() => _VerificationPageState();
@@ -59,8 +61,48 @@ class _VerificationPageState extends State<VerificationPage> {
                 ),
                 const SizedBox(height: 50),
                 GestureDetector(
-                  onTap: () {
-                    Navigator.popUntil(context, (route) => route.isFirst);
+                  onTap: () async {
+                    final password = _passwordController.text;
+                    final confirmPassword = _confirmPasswordController.text;
+
+                    if (password.isEmpty || confirmPassword.isEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Please fill all fields')),
+                      );
+                      return;
+                    }
+
+                    if (password != confirmPassword) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Passwords do not match')),
+                      );
+                      return;
+                    }
+
+                    try {
+                      final authRepo = AuthRepository();
+                      await authRepo.updatePassword(widget.email, password);
+
+                      if (mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Password updated successfully!'),
+                          ),
+                        );
+                        // Navigate back to login
+                        Navigator.popUntil(context, (route) => route.isFirst);
+                      }
+                    } catch (e) {
+                      if (mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              e.toString().replaceAll('Exception: ', ''),
+                            ),
+                          ),
+                        );
+                      }
+                    }
                   },
                   child: Container(
                     width: 315,

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class AppConstants {
-  AppConstants._();
+class Constants {
+  Constants._();
 
   // App Information
   static const String appName = 'SwiftTrip';
@@ -23,4 +23,9 @@ class AppConstants {
 
   // Colors — Warning
   static const Color warningColor = Color(0xFFF3CFCE);
+
+  // Update this ONE line whenever you change Wi-Fi networks
+  static const String machineIp = '192.168.1.11';
+
+  static const String baseUrl = 'http://$machineIp:8000/api/auth/';
 }
