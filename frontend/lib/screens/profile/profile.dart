@@ -5,7 +5,6 @@ import 'widgets/menu_section.dart';
 import 'language_screen.dart';
 import 'clear_cache_screen.dart';
 import 'wishlist_screen.dart';
-import 'payment_options_screen.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
@@ -57,18 +56,6 @@ class ProfilePage extends StatelessWidget {
                         icon: Icons.credit_card_outlined,
                         label: 'Subscription Plan',
                         onTap: () {},
-                      ),
-                      MenuItem(
-                        icon: Icons.account_balance_outlined,
-                        label: 'Payment Options',
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => const PaymentOptionsScreen(),
-                            ),
-                          );
-                        },
                       ),
                       MenuItem(
                         icon: Icons.language,
