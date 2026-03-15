@@ -12,6 +12,7 @@ import 'widgets/search_bar.dart';
 import 'widgets/section_header.dart';
 import '../../widgets/top_bar.dart';
 import '../history/history.dart';
+import '../destination/destination.dart';
 
 // ─────────────────────────────────────────────
 // CONSTANTS / MOCK DATA
@@ -217,7 +218,22 @@ class _HomePageState extends State<HomePage> {
                               const SectionHeader(title: 'Recommendation'),
                               const SizedBox(height: 12),
 
-                              RecommendationGrid(items: _serverRecommendations),
+                              RecommendationGrid(
+                                items: _serverRecommendations,
+                                onItemTap: (item) {
+                                  // Either switch tab or push new page
+                                  if (widget.onNavigateToDestination != null) {
+                                    widget.onNavigateToDestination!();
+                                  } else {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => const DestinationPage(),
+                                      ),
+                                    );
+                                  }
+                                },
+                              ),
                             ],
                           ),
                         ),

@@ -8,22 +8,29 @@ import 'dart:ui';
 
 class RecommendationGrid extends StatelessWidget {
   final List<RecommendationItem> items;
+  final Function(RecommendationItem)? onItemTap;
 
-  const RecommendationGrid({super.key, required this.items});
+  const RecommendationGrid({super.key, required this.items, this.onItemTap});
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: GridView.count(
-        shrinkWrap: true, // Crucial for nesting inside SingleChildScrollView
-        physics: const NeverScrollableScrollPhysics(), // Disable grid scrolling
-        crossAxisCount: 2, // Forces exactly 2 columns
-        mainAxisSpacing: 15, // Vertical spacing between cards
-        crossAxisSpacing: 20, // Horizontal spacing between cards
-        childAspectRatio:
-            1.65, // Defines the aspect ratio of each card (roughly matching original dimensions)
-        children: items.map((item) => _RecommendationCard(item: item)).toList(),
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        crossAxisCount: 2,
+        mainAxisSpacing: 15,
+        crossAxisSpacing: 20,
+        childAspectRatio: 1.65,
+        children: items
+            .map(
+              (item) => GestureDetector(
+                onTap: () => onItemTap?.call(item),
+                child: _RecommendationCard(item: item),
+              ),
+            )
+            .toList(),
       ),
     );
   }
