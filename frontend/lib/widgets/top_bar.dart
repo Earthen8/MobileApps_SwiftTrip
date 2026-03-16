@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import '../screens/customer_service/customer_service_overlay.dart';
 
 class TopBar extends StatelessWidget {
   const TopBar({super.key});
@@ -21,8 +22,18 @@ class TopBar extends StatelessWidget {
 
           const Spacer(),
 
-          // Menu icon
-          SvgPicture.asset('assets/icons/hamburger.svg', height: 30),
+          // Menu icon — tap to open Customer Service overlay
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const CustomerServiceOverlay(),
+                ),
+              );
+            },
+            child: SvgPicture.asset('assets/icons/hamburger.svg', height: 30),
+          ),
         ],
       ),
     );
