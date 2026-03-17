@@ -6,12 +6,14 @@ class TopBar extends StatelessWidget {
   final bool showBackButton;
   final bool showHamburger;
   final VoidCallback? onHamburgerTap;
+  final VoidCallback? onBackTap;
 
   const TopBar({
     super.key,
     this.showBackButton = false,
     this.showHamburger = true,
     this.onHamburgerTap,
+    this.onBackTap,
   });
 
   @override
@@ -29,7 +31,7 @@ class TopBar extends StatelessWidget {
           // 2. The Back Arrow (Only renders if showBackButton is true)
           if (showBackButton) ...[
             GestureDetector(
-              onTap: () {
+              onTap: onBackTap ?? () {
                 Navigator.pop(context);
               },
               child: const Icon(
