@@ -57,9 +57,10 @@ class DestinationPage extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SizedBox(height: 40),
-                  _buildSearchBar(),
+                  _buildSearchBar(), // TODO: Implement Search Bar
                   const SizedBox(height: 40),
                   _buildCategories(context),
+                  _buildCategories(), // TODO: Implement Categories
                   const SizedBox(height: 30),
                   Container(
                     margin: const EdgeInsets.symmetric(horizontal: 20),
@@ -75,9 +76,18 @@ class DestinationPage extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 30),
-                  _buildSection('Discount', _mockDestinations),
-                  _buildSection('People\'s Favorites', _mockDestinations),
-                  _buildSection('Hot Destinations', _mockDestinations),
+                  _buildSection(
+                    'Discount',
+                    _mockDestinations,
+                  ), // TODO: Implement Discount
+                  _buildSection(
+                    'People’s Favorites',
+                    _mockDestinations,
+                  ), // TODO: Implement People’s Favorites
+                  _buildSection(
+                    'Hot Destinations',
+                    _mockDestinations,
+                  ), // TODO: Implement Hot Destinations
                   const SizedBox(height: 80),
                 ],
               ),

@@ -11,6 +11,8 @@ import 'widgets/schedule_carousel.dart';
 import 'widgets/search_bar.dart';
 import 'widgets/section_header.dart';
 import '../../widgets/top_bar.dart';
+import '../history/history.dart';
+import '../destination/destination.dart';
 
 // ─────────────────────────────────────────────
 // CONSTANTS / MOCK DATA
@@ -50,7 +52,8 @@ const _recommendations = [
 // ─────────────────────────────────────────────
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  final VoidCallback? onNavigateToDestination;
+  const HomePage({super.key, this.onNavigateToDestination});
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -174,6 +177,7 @@ class _HomePageState extends State<HomePage> {
                                       currentIndex: _currentBanner,
                                       onPageChanged: (i) =>
                                           setState(() => _currentBanner = i),
+                                      onTap: widget.onNavigateToDestination,
                                     ),
                                     const Positioned(
                                       bottom: 0,
@@ -188,7 +192,14 @@ class _HomePageState extends State<HomePage> {
                               SectionHeader(
                                 title: 'Your Schedule',
                                 actionLabel: 'History >',
-                                onAction: () {},
+                                onAction: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => const HistoryPage(),
+                                    ),
+                                  );
+                                },
                               ),
                               const SizedBox(height: 12),
 
@@ -207,7 +218,22 @@ class _HomePageState extends State<HomePage> {
                               const SectionHeader(title: 'Recommendation'),
                               const SizedBox(height: 12),
 
-                              RecommendationGrid(items: _serverRecommendations),
+                              RecommendationGrid(
+                                items: _serverRecommendations,
+                                onItemTap: (item) {
+                                  // Either switch tab or push new page
+                                  if (widget.onNavigateToDestination != null) {
+                                    widget.onNavigateToDestination!();
+                                  } else {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => const DestinationPage(),
+                                      ),
+                                    );
+                                  }
+                                },
+                              ),
                             ],
                           ),
                         ),

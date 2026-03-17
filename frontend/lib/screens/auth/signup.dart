@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'forgot_pass/forgot_pass.dart';
+import 'package:swifttrip_frontend/repositories/auth_repository.dart';
+import 'widgets/auth_widgets.dart';
+import 'user_info.dart';
 
 class SignupPage extends StatefulWidget {
   const SignupPage({super.key});
@@ -63,7 +66,7 @@ class _SignupPageState extends State<SignupPage> {
 
                 // ── Input Fields ──────────────────────────────────────
                 // Email Field
-                _inputField(
+                AuthWidgets.inputField(
                   controller: _emailController,
                   hint: 'Email',
                   obscure: false,
@@ -71,7 +74,7 @@ class _SignupPageState extends State<SignupPage> {
                 const SizedBox(height: 14),
 
                 // Password Field
-                _inputField(
+                AuthWidgets.inputField(
                   controller: _passwordController,
                   hint: 'Password',
                   obscure: _obscurePassword,
@@ -91,7 +94,7 @@ class _SignupPageState extends State<SignupPage> {
                 const SizedBox(height: 14),
 
                 // Confirm Password Field
-                _inputField(
+                AuthWidgets.inputField(
                   controller: _confirmPasswordController,
                   hint: 'Confirm Password',
                   obscure: _obscureConfirmPassword,
@@ -112,9 +115,46 @@ class _SignupPageState extends State<SignupPage> {
                 const SizedBox(height: 14),
 
                 // Email Verification Field (Row)
-                _verificationField(
+                AuthWidgets.verificationField(
                   controller: _verificationController,
                   hint: 'Email Verification',
+                  onAskCode: () async {
+                    final email = _emailController.text.trim();
+
+                    if (email.isEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Please enter your email first'),
+                        ),
+                      );
+                      return;
+                    }
+
+                    try {
+                      final authRepo = AuthRepository();
+                      await authRepo.requestOtp(email);
+
+                      if (mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text(
+                              'Verification code sent to your email!',
+                            ),
+                          ),
+                        );
+                      }
+                    } catch (e) {
+                      if (mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              e.toString().replaceAll('Exception: ', ''),
+                            ),
+                          ),
+                        );
+                      }
+                    }
+                  },
                 ),
                 const SizedBox(height: 25),
 
@@ -125,21 +165,21 @@ class _SignupPageState extends State<SignupPage> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       // Facebook Pill
-                      _socialButton(
+                      AuthWidgets.socialButton(
                         child: SvgPicture.asset(
                           'assets/icons/facebook_logo.svg',
                           width: 20,
                         ),
                       ),
                       // X (Twitter) Pill
-                      _socialButton(
+                      AuthWidgets.socialButton(
                         child: SvgPicture.asset(
                           'assets/icons/x_logo.svg',
                           width: 20,
                         ),
                       ),
                       // Google Pill
-                      _socialButton(
+                      AuthWidgets.socialButton(
                         child: SvgPicture.asset(
                           'assets/icons/google_logo.svg',
                           width: 20,
@@ -152,11 +192,58 @@ class _SignupPageState extends State<SignupPage> {
 
                 // ── Primary Action: Sign Up Button ────────────────────
                 GestureDetector(
-                  onTap: () {
-                    // TODO: handle signup form submission (validate and call backend)
-                    print(
-                      'Sign Up pressed with Email: ${_emailController.text}',
-                    );
+                  onTap: () async {
+                    final email = _emailController.text.trim();
+                    final password = _passwordController.text;
+                    final confirm = _confirmPasswordController.text;
+                    final otp = _verificationController.text.trim();
+
+                    if (email.isEmpty || password.isEmpty || confirm.isEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Please fill all fields')),
+                      );
+                      return;
+                    }
+                    if (password != confirm) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Passwords do not match')),
+                      );
+                      return;
+                    }
+
+                    try {
+                      final authRepo = AuthRepository();
+                      await authRepo.verifyOtp(email, otp);
+
+                      bool signupSuccess = await authRepo.signup(
+                        email,
+                        password,
+                        confirm,
+                      );
+                      if (signupSuccess && mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Signup successful! Please complete your profile.'),
+                          ),
+                        );
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const UserInfoPage(),
+                          ),
+                        );
+                      }
+                    } catch (e) {
+                      if (mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              e.toString().replaceAll('Exception: ', ''),
+                            ),
+                          ),
+                        );
+                      }
+                    }
                   },
                   child: Container(
                     width: 315,
@@ -268,179 +355,6 @@ class _SignupPageState extends State<SignupPage> {
           ),
         ),
       ),
-    );
-  }
-
-  // ── Modified reusable input field (includes basic setup from login.dart)
-  Widget _inputField({
-    required TextEditingController controller,
-    required String hint,
-    required bool obscure,
-    Widget? suffixIcon,
-  }) {
-    return Container(
-      width: 347,
-      height: 56,
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      decoration: ShapeDecoration(
-        color: const Color(0xFFE8EDF2),
-        shape: RoundedRectangleBorder(
-          side: const BorderSide(width: 1, color: Color(0xFFD1DEE5)),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        shadows: const [
-          BoxShadow(
-            color: Color(0x26000000),
-            blurRadius: 20,
-            offset: Offset(0, 4),
-            spreadRadius: 0,
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: TextField(
-              controller: controller,
-              obscureText: obscure,
-              keyboardType: hint == 'Email'
-                  ? TextInputType.emailAddress
-                  : TextInputType.text,
-              style: const TextStyle(
-                color: Color(0xFF0C161C),
-                fontSize: 16,
-                fontFamily: 'Poppins',
-                fontWeight: FontWeight.w400,
-                height: 1.50,
-              ),
-              decoration: InputDecoration(
-                hintText: hint,
-                hintStyle: const TextStyle(
-                  color: Color(0xFF4F7A93),
-                  fontSize: 16,
-                  fontFamily: 'Poppins',
-                  fontWeight: FontWeight.w400,
-                  height: 1.50,
-                ),
-                border: InputBorder.none,
-                contentPadding: EdgeInsets.zero,
-                isDense: true,
-              ),
-            ),
-          ),
-          if (suffixIcon != null) suffixIcon,
-        ],
-      ),
-    );
-  }
-
-  // ── Specialized Reusable Verification Field (Visual replica) ─────
-  Widget _verificationField({
-    required TextEditingController controller,
-    required String hint,
-  }) {
-    return Container(
-      width: 347,
-      height: 56,
-      decoration: ShapeDecoration(
-        // Soft background color
-        color: const Color(0xFFE8EDF2),
-        shape: RoundedRectangleBorder(
-          side: const BorderSide(width: 1, color: Color(0xFFD1DEE5)),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        shadows: const [
-          BoxShadow(
-            color: Color(0x26000000),
-            blurRadius: 20,
-            offset: Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Stack(
-        alignment: Alignment.centerRight,
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: TextField(
-              controller: controller,
-              style: const TextStyle(
-                color: Color(0xFF0C161C),
-                fontSize: 16,
-                fontFamily: 'Poppins',
-                fontWeight: FontWeight.w400,
-                height: 1.50,
-              ),
-              decoration: InputDecoration(
-                hintText: hint,
-                hintStyle: const TextStyle(
-                  color: Color(0xFF4F7A93),
-                  fontSize: 16,
-                  fontFamily: 'Poppins',
-                  fontWeight: FontWeight.w400,
-                  height: 1.50,
-                ),
-                border: InputBorder.none,
-                contentPadding: const EdgeInsets.only(right: 90),
-                isDense: true,
-              ),
-            ),
-          ),
-          // Visually matching "Ask Code" button
-          GestureDetector(
-            onTap: () {
-              // TODO: implement ask code logic (call backend)
-              print('Ask Code pressed');
-            },
-            child: Container(
-              width: 80,
-              height: 40,
-              margin: const EdgeInsets.only(right: 8),
-              decoration: ShapeDecoration(
-                color: const Color(0xFF2B99E3), // Match theme blue
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(
-                    10,
-                  ), // Matching inner curve
-                ),
-              ),
-              alignment: Alignment.center,
-              child: const Text(
-                'Ask\nCode',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: Color(0xFFF7F9F9),
-                  fontSize: 12,
-                  fontFamily: 'Poppins',
-                  fontWeight: FontWeight.w700,
-                  height: 1.10, // Tighter height for multi-line
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // ── Reusable social pill button ────────────────────────────────────
-  Widget _socialButton({required Widget child}) {
-    return Container(
-      width: 74,
-      height: 40,
-      decoration: ShapeDecoration(
-        // Social icons use the theme blue as the button color
-        color: const Color(0xFF2B99E3),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        shadows: const [
-          BoxShadow(
-            color: Color(0x26000000),
-            blurRadius: 20,
-            offset: Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Center(child: child),
     );
   }
 }
