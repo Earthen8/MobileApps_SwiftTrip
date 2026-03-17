@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../../widgets/top_bar.dart';
 import '../promotions/promotions.dart';
+import '../checkout/checkout.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // DATA MODEL — backend-friendly, swap with fromJson later
@@ -707,13 +708,21 @@ class _TotalConfirmBar extends StatelessWidget {
                 borderRadius: BorderRadius.circular(20),
               ),
             ),
-            child: const Text(
-              'Confirm',
-              style: TextStyle(
-                color: Color(0xFFE5E5E5),
-                fontSize: 12,
-                fontFamily: 'Poppins',
-                fontWeight: FontWeight.w400,
+            child: GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const CheckoutPage()),
+                );
+              },
+              child: const Text(
+                'Confirm',
+                style: TextStyle(
+                  color: Color(0xFFE5E5E5),
+                  fontSize: 12,
+                  fontFamily: 'Poppins',
+                  fontWeight: FontWeight.w400,
+                ),
               ),
             ),
           ),
