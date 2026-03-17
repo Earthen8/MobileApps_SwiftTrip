@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import '../main/main_screen.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // MODELS
@@ -14,11 +15,11 @@ class _ChatMessage {
   final _TicketData? ticket;
 
   const _ChatMessage.text({required this.type, required String this.text})
-      : ticket = null;
+    : ticket = null;
 
   const _ChatMessage.ticket({required _TicketData this.ticket})
-      : type = _MsgType.ticket,
-        text = null;
+    : type = _MsgType.ticket,
+      text = null;
 }
 
 class _TicketData {
@@ -60,14 +61,8 @@ class _RoomChatPageState extends State<RoomChatPage> {
   bool _isBotTyping = false;
 
   final List<_ChatMessage> _messages = [
-    const _ChatMessage.text(
-      type: _MsgType.ai,
-      text: 'What can i help?',
-    ),
-    const _ChatMessage.text(
-      type: _MsgType.user,
-      text: 'To Jakarta',
-    ),
+    const _ChatMessage.text(type: _MsgType.ai, text: 'What can i help?'),
+    const _ChatMessage.text(type: _MsgType.user, text: 'To Jakarta'),
     const _ChatMessage.ticket(
       ticket: _TicketData(
         from: 'Jakarta',
@@ -130,10 +125,13 @@ class _RoomChatPageState extends State<RoomChatPage> {
       if (!mounted) return;
       setState(() {
         _isBotTyping = false;
-        _messages.add(const _ChatMessage.text(
-          type: _MsgType.ai,
-          text: 'I found some options for you. Let me know if you need more details!',
-        ));
+        _messages.add(
+          const _ChatMessage.text(
+            type: _MsgType.ai,
+            text:
+                'I found some options for you. Let me know if you need more details!',
+          ),
+        );
       });
       _scrollToBottom();
     });
@@ -168,10 +166,8 @@ class _RoomChatPageState extends State<RoomChatPage> {
           ),
 
           // ── Input Bar ────────────────────────────────────────────────────
-          _ChatInputBar(
-            controller: _inputController,
-            onSend: _sendMessage,
-          ),
+          _ChatInputBar(controller: _inputController, onSend: _sendMessage),
+          const SizedBox(height: 30),
         ],
       ),
     );
@@ -196,11 +192,22 @@ class _ChatTopBar extends StatelessWidget {
       child: Row(
         children: [
           // Logo
-          SvgPicture.asset('assets/icons/swifttrip_logo.svg', height: 30),
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const MainScreen()),
+              );
+            },
+            child: SvgPicture.asset('assets/icons/swifttrip_logo.svg', height: 30),
+          ),
           const Spacer(),
           // Bookmark icon
-          const Icon(Icons.bookmark_border_outlined,
-              size: 24, color: Colors.black),
+          const Icon(
+            Icons.bookmark_border_outlined,
+            size: 24,
+            color: Colors.black,
+          ),
           const SizedBox(width: 16),
           // Close / X icon
           GestureDetector(
@@ -229,15 +236,15 @@ class _ChatBubble extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: Row(
-        mainAxisAlignment:
-            isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
+        mainAxisAlignment: isUser
+            ? MainAxisAlignment.end
+            : MainAxisAlignment.start,
         children: [
           Container(
             constraints: BoxConstraints(
               maxWidth: MediaQuery.of(context).size.width * 0.65,
             ),
-            padding:
-                const EdgeInsets.symmetric(horizontal: 18, vertical: 13),
+            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 13),
             decoration: BoxDecoration(
               color: isUser ? const Color(0xFF2B99E3) : Colors.white,
               borderRadius: BorderRadius.only(
@@ -274,10 +281,17 @@ class _ChatBubble extends StatelessWidget {
 // TICKET CARD
 // ─────────────────────────────────────────────────────────────────────────────
 
-class _TicketCard extends StatelessWidget {
+class _TicketCard extends StatefulWidget {
   final _TicketData ticket;
 
   const _TicketCard({required this.ticket});
+
+  @override
+  State<_TicketCard> createState() => _TicketCardState();
+}
+
+class _TicketCardState extends State<_TicketCard> {
+  bool _isAdded = false;
 
   @override
   Widget build(BuildContext context) {
@@ -301,9 +315,13 @@ class _TicketCard extends StatelessWidget {
           // ── FROM / TO ───────────────────────────────────────────────────
           Row(
             children: [
-              _TicketCol(label: 'FROM', value: ticket.from, valueBig: true),
+              _TicketCol(
+                label: 'FROM',
+                value: widget.ticket.from,
+                valueBig: true,
+              ),
               const SizedBox(width: 40),
-              _TicketCol(label: 'TO', value: ticket.to, valueBig: true),
+              _TicketCol(label: 'TO', value: widget.ticket.to, valueBig: true),
             ],
           ),
           const Divider(height: 20, color: Color(0xFFE0E0E0)),
@@ -311,11 +329,11 @@ class _TicketCard extends StatelessWidget {
           // ── DATE / DEPARTURE / ARRIVE ───────────────────────────────────
           Row(
             children: [
-              _TicketCol(label: 'DATE', value: ticket.date),
+              _TicketCol(label: 'DATE', value: widget.ticket.date),
               const SizedBox(width: 20),
-              _TicketCol(label: 'DEPARTURE', value: ticket.departure),
+              _TicketCol(label: 'DEPARTURE', value: widget.ticket.departure),
               const SizedBox(width: 20),
-              _TicketCol(label: 'ARRIVE', value: ticket.arrive),
+              _TicketCol(label: 'ARRIVE', value: widget.ticket.arrive),
             ],
           ),
           const SizedBox(height: 10),
@@ -323,29 +341,39 @@ class _TicketCard extends StatelessWidget {
           // ── TRAIN / CARRIAGE / SEAT + TAMBAH button ─────────────────────
           Row(
             children: [
-              _TicketCol(label: 'TRAIN', value: ticket.train),
+              _TicketCol(label: 'TRAIN', value: widget.ticket.train),
               const SizedBox(width: 20),
-              _TicketCol(label: 'CARRIAGE', value: ticket.carriage),
+              _TicketCol(label: 'CARRIAGE', value: widget.ticket.carriage),
               const SizedBox(width: 20),
-              _TicketCol(label: 'SEAT', value: ticket.seat),
+              _TicketCol(label: 'SEAT', value: widget.ticket.seat),
               const Spacer(),
               // Tambah button
               GestureDetector(
-                onTap: () {},
+                onTap: _isAdded
+                    ? null
+                    : () {
+                        setState(() {
+                          _isAdded = true;
+                        });
+                      },
                 child: Container(
                   padding: const EdgeInsets.symmetric(
-                      horizontal: 18, vertical: 8),
+                    horizontal: 18,
+                    vertical: 8,
+                  ),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF2B99E3),
+                    color: _isAdded
+                        ? const Color(0xFFDEDEDE)
+                        : const Color(0xFF2B99E3),
                     borderRadius: BorderRadius.circular(20),
                   ),
-                  child: const Text(
-                    'Tambah',
+                  child: Text(
+                    _isAdded ? 'Ditambahkan' : 'Tambah',
                     style: TextStyle(
                       fontFamily: 'Poppins',
                       fontWeight: FontWeight.w600,
                       fontSize: 12,
-                      color: Colors.white,
+                      color: _isAdded ? const Color(0xFFAAAAAA) : Colors.white,
                     ),
                   ),
                 ),
@@ -459,10 +487,8 @@ class _TypingIndicatorState extends State<_TypingIndicator>
                 return AnimatedBuilder(
                   animation: _controller,
                   builder: (_, __) {
-                    final offset = sin(
-                          (_controller.value * 2 * pi) - (i * pi / 2),
-                        ) *
-                        3;
+                    final offset =
+                        sin((_controller.value * 2 * pi) - (i * pi / 2)) * 3;
                     return Container(
                       margin: const EdgeInsets.symmetric(horizontal: 3),
                       width: 7,
@@ -545,10 +571,7 @@ class _ChatInputBar extends StatelessWidget {
             ),
             GestureDetector(
               onTap: onSend,
-              child: SvgPicture.asset(
-                'assets/icons/magnifier.svg',
-                height: 20,
-              ),
+              child: SvgPicture.asset('assets/icons/magnifier.svg', height: 20),
             ),
           ],
         ),
