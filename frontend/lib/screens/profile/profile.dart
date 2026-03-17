@@ -6,7 +6,6 @@ import 'widgets/menu_section.dart';
 import 'language_screen.dart';
 import 'clear_cache_screen.dart';
 import 'wishlist_screen.dart';
-import 'payment_options_screen.dart';
 import 'subscription_plan_screen.dart';
 
 class ProfilePage extends StatelessWidget {
