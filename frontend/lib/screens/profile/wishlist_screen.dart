@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import '../../widgets/top_bar.dart';
 
 // MODEL
 class WishlistItem {
@@ -31,17 +32,46 @@ class WishlistScreen extends StatefulWidget {
 }
 
 class _WishlistScreenState extends State<WishlistScreen> {
-  final List<WishlistItem> _items = List.generate(
-    5,
-    (i) => WishlistItem(
-      id: 'item_$i',
-      title: 'Rumah Wilson Williem',
-      rating: 5,
+  final List<WishlistItem> _items = [
+    WishlistItem(
+      id: 'item_1',
+      title: 'Bali Beach Retreat',
+      rating: 4.8,
       description:
-          'rumah wilsoLorem ipsum dolor sit amet, consectetur adipiscing elit ......',
-      imageAsset: 'assets/images/home/vacation_logo.png',
+          'Relaxing tropical escape with white sand beaches and sunset views.',
+      imageUrl: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e',
     ),
-  );
+    WishlistItem(
+      id: 'item_2',
+      title: 'Tokyo City Lights',
+      rating: 4.7,
+      description:
+          'Modern city experience with neon lights, food, and culture.',
+      imageUrl: 'https://images.unsplash.com/photo-1549692520-acc6669e2f0c',
+    ),
+    WishlistItem(
+      id: 'item_3',
+      title: 'Swiss Alps Escape',
+      rating: 4.9,
+      description:
+          'Snowy mountains, fresh air, and breathtaking alpine scenery.',
+      imageUrl: 'https://images.unsplash.com/photo-1501785888041-af3ef285b470',
+    ),
+    WishlistItem(
+      id: 'item_4',
+      title: 'Santorini Sunset View',
+      rating: 4.8,
+      description: 'Iconic white houses with blue domes overlooking the sea.',
+      imageUrl: 'https://images.unsplash.com/photo-1505739771715-9c3fcd5f1b38',
+    ),
+    WishlistItem(
+      id: 'item_5',
+      title: 'Dubai Desert Adventure',
+      rating: 4.6,
+      description: 'Golden dunes, luxury stays, and thrilling desert safari.',
+      imageUrl: 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee',
+    ),
+  ];
 
   void _toggleWishlist(int index) {
     setState(() => _items[index].isWishlisted = !_items[index].isWishlisted);
@@ -60,7 +90,7 @@ class _WishlistScreenState extends State<WishlistScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // ── Top Bar ──────────────────────────────────────────────────────
-          _WishlistTopBar(),
+          const TopBar(showBackButton: true, showHamburger: false),
           const SizedBox(height: 10),
 
           // ── Title ────────────────────────────────────────────────────────
@@ -77,7 +107,12 @@ class _WishlistScreenState extends State<WishlistScreen> {
             ),
           ),
           const SizedBox(height: 10),
-          const Divider(height: 20, indent: 20, endIndent: 20),
+          const Divider(
+            height: 20,
+            indent: 20,
+            endIndent: 20,
+            color: Colors.black,
+          ),
           const SizedBox(height: 10),
 
           // ── List ─────────────────────────────────────────────────────────
@@ -102,39 +137,6 @@ class _WishlistScreenState extends State<WishlistScreen> {
                       onToggleWishlist: () => _toggleWishlist(i),
                     ),
                   ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// TOP BAR
-// ─────────────────────────────────────────────────────────────────────────────
-
-class _WishlistTopBar extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      color: const Color(0xFFF5F5F5),
-      padding: EdgeInsets.only(
-        top: MediaQuery.of(context).padding.top + 15,
-        left: 20,
-        right: 20,
-        bottom: 15,
-      ),
-      child: Row(
-        children: [
-          SvgPicture.asset('assets/icons/swifttrip_logo.svg', height: 30),
-          const Spacer(),
-          GestureDetector(
-            onTap: () => Navigator.pop(context),
-            child: const Icon(
-              Icons.chevron_left,
-              size: 30,
-              color: Colors.black,
-            ),
           ),
         ],
       ),
