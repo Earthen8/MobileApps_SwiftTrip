@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-class TopBar extends StatelessWidget {
+class TopBar extends StatelessWidget implements PreferredSizeWidget {
   // 1. The Logic Gate
   final bool showBackButton;
   final bool showHamburger;
@@ -15,6 +15,9 @@ class TopBar extends StatelessWidget {
     this.onHamburgerTap,
     this.onBackTap,
   });
+
+  @override
+  Size get preferredSize => const Size.fromHeight(60.0);
 
   @override
   Widget build(BuildContext context) {

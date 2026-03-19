@@ -2,6 +2,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../main/main_screen.dart';
+import 'order_ticket.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // MODELS
@@ -206,10 +207,20 @@ class _ChatTopBar extends StatelessWidget {
           ),
           const Spacer(),
           // Bookmark icon
-          const Icon(
-            Icons.bookmark_border_outlined,
-            size: 24,
-            color: Colors.black,
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const OrderTicketPage(),
+                ),
+              );
+            },
+            child: const Icon(
+              Icons.bookmark_border_outlined,
+              size: 24,
+              color: Colors.black,
+            ),
           ),
           const SizedBox(width: 16),
           // Close / X icon
