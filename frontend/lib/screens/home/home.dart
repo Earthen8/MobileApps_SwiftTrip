@@ -11,7 +11,7 @@ import 'widgets/schedule_carousel.dart';
 import 'widgets/search_bar.dart';
 import 'widgets/section_header.dart';
 import '../../widgets/top_bar.dart';
-import '../history/history.dart';
+import 'history.dart';
 import '../destination/destination.dart';
 import '../customer_service/onboarding.dart';
 import 'next_trip.dart';

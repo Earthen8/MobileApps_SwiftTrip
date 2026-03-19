@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../widgets/top_bar.dart';
-import '../cart/cart.dart'; // Assuming TicketCard and CartTicket live here
+import '../cart/cart.dart';
+import '../customer_service/onboarding.dart';
 
 class HistoryPage extends StatelessWidget {
   const HistoryPage({super.key});
@@ -14,7 +15,17 @@ class HistoryPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const TopBar(showBackButton: true),
+            TopBar(
+              showBackButton: true,
+              onHamburgerTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const OnboardingPage(),
+                  ),
+                );
+              },
+            ),
             const SizedBox(height: 20),
 
             const Padding(

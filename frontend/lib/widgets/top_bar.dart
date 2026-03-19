@@ -34,9 +34,11 @@ class TopBar extends StatelessWidget implements PreferredSizeWidget {
           // 2. The Back Arrow (Only renders if showBackButton is true)
           if (showBackButton) ...[
             GestureDetector(
-              onTap: onBackTap ?? () {
-                Navigator.pop(context);
-              },
+              onTap:
+                  onBackTap ??
+                  () {
+                    Navigator.pop(context);
+                  },
               child: const Icon(
                 Icons.arrow_back_ios_new,
                 color: Colors.black,
