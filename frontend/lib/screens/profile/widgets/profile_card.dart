@@ -1,10 +1,42 @@
 import 'package:flutter/material.dart';
+import 'package:swifttrip_frontend/repositories/auth_repository.dart';
 
-class ProfileCard extends StatelessWidget {
+class ProfileCard extends StatefulWidget {
   const ProfileCard({super.key});
 
   @override
+  State<ProfileCard> createState() => _ProfileCardState();
+}
+
+class _ProfileCardState extends State<ProfileCard> {
+  final AuthRepository _authRepo = AuthRepository();
+  bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    if (_authRepo.currentUser == null) {
+      _fetchUser();
+    }
+  }
+
+  Future<void> _fetchUser() async {
+    setState(() => _isLoading = true);
+    try {
+      await _authRepo.getUserProfile();
+    } catch (e) {
+      debugPrint('Error fetching user profile: $e');
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final user = _authRepo.currentUser;
+
     return Container(
       width: double.infinity,
       height: 114,
@@ -44,31 +76,34 @@ class ProfileCard extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 16),
-          const Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                'Timoty Arnold',
-                style: TextStyle(
-                  fontFamily: 'Poppins',
-                  fontWeight: FontWeight.w600,
-                  fontSize: 16,
-                  color: Colors.black,
+          if (_isLoading)
+            const Center(child: CircularProgressIndicator())
+          else
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  user?.fullName ?? 'Unknown User',
+                  style: const TextStyle(
+                    fontFamily: 'Poppins',
+                    fontWeight: FontWeight.w600,
+                    fontSize: 16,
+                    color: Colors.black,
+                  ),
                 ),
-              ),
-              SizedBox(height: 2),
-              Text(
-                'timotyarnold@gmail.com',
-                style: TextStyle(
-                  fontFamily: 'Poppins',
-                  fontWeight: FontWeight.w400,
-                  fontSize: 10,
-                  color: Colors.black,
+                const SizedBox(height: 2),
+                Text(
+                  user?.email ?? 'No email available',
+                  style: const TextStyle(
+                    fontFamily: 'Poppins',
+                    fontWeight: FontWeight.w400,
+                    fontSize: 10,
+                    color: Colors.black,
+                  ),
                 ),
-              ),
-            ],
-          ),
+              ],
+            ),
         ],
       ),
     );

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:swifttrip_frontend/repositories/auth_repository.dart';
 
 class UserInfoPage extends StatefulWidget {
   const UserInfoPage({super.key});
@@ -42,7 +43,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
     super.dispose();
   }
 
-  void _handleConfirm() {
+  Future<void> _handleConfirm() async {
     final firstName = _firstNameController.text.trim();
     final lastName = _lastNameController.text.trim();
 
@@ -60,12 +61,19 @@ class _UserInfoPageState extends State<UserInfoPage> {
           '$_selectedYear-${_months.indexOf(_selectedMonth) + 1}-$_selectedDay',
     };
 
-    // TODO: Send payload to backend
-    debugPrint('Submitting: $payload');
+    try {
+      final authRepo = AuthRepository();
+      await authRepo.updateUserProfile(payload);
 
-    // As UserInfo overrode Signup on top of Login, popping lands back on Login
-    if (mounted) {
-      Navigator.pop(context);
+      if (mounted) {
+        Navigator.pop(context);
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.toString().replaceAll('Exception: ', ''))),
+        );
+      }
     }
   }
 

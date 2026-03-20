@@ -1,8 +1,14 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:swifttrip_frontend/core/constants.dart';
+import 'package:swifttrip_frontend/models/user.dart';
 
 class AuthRepository {
+  static final AuthRepository _instance = AuthRepository._internal();
+  factory AuthRepository() => _instance;
+
+  AuthRepository._internal();
+
   final Dio _dio = Dio(
     BaseOptions(
       baseUrl: Constants.baseUrl,
@@ -16,6 +22,9 @@ class AuthRepository {
   );
 
   final FlutterSecureStorage _storage = const FlutterSecureStorage();
+  User? _currentUser;
+
+  User? get currentUser => _currentUser;
 
   Future<void> _saveTokens(String access, String refresh) async {
     await _storage.write(key: 'access_token', value: access);
@@ -25,10 +34,48 @@ class AuthRepository {
   Future<void> _clearTokens() async {
     await _storage.delete(key: 'access_token');
     await _storage.delete(key: 'refresh_token');
+    _currentUser = null;
   }
 
   Future<String?> getToken() async {
     return await _storage.read(key: 'access_token');
+  }
+
+  Future<User> getUserProfile() async {
+    try {
+      final token = await getToken();
+      final response = await _dio.get(
+        'user/',
+        options: Options(headers: {'Authorization': 'Bearer $token'}),
+      );
+
+      if (response.statusCode == 200) {
+        _currentUser = User.fromJson(response.data);
+        return _currentUser!;
+      }
+      throw Exception('Failed to load user profile');
+    } on DioException catch (e) {
+      throw Exception(e.response?.data?['detail'] ?? 'Failed to fetch user profile.');
+    }
+  }
+
+  Future<bool> updateUserProfile(Map<String, dynamic> data) async {
+    try {
+      final token = await getToken();
+      final response = await _dio.patch(
+        'user/',
+        data: data,
+        options: Options(headers: {'Authorization': 'Bearer $token'}),
+      );
+
+      if (response.statusCode == 200) {
+        _currentUser = User.fromJson(response.data);
+        return true;
+      }
+      return false;
+    } on DioException catch (e) {
+      throw Exception(e.response?.data?['detail'] ?? 'Failed to update profile.');
+    }
   }
 
   Future<bool> login(String email, String password) async {
@@ -39,10 +86,11 @@ class AuthRepository {
       );
 
       if (response.statusCode == 200) {
-        final access = response.data['access_token'];
-        final refresh = response.data['refresh_token'];
+        final access = response.data['access'];
+        final refresh = response.data['refresh'];
         if (access != null && refresh != null) {
           await _saveTokens(access, refresh);
+          await getUserProfile(); // Fetch profile after login
         }
         return true;
       }
@@ -67,20 +115,23 @@ class AuthRepository {
       final response = await _dio.post(
         'registration/',
         data: {
-          'username': email, // dj-rest-auth requires a username by default
+          'username': email,
           'email': email,
-          'password1': password, // dj-rest-auth uses password1
-          'password2': confirmation, // dj-rest-auth uses password2
+          'password1': password,
+          'password2': confirmation,
         },
       );
 
       if (response.statusCode == 201 || response.statusCode == 200) {
-        // Automatically logged in or redirect to login depending on settings
+        final access = response.data['access'];
+        final refresh = response.data['refresh'];
+        if (access != null && refresh != null) {
+          await _saveTokens(access, refresh);
+        }
         return true;
       }
     } on DioException catch (e) {
       print('Signup error: ${e.response?.data ?? e.message}');
-      // Return the first error value dynamically
       if (e.response?.data != null && e.response?.data is Map) {
         String errorMsg = e.response!.data.values.first[0].toString();
         throw Exception(errorMsg);
@@ -145,10 +196,7 @@ class AuthRepository {
       // This will call http://127.0.0.1:8000/api/auth/send-otp/
       final response = await _dio.post(
         'send-otp/',
-        data: {
-          'email': email,
-          'is_password_reset': isPasswordReset,
-        },
+        data: {'email': email, 'is_password_reset': isPasswordReset},
       );
 
       if (response.statusCode != 200) {
