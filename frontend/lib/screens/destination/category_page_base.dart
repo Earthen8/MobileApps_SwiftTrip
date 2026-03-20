@@ -135,7 +135,7 @@ class _CategoryTopBar extends StatelessWidget {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// CATEGORY CARD  — full-width image, name bottom-left, "book now" bottom-right
+// CATEGORY CARD
 // ─────────────────────────────────────────────────────────────────────────────
 
 class _CategoryCard extends StatelessWidget {
