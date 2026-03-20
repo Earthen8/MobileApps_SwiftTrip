@@ -324,14 +324,25 @@ class _RideCard extends StatelessWidget {
               Positioned(
                 top: 117,
                 right: 46,
-                child: Text(
-                  '${option.passengerCapacity}',
-                  style: const TextStyle(
-                    fontFamily: 'Cairo',
-                    fontWeight: FontWeight.w400,
-                    fontSize: 12,
-                    color: Color(0xFF9E9E9E),
-                  ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(
+                      Icons.person,
+                      size: 14,
+                      color: Color(0xFF9E9E9E),
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      '${option.passengerCapacity}',
+                      style: const TextStyle(
+                        fontFamily: 'Cairo',
+                        fontWeight: FontWeight.w400,
+                        fontSize: 12,
+                        color: Color(0xFF9E9E9E),
+                      ),
+                    ),
+                  ],
                 ),
               ),
 
