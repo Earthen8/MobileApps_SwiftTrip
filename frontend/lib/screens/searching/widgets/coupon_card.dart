@@ -1,10 +1,58 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../models/coupon_model.dart';
 
-class CouponCard extends StatelessWidget {
+class CouponCard extends StatefulWidget {
   final CouponModel coupon;
 
   const CouponCard({super.key, required this.coupon});
+
+  @override
+  State<CouponCard> createState() => _CouponCardState();
+}
+
+class _CouponCardState extends State<CouponCard> {
+  Future<void> _handleCopy() async {
+    await Clipboard.setData(ClipboardData(text: widget.coupon.code));
+    // TODO: Optionally POST coupon usage log to backend
+
+    if (!mounted) return;
+    final overlay = Overlay.of(context);
+    final double topPadding = MediaQuery.of(context).padding.top;
+    late OverlayEntry entry;
+    entry = OverlayEntry(
+      builder: (_) => Positioned(
+        top: topPadding + 60,
+        left: 0,
+        right: 0,
+        child: Center(
+          child: Material(
+            color: Colors.transparent,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+              decoration: BoxDecoration(
+                color: const Color(0xFF323232),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Text(
+                '"${widget.coupon.code}" copied!',
+                style: const TextStyle(
+                  fontFamily: 'Poppins',
+                  fontSize: 12,
+                  color: Colors.white,
+                  fontWeight: FontWeight.w400,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    overlay.insert(entry);
+    await Future.delayed(const Duration(milliseconds: 1500));
+    entry.remove();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +87,7 @@ class CouponCard extends StatelessWidget {
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  coupon.title,
+                  widget.coupon.title,
                   style: const TextStyle(
                     fontFamily: 'Poppins',
                     fontWeight: FontWeight.bold,
@@ -54,7 +102,7 @@ class CouponCard extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.only(left: 40),
             child: Text(
-              coupon.description,
+              widget.coupon.description,
               style: const TextStyle(
                 fontFamily: 'Poppins',
                 fontSize: 10,
@@ -80,7 +128,7 @@ class CouponCard extends StatelessWidget {
                       const Icon(Icons.copy, size: 12, color: Colors.black54),
                       const SizedBox(width: 4),
                       Text(
-                        coupon.code,
+                        widget.coupon.code,
                         style: const TextStyle(
                           fontSize: 10,
                           color: Colors.black54,
@@ -91,21 +139,24 @@ class CouponCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 8),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 6,
-                ),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF5A9AE5),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: const Text(
-                  'COPY', // TODO: Implement Copy
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
+              GestureDetector(
+                onTap: _handleCopy,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF5A9AE5),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: const Text(
+                    'COPY',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ),
@@ -116,4 +167,3 @@ class CouponCard extends StatelessWidget {
     );
   }
 }
-
