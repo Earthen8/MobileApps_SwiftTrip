@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import '../destination_detail_page.dart';
+import 'detail_page.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // MODEL
@@ -28,21 +28,23 @@ class SlideUpRoute extends PageRouteBuilder {
   final Widget page;
 
   SlideUpRoute({required this.page})
-      : super(
-          pageBuilder: (_, __, ___) => page,
-          transitionsBuilder: (_, animation, __, child) {
-            const begin = Offset(0.0, 1.0);
-            const end = Offset.zero;
-            const curve = Curves.easeOutCubic;
-            final tween =
-                Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-            return SlideTransition(
-              position: animation.drive(tween),
-              child: child,
-            );
-          },
-          transitionDuration: const Duration(milliseconds: 400),
-        );
+    : super(
+        pageBuilder: (_, __, ___) => page,
+        transitionsBuilder: (_, animation, __, child) {
+          const begin = Offset(0.0, 1.0);
+          const end = Offset.zero;
+          const curve = Curves.easeOutCubic;
+          final tween = Tween(
+            begin: begin,
+            end: end,
+          ).chain(CurveTween(curve: curve));
+          return SlideTransition(
+            position: animation.drive(tween),
+            child: child,
+          );
+        },
+        transitionDuration: const Duration(milliseconds: 400),
+      );
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -85,9 +87,8 @@ class CategoryPageBase extends StatelessWidget {
                     padding: const EdgeInsets.fromLTRB(20, 16, 20, 100),
                     itemCount: destinations.length,
                     separatorBuilder: (_, __) => const SizedBox(height: 16),
-                    itemBuilder: (_, i) => _CategoryCard(
-                      destination: destinations[i],
-                    ),
+                    itemBuilder: (_, i) =>
+                        _CategoryCard(destination: destinations[i]),
                   ),
           ),
         ],
@@ -183,12 +184,7 @@ class _CategoryCard extends StatelessWidget {
                     fontWeight: FontWeight.w600,
                     fontSize: 15,
                     color: Colors.white,
-                    shadows: [
-                      Shadow(
-                        blurRadius: 4,
-                        color: Colors.black45,
-                      ),
-                    ],
+                    shadows: [Shadow(blurRadius: 4, color: Colors.black45)],
                   ),
                 ),
               ),
@@ -202,15 +198,16 @@ class _CategoryCard extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => DestinationDetailPage(
-                          destination: destination,
-                        ),
+                        builder: (_) =>
+                            DestinationDetailPage(destination: destination),
                       ),
                     );
                   },
                   child: Container(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 7),
+                      horizontal: 16,
+                      vertical: 7,
+                    ),
                     decoration: BoxDecoration(
                       color: const Color(0xFF2B99E3),
                       borderRadius: BorderRadius.circular(20),
@@ -248,8 +245,11 @@ class _CardImage extends StatelessWidget {
   Widget build(BuildContext context) {
     final fallback = Container(
       color: Colors.blueGrey.shade200,
-      child: Icon(Icons.image_outlined,
-          color: Colors.blueGrey.shade400, size: 40),
+      child: Icon(
+        Icons.image_outlined,
+        color: Colors.blueGrey.shade400,
+        size: 40,
+      ),
     );
 
     if (destination.imageUrl.isNotEmpty) {

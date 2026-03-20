@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'widgets/category_page_base.dart';
+import 'category_page_base.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // DESTINATION DETAIL PAGE
@@ -108,8 +108,11 @@ class _DestinationDetailPageState extends State<DestinationDetailPage> {
                               ),
                             ),
                             const SizedBox(width: 2),
-                            const Icon(Icons.star,
-                                size: 16, color: Colors.black),
+                            const Icon(
+                              Icons.star,
+                              size: 16,
+                              color: Colors.black,
+                            ),
                           ],
                         ),
 
@@ -133,17 +136,24 @@ class _DestinationDetailPageState extends State<DestinationDetailPage> {
                         Center(
                           child: Container(
                             padding: const EdgeInsets.symmetric(
-                                horizontal: 16, vertical: 8),
+                              horizontal: 16,
+                              vertical: 8,
+                            ),
                             decoration: BoxDecoration(
-                              border:
-                                  Border.all(color: Colors.black26, width: 1),
+                              border: Border.all(
+                                color: Colors.black26,
+                                width: 1,
+                              ),
                               borderRadius: BorderRadius.circular(20),
                             ),
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: const [
-                                Icon(Icons.auto_awesome,
-                                    size: 16, color: Colors.black54),
+                                Icon(
+                                  Icons.auto_awesome,
+                                  size: 16,
+                                  color: Colors.black54,
+                                ),
                                 SizedBox(width: 6),
                                 Text(
                                   'Guest Favorite',
@@ -155,8 +165,11 @@ class _DestinationDetailPageState extends State<DestinationDetailPage> {
                                   ),
                                 ),
                                 SizedBox(width: 6),
-                                Icon(Icons.auto_awesome,
-                                    size: 16, color: Colors.black54),
+                                Icon(
+                                  Icons.auto_awesome,
+                                  size: 16,
+                                  color: Colors.black54,
+                                ),
                               ],
                             ),
                           ),
@@ -165,9 +178,7 @@ class _DestinationDetailPageState extends State<DestinationDetailPage> {
                         const SizedBox(height: 16),
 
                         // ── Features list ────────────────────────────────
-                        ...widget.features.map(
-                          (f) => _FeatureRow(text: f),
-                        ),
+                        ...widget.features.map((f) => _FeatureRow(text: f)),
 
                         const SizedBox(height: 100),
                       ],
@@ -222,7 +233,11 @@ class _DetailTopBar extends StatelessWidget {
           const Spacer(),
           GestureDetector(
             onTap: () => Navigator.pop(context),
-            child: const Icon(Icons.chevron_left, size: 30, color: Colors.black),
+            child: const Icon(
+              Icons.chevron_left,
+              size: 30,
+              color: Colors.black,
+            ),
           ),
         ],
       ),
@@ -250,8 +265,11 @@ class _HeroImage extends StatelessWidget {
     final fallback = Container(
       height: 260,
       color: Colors.blueGrey.shade200,
-      child: Icon(Icons.image_outlined,
-          color: Colors.blueGrey.shade400, size: 48),
+      child: Icon(
+        Icons.image_outlined,
+        color: Colors.blueGrey.shade400,
+        size: 48,
+      ),
     );
 
     return Stack(
@@ -267,12 +285,12 @@ class _HeroImage extends StatelessWidget {
                   errorBuilder: (_, __, ___) => fallback,
                 )
               : destination.imageAsset != null
-                  ? Image.asset(
-                      destination.imageAsset!,
-                      fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => fallback,
-                    )
-                  : fallback,
+              ? Image.asset(
+                  destination.imageAsset!,
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, __, ___) => fallback,
+                )
+              : fallback,
         ),
 
         // Heart icon — top right
@@ -341,10 +359,7 @@ class _BottomBar extends StatelessWidget {
   final String formattedPrice;
   final VoidCallback onAddToCart;
 
-  const _BottomBar({
-    required this.formattedPrice,
-    required this.onAddToCart,
-  });
+  const _BottomBar({required this.formattedPrice, required this.onAddToCart});
 
   @override
   Widget build(BuildContext context) {
@@ -403,8 +418,7 @@ class _BottomBar extends StatelessWidget {
           GestureDetector(
             onTap: onAddToCart,
             child: Container(
-              padding: const EdgeInsets.symmetric(
-                  horizontal: 22, vertical: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 12),
               decoration: BoxDecoration(
                 color: const Color(0xFF2B99E3),
                 borderRadius: BorderRadius.circular(20),
