@@ -8,25 +8,13 @@ import '../cart/cart.dart';
 import '../checkout/checkout.dart';
 import '../main/main_screen.dart';
 
-// ─────────────────────────────────────────────────────────────────────────────
-// MODEL
-// ─────────────────────────────────────────────────────────────────────────────
-
-class _RideOption {
-  final String name;
-  final String duration;
-  final int passengerCapacity;
-  final int priceRp;
-  final IconData icon;
-
-  const _RideOption({
-    required this.name,
-    required this.duration,
-    required this.passengerCapacity,
-    required this.priceRp,
-    required this.icon,
-  });
-}
+import 'models/detail_row.dart';
+import 'models/ride_option.dart';
+import 'utils/rp_format.dart';
+import 'widgets/map_placeholder.dart';
+import 'widgets/purchase_details_card.dart';
+import 'widgets/ride_card.dart';
+import 'widgets/total_confirm_bar.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // PAGE
@@ -44,22 +32,22 @@ class _LandVehicleSearchState extends State<LandVehicleSearch> {
   Promotion? _appliedPromo;
 
   // TODO: Replace with data fetched from backend (e.g. GET /land-vehicles/options)
-  final List<_RideOption> _rideOptions = const [
-    _RideOption(
+  final List<RideOption> _rideOptions = const [
+    RideOption(
       name: 'boom boom boogie',
       duration: '2 hrs',
       passengerCapacity: 4,
       priceRp: 50000,
       icon: Icons.directions_car_outlined,
     ),
-    _RideOption(
+    RideOption(
       name: 'boom boom bus',
       duration: '3 hrs',
       passengerCapacity: 0,
       priceRp: 50000,
       icon: Icons.directions_bus_outlined,
     ),
-    _RideOption(
+    RideOption(
       name: 'boom boom train',
       duration: '4 hrs',
       passengerCapacity: 0,
@@ -69,11 +57,11 @@ class _LandVehicleSearchState extends State<LandVehicleSearch> {
   ];
 
   // TODO: Replace with dynamic purchase details from backend
-  final List<_DetailRow> _purchaseDetails = const [
-    _DetailRow(label: 'Tiket Kereta', amount: 'Rp 14.000.000'),
-    _DetailRow(label: 'Voucher', amount: '-Rp 300.000'),
-    _DetailRow(label: 'Diskon liburan', amount: '-Rp 1.800.000'),
-    _DetailRow(label: 'PPN 10%', amount: 'Rp 110.700'),
+  final List<DetailRow> _purchaseDetails = const [
+    DetailRow(label: 'Tiket Kereta', amount: 'Rp 14.000.000'),
+    DetailRow(label: 'Voucher', amount: '-Rp 300.000'),
+    DetailRow(label: 'Diskon liburan', amount: '-Rp 1.800.000'),
+    DetailRow(label: 'PPN 10%', amount: 'Rp 110.700'),
   ];
 
   int get _total {
@@ -84,15 +72,8 @@ class _LandVehicleSearchState extends State<LandVehicleSearch> {
     return 300000;
   }
 
-  String _formatRp(int amount) {
-    final str = amount.toString();
-    final buffer = StringBuffer();
-    for (int i = 0; i < str.length; i++) {
-      if (i > 0 && (str.length - i) % 3 == 0) buffer.write('.');
-      buffer.write(str[i]);
-    }
-    return 'Rp. ${buffer.toString()}';
-  }
+  // Kept for now to avoid touching behavior in this file.
+  // (The widget layer uses `formatRp()` extracted into `utils/`.)
 
   @override
   Widget build(BuildContext context) {
@@ -121,7 +102,7 @@ class _LandVehicleSearchState extends State<LandVehicleSearch> {
                 children: [
                   const SizedBox(height: 10),
                   // ── Map Placeholder ───────────────────────────────────
-                  _MapPlaceholder(),
+                  const MapPlaceholder(),
                   const SizedBox(height: 30),
 
                   // ── Choose Ride Section ───────────────────────────────
@@ -143,7 +124,7 @@ class _LandVehicleSearchState extends State<LandVehicleSearch> {
                       clipBehavior: Clip.none,
                       itemCount: _rideOptions.length,
                       separatorBuilder: (_, __) => const SizedBox(width: 12),
-                      itemBuilder: (_, i) => _RideCard(
+                      itemBuilder: (_, i) => RideCard(
                         option: _rideOptions[i],
                         isSelected: _selectedRideIndex == i,
                         onTap: () => setState(() {
@@ -151,7 +132,7 @@ class _LandVehicleSearchState extends State<LandVehicleSearch> {
                               ? null
                               : i;
                         }),
-                        formatRp: _formatRp,
+                        formatRp: formatRp,
                       ),
                     ),
                   ),
@@ -159,7 +140,7 @@ class _LandVehicleSearchState extends State<LandVehicleSearch> {
 
                   // ── Purchase Details ──────────────────────────────────
                   // TODO: Replace total with computed value from backend
-                  _PurchaseDetailsCard(
+                  PurchaseDetailsCard(
                     details: _purchaseDetails,
                     total: 'Rp 12.000.000',
                   ),
@@ -200,9 +181,9 @@ class _LandVehicleSearchState extends State<LandVehicleSearch> {
             const SizedBox(height: 10),
 
             // ── Total + Confirm ─────────────────────────────────────────
-            _TotalConfirmBar(
+            TotalConfirmBar(
               totalLabel: 'Total:',
-              totalAmount: _formatRp(_total),
+              totalAmount: formatRp(_total),
               onConfirm: () {
                 // TODO: POST selected ride + applied promo to backend
                 // TODO: Navigate to checkout or booking confirmation
@@ -224,7 +205,7 @@ class _LandVehicleSearchState extends State<LandVehicleSearch> {
 // ─────────────────────────────────────────────────────────────────────────────
 
 class _RideCard extends StatelessWidget {
-  final _RideOption option;
+  final RideOption option;
   final bool isSelected;
   final VoidCallback onTap;
   final String Function(int) formatRp;
