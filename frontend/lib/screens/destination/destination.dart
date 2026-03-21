@@ -86,17 +86,45 @@ class DestinationPage extends StatelessWidget {
 final List<DestinationModel> _mockDestinations = [
   DestinationModel(
     id: '1',
-    name: 'rumah wilson williem',
-    imageUrl: 'https://images.unsplash.com/photo-1552733407-5d5c46c3bb3b?w=500',
-    rating: 5,
+    name: 'Bali - Pantai Kuta',
+    imageUrl:
+        'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=500',
+    rating: 4.8,
     hasDiscount: true,
     isFavorite: false,
   ),
   DestinationModel(
     id: '2',
-    name: 'rumah wilson williem',
-    imageUrl: 'https://images.unsplash.com/photo-1552733407-5d5c46c3bb3b?w=500',
-    rating: 5,
+    name: 'Yogyakarta - Candi Borobudur',
+    imageUrl:
+        'https://images.unsplash.com/photo-1588666309990-d68f08e3d4a6?w=500',
+    rating: 4.9,
+    hasDiscount: false,
+    isFavorite: false,
+  ),
+  DestinationModel(
+    id: '3',
+    name: 'Labuan Bajo - Pulau Komodo',
+    imageUrl: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=500',
+    rating: 4.9,
+    hasDiscount: true,
+    isFavorite: false,
+  ),
+  DestinationModel(
+    id: '4',
+    name: 'Bandung - Kawah Putih',
+    imageUrl:
+        'https://images.unsplash.com/photo-1596422846543-75c6fc197f07?w=500',
+    rating: 4.7,
+    hasDiscount: false,
+    isFavorite: false,
+  ),
+  DestinationModel(
+    id: '5',
+    name: 'Lombok - Pantai Tanjung Aan',
+    imageUrl:
+        'https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=500',
+    rating: 4.8,
     hasDiscount: true,
     isFavorite: false,
   ),

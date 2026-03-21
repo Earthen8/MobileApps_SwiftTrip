@@ -26,7 +26,7 @@ class DestinationCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: 200,
+      width: 180,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -36,11 +36,11 @@ class DestinationCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(8),
                 child: Image.network(
                   destination.imageUrl,
-                  height: 120,
+                  height: 110,
                   width: double.infinity,
                   fit: BoxFit.cover,
                   errorBuilder: (context, error, stackTrace) => Container(
-                    height: 120,
+                    height: 110,
                     color: Colors.grey.shade300,
                     child: const Icon(Icons.image, color: Colors.grey),
                   ),

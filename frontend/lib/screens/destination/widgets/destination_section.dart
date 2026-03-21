@@ -29,20 +29,20 @@ class DestinationSection extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         SizedBox(
-          height: 160,
+          height: 150,
           child: ListView.builder(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
+            padding: const EdgeInsets.symmetric(horizontal: 20),
             scrollDirection: Axis.horizontal,
             itemCount: items.length,
             itemBuilder: (context, index) {
               return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 5),
+                padding: const EdgeInsets.only(right: 12),
                 child: DestinationCard(destination: items[index]),
               );
             },
           ),
         ),
-        const SizedBox(height: 10),
+        const SizedBox(height: 16),
       ],
     );
   }
