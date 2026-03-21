@@ -20,55 +20,146 @@ class _DestinationSearchPageState extends State<DestinationSearchPage> {
   final List<DestinationModel> _recentSearches = [
     DestinationModel(
       id: '1',
-      name: 'rumah wilson williem',
-      imageUrl: 'https://placehold.co/200x120',
-      rating: 5,
+      name: 'Bali - Pantai Kuta',
+      imageUrl:
+          'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=500',
+      rating: 4.8,
       hasDiscount: true,
-      isFavorite: true,
+      isFavorite: false,
     ),
     DestinationModel(
       id: '2',
-      name: 'rumah wilson williem',
-      imageUrl: 'https://placehold.co/200x120',
-      rating: 5,
+      name: 'Yogyakarta - Candi Borobudur',
+      imageUrl:
+          'https://images.unsplash.com/photo-1588666309990-d68f08e3d4a6?w=500',
+      rating: 4.9,
+      hasDiscount: false,
+      isFavorite: false,
+    ),
+    DestinationModel(
+      id: '3',
+      name: 'Labuan Bajo - Pulau Komodo',
+      imageUrl:
+          'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=500',
+      rating: 4.9,
       hasDiscount: true,
-      isFavorite: true,
+      isFavorite: false,
+    ),
+    DestinationModel(
+      id: '4',
+      name: 'Bandung - Kawah Putih',
+      imageUrl:
+          'https://images.unsplash.com/photo-1596422846543-75c6fc197f07?w=500',
+      rating: 4.7,
+      hasDiscount: false,
+      isFavorite: false,
+    ),
+    DestinationModel(
+      id: '5',
+      name: 'Lombok - Pantai Tanjung Aan',
+      imageUrl:
+          'https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=500',
+      rating: 4.8,
+      hasDiscount: true,
+      isFavorite: false,
     ),
   ];
 
   // TODO: Fetch top rated from backend
   final List<DestinationModel> _topRated = [
     DestinationModel(
+      id: '1',
+      name: 'Bali - Pantai Kuta',
+      imageUrl:
+          'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=500',
+      rating: 4.8,
+      hasDiscount: true,
+      isFavorite: false,
+    ),
+    DestinationModel(
+      id: '2',
+      name: 'Yogyakarta - Candi Borobudur',
+      imageUrl:
+          'https://images.unsplash.com/photo-1588666309990-d68f08e3d4a6?w=500',
+      rating: 4.9,
+      hasDiscount: false,
+      isFavorite: false,
+    ),
+    DestinationModel(
       id: '3',
-      name: 'rumah wilson williem',
-      imageUrl: 'https://placehold.co/200x120',
-      rating: 5,
-      isFavorite: true,
+      name: 'Labuan Bajo - Pulau Komodo',
+      imageUrl:
+          'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=500',
+      rating: 4.9,
+      hasDiscount: true,
+      isFavorite: false,
     ),
     DestinationModel(
       id: '4',
-      name: 'rumah wilson williem',
-      imageUrl: 'https://placehold.co/200x120',
-      rating: 5,
-      isFavorite: true,
+      name: 'Bandung - Kawah Putih',
+      imageUrl:
+          'https://images.unsplash.com/photo-1596422846543-75c6fc197f07?w=500',
+      rating: 4.7,
+      hasDiscount: false,
+      isFavorite: false,
+    ),
+    DestinationModel(
+      id: '5',
+      name: 'Lombok - Pantai Tanjung Aan',
+      imageUrl:
+          'https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=500',
+      rating: 4.8,
+      hasDiscount: true,
+      isFavorite: false,
     ),
   ];
 
   // TODO: Fetch hot destinations from backend
   final List<DestinationModel> _hotDestinations = [
     DestinationModel(
-      id: '5',
-      name: 'rumah wilson williem',
-      imageUrl: 'https://placehold.co/200x120',
-      rating: 5,
-      isFavorite: true,
+      id: '1',
+      name: 'Bali - Pantai Kuta',
+      imageUrl:
+          'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=500',
+      rating: 4.8,
+      hasDiscount: true,
+      isFavorite: false,
     ),
     DestinationModel(
-      id: '6',
-      name: 'rumah wilson williem',
-      imageUrl: 'https://placehold.co/200x120',
-      rating: 5,
-      isFavorite: true,
+      id: '2',
+      name: 'Yogyakarta - Candi Borobudur',
+      imageUrl:
+          'https://images.unsplash.com/photo-1588666309990-d68f08e3d4a6?w=500',
+      rating: 4.9,
+      hasDiscount: false,
+      isFavorite: false,
+    ),
+    DestinationModel(
+      id: '3',
+      name: 'Labuan Bajo - Pulau Komodo',
+      imageUrl:
+          'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=500',
+      rating: 4.9,
+      hasDiscount: true,
+      isFavorite: false,
+    ),
+    DestinationModel(
+      id: '4',
+      name: 'Bandung - Kawah Putih',
+      imageUrl:
+          'https://images.unsplash.com/photo-1596422846543-75c6fc197f07?w=500',
+      rating: 4.7,
+      hasDiscount: false,
+      isFavorite: false,
+    ),
+    DestinationModel(
+      id: '5',
+      name: 'Lombok - Pantai Tanjung Aan',
+      imageUrl:
+          'https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=500',
+      rating: 4.8,
+      hasDiscount: true,
+      isFavorite: false,
     ),
   ];
 
@@ -228,7 +319,7 @@ class _DestinationSearchPageState extends State<DestinationSearchPage> {
 
                     const SizedBox(height: 20),
                     const Divider(
-                      color: Colors.black12,
+                      color: Color(0xFF404040),
                       thickness: 1,
                       indent: 20,
                       endIndent: 20,
