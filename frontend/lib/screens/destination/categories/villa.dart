@@ -25,7 +25,7 @@ class _VillaPageState extends State<VillaPage> {
     setState(() {
       _items = [
         const CategoryItem(
-          id: '1',
+          id: 'v1',
           name: 'Alila Villas Uluwatu',
           imageUrl:
               'https://images.unsplash.com/photo-1543489816-c87b0f7f287a?w=500',
@@ -35,41 +35,41 @@ class _VillaPageState extends State<VillaPage> {
           isFavorite: true,
         ),
         const CategoryItem(
-          id: '2',
-          name: 'Mandapa, Ritz-Carlton',
+          id: 'v2',
+          name: 'Mandapa Villas Ubud',
           imageUrl:
               'https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=500',
           rating: 4.8,
-          description: 'Luxury jungle retreat by the river.',
+          description: 'Private luxury villas surrounded by jungle and river.',
         ),
         const CategoryItem(
-          id: '3',
-          name: 'Nihi Sumba',
+          id: 'v3',
+          name: 'Villa Melissa Canggu',
           imageUrl:
               'https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?w=500',
-          rating: 5.0,
-          description: 'Top-rated resort with unique villas and surfing.',
+          rating: 4.9,
+          description: 'Beachfront luxury villa with private pool.',
           hasDiscount: true,
         ),
         const CategoryItem(
-          id: '4',
-          name: 'The Kayon Jungle Resort',
+          id: 'v4',
+          name: 'The Kayon Private Villas',
           imageUrl:
               'https://images.unsplash.com/photo-1590073242678-70ee3fc28e8e?w=500',
-          rating: 4.7,
-          description: 'Peaceful jungle retreat for relaxation.',
+          rating: 4.8,
+          description: 'Exclusive jungle villas with infinity pools.',
           isFavorite: true,
         ),
         const CategoryItem(
-          id: '5',
-          name: 'Bulgari Resort Bali',
+          id: 'v5',
+          name: 'Bvlgari Villas Bali',
           imageUrl:
               'https://images.unsplash.com/photo-1540518614846-7eded433c457?w=500',
           rating: 4.9,
-          description: 'Luxury resort blending Balinese and Italian design.',
+          description: 'Ultra-luxury cliffside villas with private pools.',
         ),
         const CategoryItem(
-          id: '6',
+          id: 'v6',
           name: 'Viceroy Bali',
           imageUrl:
               'https://images.unsplash.com/photo-1584132967334-10e028bd69f7?w=500',
@@ -78,24 +78,24 @@ class _VillaPageState extends State<VillaPage> {
           hasDiscount: true,
         ),
         const CategoryItem(
-          id: '7',
-          name: 'Amankila',
+          id: 'v7',
+          name: 'Amankila Villas',
           imageUrl:
               'https://images.unsplash.com/photo-1576013551627-0cc20b96c2a7?w=500',
           rating: 4.9,
-          description: 'Cliffside resort with iconic infinity pool.',
+          description: 'Luxury private villas with ocean views.',
         ),
         const CategoryItem(
-          id: '8',
-          name: 'Puri Sebali Resort',
+          id: 'v8',
+          name: 'Sebali Private Villas Ubud',
           imageUrl:
               'https://images.unsplash.com/photo-1551882547-ff43c636a0fb?w=500',
-          rating: 4.6,
-          description: 'Romantic villas in rice field surroundings.',
+          rating: 4.7,
+          description: 'Secluded villas surrounded by rice fields.',
           isFavorite: true,
         ),
         const CategoryItem(
-          id: '9',
+          id: 'v9',
           name: 'The Royal Santrian',
           imageUrl:
               'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=500',
@@ -103,12 +103,12 @@ class _VillaPageState extends State<VillaPage> {
           description: 'Beach villas with private pools and spa.',
         ),
         const CategoryItem(
-          id: '10',
-          name: 'Kamandalu Ubud',
+          id: 'v10',
+          name: 'Kamandalu Private Villas',
           imageUrl:
               'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=500',
           rating: 4.8,
-          description: 'Village-style resort with modern comfort.',
+          description: 'Private villas with traditional Balinese design.',
           hasDiscount: true,
         ),
       ];
