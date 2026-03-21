@@ -16,6 +16,7 @@ import '../destination/destination.dart';
 import '../customer_service/onboarding.dart';
 import 'next_trip.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'review.dart';
 
 // ─────────────────────────────────────────────
 // CONSTANTS / MOCK DATA
@@ -239,8 +240,10 @@ class _HomePageState extends State<HomePage> {
               // ── CTA link ──────────────────────────────────────
               GestureDetector(
                 onTap: () {
-                  Navigator.pop(context);
-                  // TODO: Navigate to review/feedback page
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => ReviewPage()),
+                  );
                   // TODO: Pass booking ID so backend can link review to booking
                 },
                 child: const Text(
