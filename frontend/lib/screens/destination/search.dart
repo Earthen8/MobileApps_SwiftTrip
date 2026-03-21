@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'widgets/destination_card.dart';
 import 'widgets/destination_section.dart';
+import 'search/cozy.dart';
+import 'search/airy.dart';
+import 'search/moody.dart';
+import 'search/sleek.dart';
 
 class DestinationSearchPage extends StatefulWidget {
   const DestinationSearchPage({super.key});
@@ -11,7 +15,6 @@ class DestinationSearchPage extends StatefulWidget {
 
 class _DestinationSearchPageState extends State<DestinationSearchPage> {
   final TextEditingController _searchController = TextEditingController();
-  int? _activeTagIndex;
 
   // TODO: Fetch trending tags from backend
   final List<String> _trendingTags = ['Cozy', 'Sleek', 'Airy', 'Moody'];
@@ -176,6 +179,7 @@ class _DestinationSearchPageState extends State<DestinationSearchPage> {
       body: SafeArea(
         child: Column(
           children: [
+            const SizedBox(height: 20),
             // ── Search bar row with back button ───────────────────────
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
@@ -285,12 +289,31 @@ class _DestinationSearchPageState extends State<DestinationSearchPage> {
                       child: Wrap(
                         spacing: 8,
                         children: List.generate(_trendingTags.length, (i) {
-                          final isActive = _activeTagIndex == i;
+                          final tagLabel = _trendingTags[i];
+
                           return GestureDetector(
                             onTap: () {
-                              setState(() => _activeTagIndex = i);
-                              _searchController.text = _trendingTags[i];
-                              // TODO: Trigger filtered search by tag from backend
+                              _searchController.text = tagLabel;
+
+                              Widget? targetPage;
+                              if (tagLabel == 'Cozy') {
+                                targetPage = const CozySearchPage();
+                              } else if (tagLabel == 'Airy') {
+                                targetPage = const AirySearchPage();
+                              } else if (tagLabel == 'Moody') {
+                                targetPage = const MoodySearchPage();
+                              } else if (tagLabel == 'Sleek') {
+                                targetPage = const SleekSearchPage();
+                              }
+
+                              if (targetPage != null) {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => targetPage!,
+                                  ),
+                                );
+                              }
                             },
                             child: Container(
                               padding: const EdgeInsets.symmetric(
@@ -298,13 +321,11 @@ class _DestinationSearchPageState extends State<DestinationSearchPage> {
                                 vertical: 8,
                               ),
                               decoration: BoxDecoration(
-                                color: isActive
-                                    ? const Color(0xFF2B99E3)
-                                    : const Color(0xFF2B99E3),
+                                color: const Color(0xFF2B99E3),
                                 borderRadius: BorderRadius.circular(20),
                               ),
                               child: Text(
-                                _trendingTags[i],
+                                tagLabel,
                                 style: const TextStyle(
                                   fontFamily: 'Poppins',
                                   fontSize: 13,
