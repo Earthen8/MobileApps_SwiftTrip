@@ -26,39 +26,41 @@ class DestinationPage extends StatelessWidget {
               );
             },
           ),
+          // ── Fixed: search bar + categories ───────────────────────────
+          const SizedBox(height: 30),
+          DestinationSearchBar(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const DestinationSearchPage(),
+                ),
+              );
+            },
+          ),
+          const SizedBox(height: 40),
+          const CategoryList(),
+          const SizedBox(height: 30),
+          Container(
+            margin: const EdgeInsets.symmetric(horizontal: 20),
+            height: 1,
+            decoration: const ShapeDecoration(
+              shape: RoundedRectangleBorder(
+                side: BorderSide(
+                  width: 1,
+                  color: Colors.black12,
+                  strokeAlign: BorderSide.strokeAlignCenter,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 10),
+          // ── Scrollable: destination sections ─────────────────────────
           Expanded(
             child: SingleChildScrollView(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SizedBox(height: 30),
-                  DestinationSearchBar(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const DestinationSearchPage(),
-                        ),
-                      );
-                    },
-                  ),
-                  const SizedBox(height: 40),
-                  const CategoryList(),
-                  const SizedBox(height: 30),
-                  Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 20),
-                    height: 1,
-                    decoration: const ShapeDecoration(
-                      shape: RoundedRectangleBorder(
-                        side: BorderSide(
-                          width: 1,
-                          color: Colors.black12,
-                          strokeAlign: BorderSide.strokeAlignCenter,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 30),
                   DestinationSection(
                     title: 'Discount',
                     items: _mockDestinations,
