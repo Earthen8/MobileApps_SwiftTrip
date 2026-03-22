@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:swifttrip_frontend/repositories/auth_repository.dart';
+import 'widgets/auth_primary_button.dart';
+import 'widgets/birth_date_picker.dart';
+import 'models/auth_models.dart';
+import 'services/auth_service.dart';
 
 class UserInfoPage extends StatefulWidget {
   const UserInfoPage({super.key});
@@ -11,6 +14,7 @@ class UserInfoPage extends StatefulWidget {
 class _UserInfoPageState extends State<UserInfoPage> {
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
+  final AuthService _authService = AuthService();
 
   int _selectedDay = 1;
   String _selectedMonth = 'January';
@@ -18,18 +22,8 @@ class _UserInfoPageState extends State<UserInfoPage> {
 
   final List<int> _days = List.generate(31, (index) => index + 1);
   final List<String> _months = [
-    'January',
-    'February',
-    'March',
-    'April',
-    'May',
-    'June',
-    'July',
-    'August',
-    'September',
-    'October',
-    'November',
-    'December',
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December',
   ];
   final List<int> _years = List.generate(
     100,
@@ -48,22 +42,20 @@ class _UserInfoPageState extends State<UserInfoPage> {
     final lastName = _lastNameController.text.trim();
 
     if (firstName.isEmpty || lastName.isEmpty) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Please fill all fields')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please fill all fields')),
+      );
       return;
     }
 
-    final Map<String, dynamic> payload = {
-      'first_name': firstName,
-      'last_name': lastName,
-      'date_of_birth':
-          '$_selectedYear-${_months.indexOf(_selectedMonth) + 1}-$_selectedDay',
-    };
+    final profile = UserProfile(
+      firstName: firstName,
+      lastName: lastName,
+      dateOfBirth: '$_selectedYear-${_months.indexOf(_selectedMonth) + 1}-$_selectedDay',
+    );
 
     try {
-      final authRepo = AuthRepository();
-      await authRepo.updateUserProfile(payload);
+      await _authService.updateUserProfile(profile);
 
       if (mounted) {
         Navigator.pop(context);
@@ -130,63 +122,25 @@ class _UserInfoPageState extends State<UserInfoPage> {
                 ),
                 const SizedBox(height: 16),
 
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    _buildWheelPicker<int>(
-                      label: 'Day',
-                      items: _days,
-                      initialItem: _days.indexOf(_selectedDay),
-                      onChanged: (val) => setState(() => _selectedDay = val),
-                      width: 70,
-                    ),
-                    _buildWheelPicker<String>(
-                      label: 'Month',
-                      items: _months,
-                      initialItem: _months.indexOf(_selectedMonth),
-                      onChanged: (val) => setState(() => _selectedMonth = val),
-                      width: 140,
-                    ),
-                    _buildWheelPicker<int>(
-                      label: 'Year',
-                      items: _years,
-                      initialItem: _years.indexOf(_selectedYear),
-                      onChanged: (val) => setState(() => _selectedYear = val),
-                      width: 80,
-                    ),
-                  ],
+                BirthDatePicker(
+                  selectedDay: _selectedDay,
+                  selectedMonth: _selectedMonth,
+                  selectedYear: _selectedYear,
+                  days: _days,
+                  months: _months,
+                  years: _years,
+                  onDayChanged: (val) => setState(() => _selectedDay = val),
+                  onMonthChanged: (val) => setState(() => _selectedMonth = val),
+                  onYearChanged: (val) => setState(() => _selectedYear = val),
                 ),
                 const SizedBox(height: 32),
 
-                GestureDetector(
+                AuthPrimaryButton(
+                  text: 'Confirm',
+                  width: double.infinity,
+                  height: 52,
+                  color: const Color(0xFF679CE0),
                   onTap: _handleConfirm,
-                  child: Container(
-                    width: double.infinity,
-                    height: 52,
-                    decoration: ShapeDecoration(
-                      color: const Color(0xFF679CE0),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      shadows: const [
-                        BoxShadow(
-                          color: Color(0x26000000),
-                          blurRadius: 10,
-                          offset: Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    alignment: Alignment.center,
-                    child: const Text(
-                      'Confirm',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontFamily: 'Poppins',
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ),
                 ),
                 const SizedBox(height: 40),
               ],
@@ -245,71 +199,6 @@ class _UserInfoPageState extends State<UserInfoPage> {
           ),
         ),
       ),
-    );
-  }
-
-  Widget _buildWheelPicker<T>({
-    required String label,
-    required List<T> items,
-    required int initialItem,
-    required ValueChanged<T> onChanged,
-    required double width,
-  }) {
-    return Column(
-      children: [
-        Container(
-          width: width,
-          height: 60,
-          decoration: ShapeDecoration(
-            color: const Color(0xFFE8EDF2),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-            shadows: const [
-              BoxShadow(
-                color: Color(0x26000000),
-                blurRadius: 20,
-                offset: Offset(0, 4),
-                spreadRadius: 0,
-              ),
-            ],
-          ),
-          child: ListWheelScrollView.useDelegate(
-            itemExtent: 30,
-            perspective: 0.005,
-            diameterRatio: 1.2,
-            physics: const FixedExtentScrollPhysics(),
-            controller: FixedExtentScrollController(initialItem: initialItem),
-            onSelectedItemChanged: (index) => onChanged(items[index]),
-            childDelegate: ListWheelChildBuilderDelegate(
-              childCount: items.length,
-              builder: (context, index) {
-                return Center(
-                  child: Text(
-                    items[index].toString(),
-                    style: const TextStyle(
-                      color: Color(0xFF4F7A93),
-                      fontSize: 16,
-                      fontFamily: 'Poppins',
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                );
-              },
-            ),
-          ),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          label,
-          style: const TextStyle(
-            color: Color(0xFF4F7A93),
-            fontSize: 14,
-            fontFamily: 'Poppins',
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-      ],
     );
   }
 }

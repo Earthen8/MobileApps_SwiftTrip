@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import '../widgets/auth_widgets.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:swifttrip_frontend/repositories/auth_repository.dart';
+import '../widgets/auth_primary_button.dart';
+import '../widgets/social_auth_group.dart';
 import 'verification.dart';
+import '../services/auth_service.dart';
 
 class ForgotPassPage extends StatefulWidget {
   const ForgotPassPage({super.key});
@@ -14,6 +15,7 @@ class ForgotPassPage extends StatefulWidget {
 class _ForgotPassPageState extends State<ForgotPassPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _verificationController = TextEditingController();
+  final AuthService _authService = AuthService();
 
   @override
   void dispose() {
@@ -82,8 +84,7 @@ class _ForgotPassPageState extends State<ForgotPassPage> {
                     }
 
                     try {
-                      final authRepo = AuthRepository();
-                      await authRepo.requestOtp(email, isPasswordReset: true);
+                      await _authService.requestOtp(email, isPasswordReset: true);
 
                       if (mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
@@ -109,40 +110,13 @@ class _ForgotPassPageState extends State<ForgotPassPage> {
                 ),
                 const SizedBox(height: 40),
 
-                SizedBox(
-                  width: 266,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      // Facebook
-                      AuthWidgets.socialButton(
-                        child: SvgPicture.asset(
-                          'assets/icons/facebook_logo.svg',
-                          width: 20,
-                        ),
-                      ),
-                      // X (Twitter)
-                      AuthWidgets.socialButton(
-                        child: SvgPicture.asset(
-                          'assets/icons/x_logo.svg',
-                          width: 20,
-                        ),
-                      ),
-                      // Google
-                      AuthWidgets.socialButton(
-                        child: SvgPicture.asset(
-                          'assets/icons/google_logo.svg',
-                          width: 20,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+                const SocialAuthGroup(),
 
                 const SizedBox(height: 25),
 
                 // Verify Button
-                GestureDetector(
+                AuthPrimaryButton(
+                  text: 'Continue',
                   onTap: () async {
                     final email = _emailController.text;
                     final code = _verificationController.text;
@@ -155,8 +129,7 @@ class _ForgotPassPageState extends State<ForgotPassPage> {
                     }
 
                     try {
-                      final authRepo = AuthRepository();
-                      await authRepo.verifyOtp(email, code);
+                      await _authService.verifyOtp(email, code);
 
                       if (mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
@@ -183,35 +156,6 @@ class _ForgotPassPageState extends State<ForgotPassPage> {
                       }
                     }
                   },
-                  child: Container(
-                    width: 315,
-                    height: 48,
-                    decoration: ShapeDecoration(
-                      color: const Color(0xFF2B99E3),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      shadows: const [
-                        BoxShadow(
-                          color: Color(0x26000000),
-                          blurRadius: 20,
-                          offset: Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    alignment: Alignment.center,
-                    child: const Text(
-                      'Continue',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Color(0xFFF7F9F9),
-                        fontSize: 16,
-                        fontFamily: 'Poppins',
-                        fontWeight: FontWeight.w700,
-                        height: 1.50,
-                      ),
-                    ),
-                  ),
                 ),
                 const SizedBox(height: 40),
               ],

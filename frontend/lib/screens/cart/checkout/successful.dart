@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import '../../widgets/top_bar.dart';
+import '../../../widgets/top_bar.dart';
 import 'payment_detail.dart';
-import '../customer_service/onboarding.dart';
+import '../../customer_service/onboarding.dart';
 
 class SuccessfulPage extends StatefulWidget {
   const SuccessfulPage({super.key});

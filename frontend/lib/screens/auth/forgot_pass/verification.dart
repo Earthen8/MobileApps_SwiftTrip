@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import '../login.dart';
-import 'package:swifttrip_frontend/repositories/auth_repository.dart';
 import '../widgets/auth_widgets.dart';
+import '../widgets/auth_primary_button.dart';
+import '../services/auth_service.dart';
 
 class VerificationPage extends StatefulWidget {
   final String email;
@@ -15,6 +15,7 @@ class _VerificationPageState extends State<VerificationPage> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController =
       TextEditingController();
+  final AuthService _authService = AuthService();
 
   @override
   void dispose() {
@@ -61,7 +62,8 @@ class _VerificationPageState extends State<VerificationPage> {
                   obscure: true,
                 ),
                 const SizedBox(height: 50),
-                GestureDetector(
+                AuthPrimaryButton(
+                  text: 'Confirm',
                   onTap: () async {
                     final password = _passwordController.text;
                     final confirmPassword = _confirmPasswordController.text;
@@ -81,8 +83,7 @@ class _VerificationPageState extends State<VerificationPage> {
                     }
 
                     try {
-                      final authRepo = AuthRepository();
-                      await authRepo.updatePassword(widget.email, password);
+                      await _authService.updatePassword(widget.email, password);
 
                       if (mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
@@ -105,35 +106,6 @@ class _VerificationPageState extends State<VerificationPage> {
                       }
                     }
                   },
-                  child: Container(
-                    width: 315,
-                    height: 48,
-                    decoration: ShapeDecoration(
-                      color: const Color(0xFF2B99E3),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      shadows: const [
-                        BoxShadow(
-                          color: Color(0x26000000),
-                          blurRadius: 20,
-                          offset: Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    alignment: Alignment.center,
-                    child: const Text(
-                      'Confirm',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Color(0xFFF7F9F9),
-                        fontSize: 16,
-                        fontFamily: 'Poppins',
-                        fontWeight: FontWeight.w700,
-                        height: 1.50,
-                      ),
-                    ),
-                  ),
                 ),
                 const SizedBox(height: 40),
               ],

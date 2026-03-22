@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'forgot_pass/forgot_pass.dart';
-import 'package:swifttrip_frontend/repositories/auth_repository.dart';
 import 'widgets/auth_widgets.dart';
+import 'widgets/auth_primary_button.dart';
+import 'widgets/social_auth_group.dart';
+import 'widgets/auth_footer_link.dart';
 import 'user_info.dart';
+import 'models/auth_models.dart';
+import 'services/auth_service.dart';
 
 class SignupPage extends StatefulWidget {
   const SignupPage({super.key});
@@ -19,6 +22,8 @@ class _SignupPageState extends State<SignupPage> {
   final TextEditingController _confirmPasswordController =
       TextEditingController();
   final TextEditingController _verificationController = TextEditingController();
+
+  final AuthService _authService = AuthService();
 
   // State variable to manage password visibility toggles
   bool _obscurePassword = true;
@@ -122,6 +127,7 @@ class _SignupPageState extends State<SignupPage> {
                     final email = _emailController.text.trim();
 
                     if (email.isEmpty) {
+                      if (!mounted) return;
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
                           content: Text('Please enter your email first'),
@@ -131,8 +137,7 @@ class _SignupPageState extends State<SignupPage> {
                     }
 
                     try {
-                      final authRepo = AuthRepository();
-                      await authRepo.requestOtp(email);
+                      await _authService.requestOtp(email);
 
                       if (mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
@@ -159,39 +164,12 @@ class _SignupPageState extends State<SignupPage> {
                 const SizedBox(height: 25),
 
                 // ── Social Buttons: Replicated Style ──────────────────
-                SizedBox(
-                  width: 266,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      // Facebook Pill
-                      AuthWidgets.socialButton(
-                        child: SvgPicture.asset(
-                          'assets/icons/facebook_logo.svg',
-                          width: 20,
-                        ),
-                      ),
-                      // X (Twitter) Pill
-                      AuthWidgets.socialButton(
-                        child: SvgPicture.asset(
-                          'assets/icons/x_logo.svg',
-                          width: 20,
-                        ),
-                      ),
-                      // Google Pill
-                      AuthWidgets.socialButton(
-                        child: SvgPicture.asset(
-                          'assets/icons/google_logo.svg',
-                          width: 20,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+                const SocialAuthGroup(),
                 const SizedBox(height: 25),
 
                 // ── Primary Action: Sign Up Button ────────────────────
-                GestureDetector(
+                AuthPrimaryButton(
+                  text: 'Sign Up',
                   onTap: () async {
                     final email = _emailController.text.trim();
                     final password = _passwordController.text;
@@ -199,12 +177,14 @@ class _SignupPageState extends State<SignupPage> {
                     final otp = _verificationController.text.trim();
 
                     if (email.isEmpty || password.isEmpty || confirm.isEmpty) {
+                      if (!mounted) return;
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(content: Text('Please fill all fields')),
                       );
                       return;
                     }
                     if (password != confirm) {
+                      if (!mounted) return;
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(content: Text('Passwords do not match')),
                       );
@@ -212,18 +192,20 @@ class _SignupPageState extends State<SignupPage> {
                     }
 
                     try {
-                      final authRepo = AuthRepository();
-                      await authRepo.verifyOtp(email, otp);
+                      await _authService.verifyOtp(email, otp);
 
-                      bool signupSuccess = await authRepo.signup(
-                        email,
-                        password,
-                        confirm,
+                      bool signupSuccess = await _authService.signup(
+                        SignupRequest(
+                          email: email,
+                          password: password,
+                          confirmPassword: confirm,
+                        ),
                       );
                       if (signupSuccess && mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
-                            content: Text('Signup successful! Please complete your profile.'),
+                            content: Text(
+                                'Signup successful! Please complete your profile.'),
                           ),
                         );
                         Navigator.pushReplacement(
@@ -245,76 +227,17 @@ class _SignupPageState extends State<SignupPage> {
                       }
                     }
                   },
-                  child: Container(
-                    width: 315,
-                    height: 48,
-                    decoration: ShapeDecoration(
-                      // Main blue theme color
-                      color: const Color(0xFF2B99E3),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      shadows: const [
-                        BoxShadow(
-                          color: Color(0x26000000),
-                          blurRadius: 20,
-                          offset: Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    alignment: Alignment.center,
-                    child: const Text(
-                      'Sign Up',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Color(0xFFF7F9F9),
-                        fontSize: 16,
-                        fontFamily: 'Poppins',
-                        fontWeight: FontWeight.w700,
-                        height: 1.50,
-                      ),
-                    ),
-                  ),
                 ),
                 const SizedBox(height: 20),
 
                 // ── Footer: Already Have An Account? ─────────────────
-                SizedBox(
-                  width: 315,
-                  height: 48,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      const Text(
-                        'Already Have an account?',
-                        style: TextStyle(
-                          color: Color(0xFF0C161C),
-                          fontSize: 16,
-                          fontFamily: 'Poppins',
-                          fontWeight: FontWeight.w600,
-                          height: 1.50,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      GestureDetector(
-                        onTap: () {
-                          // Navigate back to login screen
-                          Navigator.pop(context);
-                        },
-                        child: const Text(
-                          'Login',
-                          style: TextStyle(
-                            color: Color(0xFF2B99E3),
-                            fontSize: 16,
-                            fontFamily: 'Poppins',
-                            fontWeight: FontWeight.w600,
-                            height: 1.50,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
+                AuthFooterLink(
+                  label: 'Already Have an account?',
+                  linkText: 'Login',
+                  onTap: () {
+                    // Navigate back to login screen
+                    Navigator.pop(context);
+                  },
                 ),
                 const SizedBox(height: 12),
 

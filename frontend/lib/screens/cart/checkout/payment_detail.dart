@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:swifttrip_frontend/screens/customer_service/onboarding.dart';
-import '../../widgets/top_bar.dart';
-import '../main/main_screen.dart';
+import '../../../widgets/top_bar.dart';
+import '../../main/main_screen.dart';
 
 class PaymentDetailPage extends StatelessWidget {
   const PaymentDetailPage({super.key});

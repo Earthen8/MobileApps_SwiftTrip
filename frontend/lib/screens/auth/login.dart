@@ -1,28 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:swifttrip_frontend/screens/home/home.dart';
 import 'package:swifttrip_frontend/screens/main/main_screen.dart';
 import 'signup.dart';
 import 'forgot_pass/forgot_pass.dart';
-import 'package:swifttrip_frontend/repositories/auth_repository.dart';
 import 'widgets/auth_widgets.dart';
-
-void main() {
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const MaterialApp(
-      title: 'Vacation Planner',
-      debugShowCheckedModeBanner: false,
-      home: LoginPage(),
-    );
-  }
-}
+import 'widgets/auth_primary_button.dart';
+import 'widgets/social_auth_group.dart';
+import 'widgets/auth_footer_link.dart';
+import 'models/auth_models.dart';
+import 'services/auth_service.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -34,6 +19,7 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final AuthService _authService = AuthService();
   bool _obscurePassword = true;
 
   @override
@@ -99,43 +85,17 @@ class _LoginPageState extends State<LoginPage> {
                 const SizedBox(height: 25),
 
                 // ── Social Buttons: Facebook · X · Google ──────────────
-                SizedBox(
-                  width: 266,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      // Facebook
-                      AuthWidgets.socialButton(
-                        child: SvgPicture.asset(
-                          'assets/icons/facebook_logo.svg',
-                          width: 20,
-                        ),
-                      ),
-                      // X (Twitter)
-                      AuthWidgets.socialButton(
-                        child: SvgPicture.asset(
-                          'assets/icons/x_logo.svg',
-                          width: 20,
-                        ),
-                      ),
-                      // Google
-                      AuthWidgets.socialButton(
-                        child: SvgPicture.asset(
-                          'assets/icons/google_logo.svg',
-                          width: 20,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+                const SocialAuthGroup(),
                 const SizedBox(height: 25),
 
                 // ── Log In Button ──────────────────────────────────────
-                GestureDetector(
+                AuthPrimaryButton(
+                  text: 'Log in',
                   onTap: () async {
                     final email = _emailController.text;
                     final password = _passwordController.text;
                     if (email.isEmpty || password.isEmpty) {
+                      if (!mounted) return;
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(content: Text('Please fill all fields')),
                       );
@@ -143,8 +103,9 @@ class _LoginPageState extends State<LoginPage> {
                     }
 
                     try {
-                      final authRepo = AuthRepository();
-                      bool success = await authRepo.login(email, password);
+                      final success = await _authService.login(
+                        LoginRequest(email: email, password: password),
+                      );
 
                       if (success && mounted) {
                         Navigator.pushReplacement(
@@ -166,79 +127,21 @@ class _LoginPageState extends State<LoginPage> {
                       }
                     }
                   },
-                  child: Container(
-                    width: 315,
-                    height: 48,
-                    decoration: ShapeDecoration(
-                      color: const Color(0xFF2B99E3),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      shadows: const [
-                        BoxShadow(
-                          color: Color(0x26000000),
-                          blurRadius: 20,
-                          offset: Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    alignment: Alignment.center,
-                    child: const Text(
-                      'Log in',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Color(0xFFF7F9F9),
-                        fontSize: 16,
-                        fontFamily: 'Poppins',
-                        fontWeight: FontWeight.w700,
-                        height: 1.50,
-                      ),
-                    ),
-                  ),
                 ),
                 const SizedBox(height: 12),
 
                 // ── New user? Sign Up ──────────────────────────────────
-                SizedBox(
-                  width: 315,
-                  height: 48,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      const Text(
-                        'New user?',
-                        style: TextStyle(
-                          color: Color(0xFF0C161C),
-                          fontSize: 16,
-                          fontFamily: 'Poppins',
-                          fontWeight: FontWeight.w600,
-                          height: 1.50,
-                        ),
+                AuthFooterLink(
+                  label: 'New user?',
+                  linkText: 'Sign Up',
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const SignupPage(),
                       ),
-                      const SizedBox(width: 8),
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const SignupPage(),
-                            ),
-                          );
-                        },
-                        child: const Text(
-                          'Sign Up',
-                          style: TextStyle(
-                            color: Color(0xFF2B99E3),
-                            fontSize: 16,
-                            fontFamily: 'Poppins',
-                            fontWeight: FontWeight.w600,
-                            height: 1.50,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
+                    );
+                  },
                 ),
                 const SizedBox(height: 12),
 
@@ -281,5 +184,4 @@ class _LoginPageState extends State<LoginPage> {
       ),
     );
   }
-
 }

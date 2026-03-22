@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../widgets/top_bar.dart';
+import '../../../widgets/top_bar.dart';
 import 'successful.dart';
-import '../customer_service/onboarding.dart';
+import '../../customer_service/onboarding.dart';
 
 class CheckoutPage extends StatefulWidget {
   const CheckoutPage({super.key});

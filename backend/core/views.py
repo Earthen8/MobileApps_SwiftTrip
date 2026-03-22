@@ -126,14 +126,25 @@ def update_password(request):
 
     User = get_user_model()
     try:
-        user = User.objects.get(email=email)
-        user.set_password(new_password)
-        user.save()
+        users = User.objects.filter(email=email)
+        if not users.exists():
+            return Response({'detail': 'User with this email not found.'}, status=status.HTTP_404_NOT_FOUND)
+        
+        for user in users:
+            user.set_password(new_password)
+            user.save()
+            
         # Remove the verification flag so it can't be reused immediately
         cache.delete(verified_key)
-        return Response({'detail': 'Password updated successfully.'}, status=status.HTTP_200_OK)
-    except User.DoesNotExist:
-        return Response({'detail': 'User with this email not found.'}, status=status.HTTP_404_NOT_FOUND)
+        
+        detail_msg = 'Password updated successfully.'
+        if users.count() > 1:
+            detail_msg = f'Password updated for {users.count()} associated accounts.'
+            
+        return Response({'detail': detail_msg}, status=status.HTTP_200_OK)
+    except Exception as e:
+        print(f"Update password unexpected error: {e}")
+        return Response({'detail': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 @api_view(['DELETE'])

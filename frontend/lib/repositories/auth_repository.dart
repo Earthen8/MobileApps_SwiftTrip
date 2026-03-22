@@ -55,9 +55,12 @@ class AuthRepository {
       }
       throw Exception('Failed to load user profile');
     } on DioException catch (e) {
-      throw Exception(
-        e.response?.data?['detail'] ?? 'Failed to fetch user profile.',
-      );
+      final data = e.response?.data;
+      String message = 'Failed to fetch user profile.';
+      if (data is Map && data.containsKey('detail')) {
+        message = data['detail'];
+      }
+      throw Exception(message);
     }
   }
 
@@ -76,9 +79,12 @@ class AuthRepository {
       }
       return false;
     } on DioException catch (e) {
-      throw Exception(
-        e.response?.data?['detail'] ?? 'Failed to update profile.',
-      );
+      final data = e.response?.data;
+      String message = 'Failed to update profile.';
+      if (data is Map && data.containsKey('detail')) {
+        message = data['detail'];
+      }
+      throw Exception(message);
     }
   }
 
@@ -100,10 +106,14 @@ class AuthRepository {
       }
     } on DioException catch (e) {
       print('Login error: ${e.response?.data ?? e.message}');
-      throw Exception(
-        e.response?.data?['non_field_errors']?[0] ??
-            'Login failed. Please check your credentials.',
-      );
+      final data = e.response?.data;
+      String message = 'Login failed. Please check your credentials.';
+      if (data is Map && data.containsKey('non_field_errors') && (data['non_field_errors'] as List).isNotEmpty) {
+        message = data['non_field_errors'][0];
+      } else if (data is Map && data.containsKey('detail')) {
+        message = data['detail'];
+      }
+      throw Exception(message);
     } catch (_) {
       throw Exception('An unexpected error occurred.');
     }
@@ -208,9 +218,12 @@ class AuthRepository {
       }
     } on DioException catch (e) {
       print('OTP Error: ${e.response?.data ?? e.message}');
-      throw Exception(
-        e.response?.data?['detail'] ?? 'Failed to send verification code.',
-      );
+      final data = e.response?.data;
+      String message = 'Failed to send verification code.';
+      if (data is Map && data.containsKey('detail')) {
+        message = data['detail'];
+      }
+      throw Exception(message);
     } catch (e) {
       throw Exception('An unexpected error occurred.');
     }
@@ -230,9 +243,12 @@ class AuthRepository {
       return false;
     } on DioException catch (e) {
       print('Verification Error: ${e.response?.data ?? e.message}');
-      throw Exception(
-        e.response?.data?['detail'] ?? 'Invalid or expired code.',
-      );
+      final data = e.response?.data;
+      String message = 'Invalid or expired code.';
+      if (data is Map && data.containsKey('detail')) {
+        message = data['detail'];
+      }
+      throw Exception(message);
     } catch (e) {
       throw Exception('An unexpected error occurred during verification.');
     }
@@ -251,9 +267,12 @@ class AuthRepository {
       return false;
     } on DioException catch (e) {
       print('Update Password Error: ${e.response?.data ?? e.message}');
-      throw Exception(
-        e.response?.data?['detail'] ?? 'Failed to update password.',
-      );
+      final data = e.response?.data;
+      String message = 'Failed to update password.';
+      if (data is Map && data.containsKey('detail')) {
+        message = data['detail'];
+      }
+      throw Exception(message);
     } catch (e) {
       throw Exception('An unexpected error occurred while updating password.');
     }
@@ -274,9 +293,12 @@ class AuthRepository {
       }
       return false;
     } on DioException catch (e) {
-      throw Exception(
-        e.response?.data?['detail'] ?? 'Failed to delete account.',
-      );
+      final data = e.response?.data;
+      String message = 'Failed to delete account.';
+      if (data is Map && data.containsKey('detail')) {
+        message = data['detail'];
+      }
+      throw Exception(message);
     }
   }
 }

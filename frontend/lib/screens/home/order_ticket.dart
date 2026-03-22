@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../widgets/top_bar.dart';
 import '../cart/cart.dart';
-import '../checkout/checkout.dart';
+import '../cart/checkout/checkout.dart';
 import '../main/main_screen.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────

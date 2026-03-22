@@ -5,7 +5,7 @@ import '../../widgets/top_bar.dart';
 import '../customer_service/onboarding.dart';
 import '../home/next_trip.dart';
 import '../cart/cart.dart';
-import '../checkout/checkout.dart';
+import '../cart/checkout/checkout.dart';
 import '../main/main_screen.dart';
 
 import 'models/detail_row.dart';
