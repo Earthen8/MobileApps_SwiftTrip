@@ -39,7 +39,7 @@ class _MainScreenState extends State<MainScreen> {
   ];
 
   final List<Widget> _navIcons = [
-    const Icon(Icons.home_outlined, size: 28, color: Colors.white),
+    const Icon(Icons.home_outlined, size: 32, color: Colors.white),
     const Icon(Icons.shopping_cart_outlined, size: 28, color: Colors.white),
     SvgPicture.string(
       '''<svg width="31" height="31" viewBox="0 0 31 31" fill="none" xmlns="http://www.w3.org/2000/svg">
