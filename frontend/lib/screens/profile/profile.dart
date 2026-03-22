@@ -110,7 +110,6 @@ class ProfilePage extends StatelessWidget {
                         labelColor: Colors.black,
                         showArrow: false,
                         onTap: () {
-                          // Hapus seluruh navigation stack lalu arahkan ke LoginPage
                           Navigator.pushAndRemoveUntil(
                             context,
                             MaterialPageRoute(
@@ -122,9 +121,7 @@ class ProfilePage extends StatelessWidget {
                       ),
                     ],
                   ),
-                  const SizedBox(
-                    height: 100,
-                  ), // padding for CurvedNavigationBar
+                  const SizedBox(height: 100),
                 ],
               ),
             ),
