@@ -251,7 +251,7 @@ class _AddRequestPageState extends State<AddRequestPage>
                         fileName: _uploadedFileName,
                         onImport: _handleImportFile,
                       ),
-                      const SizedBox(height: 32),
+                      const SizedBox(height: 40),
 
                       // ── Send Request Button ────────────────────────────────────
                       Align(
