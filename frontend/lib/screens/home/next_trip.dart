@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:swifttrip_frontend/screens/cart/models/cart_models.dart';
+import 'package:swifttrip_frontend/screens/cart/widgets/ticket_card.dart';
 import '../../widgets/top_bar.dart';
 import '../cart/cart.dart';
 import '../main/main_screen.dart';
