@@ -1,19 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-class CategoryModel {
-  final String label;
-  final String? iconPath;
-  final String? iconSvg;
-  final Widget? targetPage;
-
-  CategoryModel({
-    required this.label,
-    this.iconPath,
-    this.iconSvg,
-    this.targetPage,
-  });
-}
+import '../models/category_model.dart';
 
 class CategoryItem extends StatelessWidget {
   final CategoryModel category;

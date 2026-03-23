@@ -4,7 +4,7 @@ import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import '../home/home.dart';
 import '../cart/cart.dart';
 import '../searching/searching.dart';
-import '../destination/destination.dart';
+import '../destination/destination_screen.dart';
 import '../profile/profile.dart';
 
 class MainScreen extends StatefulWidget {

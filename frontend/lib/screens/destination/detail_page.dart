@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'category_page_base.dart';
+import 'models/destination_model.dart';
 import '../../widgets/top_bar.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -8,26 +8,11 @@ import '../../widgets/top_bar.dart';
 // ─────────────────────────────────────────────────────────────────────────────
 
 class DestinationDetailPage extends StatefulWidget {
-  final CategoryItem destination;
-  final double pricePerNight;
-  final double rating;
-  final String description;
-  final List<String> features;
+  final DestinationModel destination;
 
   const DestinationDetailPage({
     super.key,
     required this.destination,
-    this.pricePerNight = 300000,
-    this.rating = 5,
-    this.description =
-        'Lorem ipsum dolor sit amet consectetur adipiscing elit. '
-        'Quisque faucibus ex sapien vitae pellentesque sem placerat. '
-        'In id cursus mi pretium tellus duis convallis. Tempus leo eu '
-        'aenean sed diam urna tempor. Pulvinar vivamus fringilla lacus '
-        'nec metus bibendum egestas. Iaculis massa nisl malesuada lacinia '
-        'integer nunc posuere. Ut hendrerit semper vel class aptent taciti '
-        'sociosqu. Ad litora torquent per conubia nostra inceptos himenaeos.',
-    this.features = const ['Great Check In Experience', 'Great Location'],
   });
 
   @override
@@ -37,8 +22,14 @@ class DestinationDetailPage extends StatefulWidget {
 class _DestinationDetailPageState extends State<DestinationDetailPage> {
   bool _isFavorite = false;
 
+  @override
+  void initState() {
+    super.initState();
+    _isFavorite = widget.destination.isFavorite;
+  }
+
   String get _formattedPrice {
-    final price = widget.pricePerNight.toInt();
+    final price = widget.destination.price.toInt();
     final str = price.toString();
     final buffer = StringBuffer();
     int count = 0;
@@ -101,7 +92,7 @@ class _DestinationDetailPageState extends State<DestinationDetailPage> {
                             ),
                             const SizedBox(width: 8),
                             Text(
-                              '${widget.rating.toInt()}',
+                              '${widget.destination.rating.toInt()}',
                               style: const TextStyle(
                                 fontFamily: 'Poppins',
                                 fontWeight: FontWeight.w700,
@@ -122,7 +113,7 @@ class _DestinationDetailPageState extends State<DestinationDetailPage> {
 
                         // ── Description ──────────────────────────────────
                         Text(
-                          widget.description,
+                          widget.destination.description,
                           style: const TextStyle(
                             fontFamily: 'Poppins',
                             fontWeight: FontWeight.w300,
@@ -177,7 +168,7 @@ class _DestinationDetailPageState extends State<DestinationDetailPage> {
                         const SizedBox(height: 16),
 
                         // ── Features list ────────────────────────────────
-                        ...widget.features.map((f) => _FeatureRow(text: f)),
+                        ...widget.destination.features.map((f) => _FeatureRow(text: f)),
 
                         const Divider(height: 30, color: Color(0xFF000000)),
                         const SizedBox(height: 60),
@@ -218,7 +209,7 @@ class _DestinationDetailPageState extends State<DestinationDetailPage> {
 // ─────────────────────────────────────────────────────────────────────────────
 
 class _HeroImage extends StatelessWidget {
-  final CategoryItem destination;
+  final DestinationModel destination;
   final bool isFavorite;
   final VoidCallback onToggleFavorite;
 

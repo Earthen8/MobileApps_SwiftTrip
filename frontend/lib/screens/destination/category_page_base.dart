@@ -1,53 +1,6 @@
 import 'package:flutter/material.dart';
+import 'models/destination_model.dart';
 import '../../widgets/top_bar.dart';
-
-// ─────────────────────────────────────────────────────────────────────────────
-// MODEL
-// ─────────────────────────────────────────────────────────────────────────────
-
-class CategoryItem {
-  final String id;
-  final String name;
-  final String imageUrl;
-  final double rating;
-  final String description;
-  final bool hasDiscount;
-  final bool isFavorite;
-
-  const CategoryItem({
-    required this.id,
-    required this.name,
-    required this.imageUrl,
-    required this.rating,
-    required this.description,
-    this.hasDiscount = false,
-    this.isFavorite = false,
-  });
-
-  factory CategoryItem.fromJson(Map<String, dynamic> json) {
-    return CategoryItem(
-      id: json['id']?.toString() ?? '',
-      name: json['name'] ?? '',
-      imageUrl: json['image_url'] ?? json['imageUrl'] ?? '',
-      rating: (json['rating'] ?? 0.0).toDouble(),
-      description: json['description'] ?? '',
-      hasDiscount: json['has_discount'] ?? json['hasDiscount'] ?? false,
-      isFavorite: json['is_favorite'] ?? json['isFavorite'] ?? false,
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'name': name,
-      'image_url': imageUrl,
-      'rating': rating,
-      'description': description,
-      'has_discount': hasDiscount,
-      'is_favorite': isFavorite,
-    };
-  }
-}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // REUSABLE CATEGORY PAGE BASE
@@ -55,9 +8,9 @@ class CategoryItem {
 
 class CategoryPageBase extends StatelessWidget {
   final String title;
-  final List<CategoryItem> items;
+  final List<DestinationModel> items;
   final bool isLoading;
-  final void Function(CategoryItem)? onItemTap;
+  final void Function(DestinationModel)? onItemTap;
 
   // TODO: Add pagination / infinite scroll support when backend is ready
 
@@ -135,8 +88,8 @@ class CategoryPageBase extends StatelessWidget {
 // ─────────────────────────────────────────────────────────────────────────────
 
 class CategoryItemCard extends StatelessWidget {
-  final CategoryItem item;
-  final void Function(CategoryItem)? onTap;
+  final DestinationModel item;
+  final void Function(DestinationModel)? onTap;
 
   const CategoryItemCard({super.key, required this.item, this.onTap});
 

@@ -12,7 +12,7 @@ import 'widgets/search_bar.dart';
 import 'widgets/section_header.dart';
 import '../../widgets/top_bar.dart';
 import 'history.dart';
-import '../destination/destination.dart';
+import '../destination/destination_screen.dart';
 import '../customer_service/onboarding.dart';
 import 'next_trip.dart';
 import 'package:flutter_svg/flutter_svg.dart';

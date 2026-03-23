@@ -1,24 +1,7 @@
 import 'package:flutter/material.dart';
 import '../detail_page.dart';
-import '../category_page_base.dart';
 
-class DestinationModel {
-  final String id;
-  final String name;
-  final String imageUrl;
-  final double rating;
-  final bool hasDiscount;
-  final bool isFavorite;
-
-  DestinationModel({
-    required this.id,
-    required this.name,
-    required this.imageUrl,
-    required this.rating,
-    this.hasDiscount = false,
-    this.isFavorite = false,
-  });
-}
+import '../models/destination_model.dart';
 
 class DestinationCard extends StatelessWidget {
   final DestinationModel destination;
@@ -33,15 +16,7 @@ class DestinationCard extends StatelessWidget {
           context,
           MaterialPageRoute(
             builder: (context) => DestinationDetailPage(
-              destination: CategoryItem(
-                id: destination.id,
-                name: destination.name,
-                imageUrl: destination.imageUrl,
-                rating: destination.rating,
-                description: 'Experience the beauty of ${destination.name}.',
-                hasDiscount: destination.hasDiscount,
-                isFavorite: destination.isFavorite,
-              ),
+              destination: destination,
             ),
           ),
         );

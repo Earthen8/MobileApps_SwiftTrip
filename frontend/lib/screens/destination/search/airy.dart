@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../category_page_base.dart';
 import '../detail_page.dart';
+import '../models/destination_model.dart';
 
 class AirySearchPage extends StatefulWidget {
   const AirySearchPage({super.key});
@@ -11,7 +12,7 @@ class AirySearchPage extends StatefulWidget {
 
 class _AirySearchPageState extends State<AirySearchPage> {
   bool _isLoading = true;
-  List<CategoryItem> _items = [];
+  List<DestinationModel> _items = [];
 
   @override
   void initState() {
@@ -24,18 +25,21 @@ class _AirySearchPageState extends State<AirySearchPage> {
     await Future.delayed(const Duration(milliseconds: 500));
     if (!mounted) return;
     setState(() {
+      // For now using filter from mock data or hardcoded mock that matches new model
       _items = [
-        const CategoryItem(
+        DestinationModel(
           id: 'ai-1',
           name: 'The Oberoi Beach Resort',
           imageUrl:
               'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=500',
           rating: 4.9,
           description: 'Breezy open pavilions by the Lombok shoreline.',
+          price: 6000000,
+          features: ['Beachfront', 'Open Pavilion', 'Lombok Views'],
           hasDiscount: true,
           isFavorite: true,
         ),
-        const CategoryItem(
+        DestinationModel(
           id: 'ai-2',
           name: 'Como Shambhala Estate',
           imageUrl:
@@ -43,23 +47,29 @@ class _AirySearchPageState extends State<AirySearchPage> {
           rating: 4.9,
           description:
               'Spacious retreats designed for ultimate air circulation.',
+          price: 11000000,
+          features: ['Airy Design', 'Wellness Retreat', 'Jungle View'],
         ),
-        const CategoryItem(
+        DestinationModel(
           id: 'ai-3',
           name: 'Ayana Segara Bali',
           imageUrl:
               'https://images.unsplash.com/photo-1576013551627-0cc20b96c2a7?w=500',
           rating: 4.8,
           description: 'Modern beach living with wide-open ocean terraces.',
+          price: 7500000,
+          features: ['Ocean Terrace', 'Modern Beach Living'],
           isFavorite: true,
         ),
-        const CategoryItem(
+        DestinationModel(
           id: 'ai-4',
           name: 'Mentawai Surf Villas',
           imageUrl:
               'https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?w=500',
           rating: 4.7,
           description: 'Light-filled island escapes for the modern surfer.',
+          price: 3500000,
+          features: ['Island Escape', 'Surf Access'],
         ),
       ];
       _isLoading = false;

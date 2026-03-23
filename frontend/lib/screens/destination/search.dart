@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'widgets/destination_card.dart';
 import 'widgets/destination_section.dart';
 import 'search/cozy.dart';
 import 'search/airy.dart';
 import 'search/moody.dart';
 import 'search/sleek.dart';
+import 'services/destination_service.dart';
+import 'models/destination_model.dart';
 
 class DestinationSearchPage extends StatefulWidget {
   const DestinationSearchPage({super.key});
@@ -15,156 +16,21 @@ class DestinationSearchPage extends StatefulWidget {
 
 class _DestinationSearchPageState extends State<DestinationSearchPage> {
   final TextEditingController _searchController = TextEditingController();
+  final DestinationService _service = DestinationService();
 
-  // TODO: Fetch trending tags from backend
-  final List<String> _trendingTags = ['Cozy', 'Sleek', 'Airy', 'Moody'];
+  late final List<String> _trendingTags;
+  late final List<DestinationModel> _recentSearches;
+  late final List<DestinationModel> _topRated;
+  late final List<DestinationModel> _hotDestinations;
 
-  // TODO: Fetch recent searches from backend / local storage
-  final List<DestinationModel> _recentSearches = [
-    DestinationModel(
-      id: '1',
-      name: 'Bali - Pantai Kuta',
-      imageUrl:
-          'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=500',
-      rating: 4.8,
-      hasDiscount: true,
-      isFavorite: false,
-    ),
-    DestinationModel(
-      id: '2',
-      name: 'Yogyakarta - Candi Borobudur',
-      imageUrl:
-          'https://images.unsplash.com/photo-1588666309990-d68f08e3d4a6?w=500',
-      rating: 4.9,
-      hasDiscount: false,
-      isFavorite: false,
-    ),
-    DestinationModel(
-      id: '3',
-      name: 'Labuan Bajo - Pulau Komodo',
-      imageUrl:
-          'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=500',
-      rating: 4.9,
-      hasDiscount: true,
-      isFavorite: false,
-    ),
-    DestinationModel(
-      id: '4',
-      name: 'Bandung - Kawah Putih',
-      imageUrl:
-          'https://images.unsplash.com/photo-1596422846543-75c6fc197f07?w=500',
-      rating: 4.7,
-      hasDiscount: false,
-      isFavorite: false,
-    ),
-    DestinationModel(
-      id: '5',
-      name: 'Lombok - Pantai Tanjung Aan',
-      imageUrl:
-          'https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=500',
-      rating: 4.8,
-      hasDiscount: true,
-      isFavorite: false,
-    ),
-  ];
-
-  // TODO: Fetch top rated from backend
-  final List<DestinationModel> _topRated = [
-    DestinationModel(
-      id: '1',
-      name: 'Bali - Pantai Kuta',
-      imageUrl:
-          'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=500',
-      rating: 4.8,
-      hasDiscount: true,
-      isFavorite: false,
-    ),
-    DestinationModel(
-      id: '2',
-      name: 'Yogyakarta - Candi Borobudur',
-      imageUrl:
-          'https://images.unsplash.com/photo-1588666309990-d68f08e3d4a6?w=500',
-      rating: 4.9,
-      hasDiscount: false,
-      isFavorite: false,
-    ),
-    DestinationModel(
-      id: '3',
-      name: 'Labuan Bajo - Pulau Komodo',
-      imageUrl:
-          'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=500',
-      rating: 4.9,
-      hasDiscount: true,
-      isFavorite: false,
-    ),
-    DestinationModel(
-      id: '4',
-      name: 'Bandung - Kawah Putih',
-      imageUrl:
-          'https://images.unsplash.com/photo-1596422846543-75c6fc197f07?w=500',
-      rating: 4.7,
-      hasDiscount: false,
-      isFavorite: false,
-    ),
-    DestinationModel(
-      id: '5',
-      name: 'Lombok - Pantai Tanjung Aan',
-      imageUrl:
-          'https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=500',
-      rating: 4.8,
-      hasDiscount: true,
-      isFavorite: false,
-    ),
-  ];
-
-  // TODO: Fetch hot destinations from backend
-  final List<DestinationModel> _hotDestinations = [
-    DestinationModel(
-      id: '1',
-      name: 'Bali - Pantai Kuta',
-      imageUrl:
-          'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=500',
-      rating: 4.8,
-      hasDiscount: true,
-      isFavorite: false,
-    ),
-    DestinationModel(
-      id: '2',
-      name: 'Yogyakarta - Candi Borobudur',
-      imageUrl:
-          'https://images.unsplash.com/photo-1588666309990-d68f08e3d4a6?w=500',
-      rating: 4.9,
-      hasDiscount: false,
-      isFavorite: false,
-    ),
-    DestinationModel(
-      id: '3',
-      name: 'Labuan Bajo - Pulau Komodo',
-      imageUrl:
-          'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=500',
-      rating: 4.9,
-      hasDiscount: true,
-      isFavorite: false,
-    ),
-    DestinationModel(
-      id: '4',
-      name: 'Bandung - Kawah Putih',
-      imageUrl:
-          'https://images.unsplash.com/photo-1596422846543-75c6fc197f07?w=500',
-      rating: 4.7,
-      hasDiscount: false,
-      isFavorite: false,
-    ),
-    DestinationModel(
-      id: '5',
-      name: 'Lombok - Pantai Tanjung Aan',
-      imageUrl:
-          'https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=500',
-      rating: 4.8,
-      hasDiscount: true,
-      isFavorite: false,
-    ),
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _trendingTags = _service.getTrendingTags();
+    _recentSearches = _service.getRecentSearches();
+    _topRated = _service.getTopRated();
+    _hotDestinations = _service.getHotDestinations();
+  }
 
   @override
   void dispose() {

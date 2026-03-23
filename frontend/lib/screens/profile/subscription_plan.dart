@@ -4,7 +4,7 @@ import 'package:swifttrip_frontend/screens/main/main_screen.dart';
 import '../home/home.dart';
 import '../cart/cart.dart';
 import '../searching/searching.dart';
-import '../destination/destination.dart';
+
 import '../profile/profile.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────

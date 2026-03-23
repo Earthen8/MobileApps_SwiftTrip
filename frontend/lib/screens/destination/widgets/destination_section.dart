@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../models/destination_model.dart';
 import 'destination_card.dart';
 
 class DestinationSection extends StatelessWidget {

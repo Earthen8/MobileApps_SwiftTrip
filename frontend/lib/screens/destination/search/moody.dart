@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../category_page_base.dart';
 import '../detail_page.dart';
+import '../models/destination_model.dart';
 
 class MoodySearchPage extends StatefulWidget {
   const MoodySearchPage({super.key});
@@ -11,7 +12,7 @@ class MoodySearchPage extends StatefulWidget {
 
 class _MoodySearchPageState extends State<MoodySearchPage> {
   bool _isLoading = true;
-  List<CategoryItem> _items = [];
+  List<DestinationModel> _items = [];
 
   @override
   void initState() {
@@ -25,39 +26,47 @@ class _MoodySearchPageState extends State<MoodySearchPage> {
     if (!mounted) return;
     setState(() {
       _items = [
-        const CategoryItem(
+        DestinationModel(
           id: 'mo-1',
           name: 'Jiwa Jawa Resort Ijen',
           imageUrl:
               'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=500',
           rating: 4.7,
           description: 'Foggy mornings and industrial chic near the volcano.',
+          price: 2500000,
+          features: ['Volcano View', 'Industrial Chic', 'Foggy Morning'],
           hasDiscount: true,
         ),
-        const CategoryItem(
+        DestinationModel(
           id: 'mo-2',
           name: 'The Kayon Jungle Resort',
           imageUrl:
               'https://images.unsplash.com/photo-1590073242678-70ee3fc28e8e?w=500',
           rating: 4.8,
           description: 'Deep green pools and rainforest shadows in Ubud.',
+          price: 5800000,
+          features: ['Jungle Resort', 'Rainforest Shadow'],
           isFavorite: true,
         ),
-        const CategoryItem(
+        DestinationModel(
           id: 'mo-3',
           name: 'Hard Rock Hotel Bali',
           imageUrl:
               'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=500',
           rating: 4.5,
           description: 'Edgy evening vibes and rock-and-roll luxury.',
+          price: 3200000,
+          features: ['Rock-and-Roll Luxury', 'Edgy Vibes'],
         ),
-        const CategoryItem(
+        DestinationModel(
           id: 'mo-4',
           name: 'Plataran Canggu',
           imageUrl:
               'https://images.unsplash.com/photo-1536376074432-8d642fed43f7?w=500',
           rating: 4.6,
           description: 'Mystical jungle enclaves with vintage character.',
+          price: 4500000,
+          features: ['Jungle Enclave', 'Mystical Vibe'],
           isFavorite: true,
         ),
       ];
