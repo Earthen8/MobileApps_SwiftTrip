@@ -4,6 +4,7 @@ import '../../widgets/top_bar.dart';
 import '../auth/login.dart';
 import 'widgets/profile_card.dart';
 import 'widgets/menu_section.dart';
+import 'widgets/menu_item.dart';
 import 'language.dart';
 import 'clear_cache.dart';
 import 'wishlist.dart';

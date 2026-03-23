@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'services/cache_service.dart';
+import 'widgets/cache_row.dart';
 
 class ClearCacheScreen extends StatefulWidget {
   const ClearCacheScreen({super.key});
@@ -9,30 +11,61 @@ class ClearCacheScreen extends StatefulWidget {
 }
 
 class _ClearCacheScreenState extends State<ClearCacheScreen> {
+  final CacheService _cacheService = CacheService();
   double _searchCache = 103;
   double _userCache = 0;
   double _downloadCache = 201;
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadCache();
+  }
+
+  Future<void> _loadCache() async {
+    try {
+      final details = await _cacheService.getCacheDetails();
+      if (mounted) {
+        setState(() {
+          _searchCache = details['Search Cache'] ?? 0;
+          _userCache = details['User Cache'] ?? 0;
+          _downloadCache = details['Download Cache'] ?? 0;
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      debugPrint('Error loading cache: $e');
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
 
   double get _totalCache => _searchCache + _userCache + _downloadCache;
 
-  void _clearAllCache() {
-    setState(() {
-      _searchCache = 0;
-      _userCache = 0;
-      _downloadCache = 0;
-    });
+  Future<void> _clearAllCache() async {
+    setState(() => _isLoading = true);
+    await _cacheService.clearAllCache();
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text(
-          'Cache cleared successfully',
-          style: TextStyle(fontFamily: 'Poppins'),
+    if (mounted) {
+      setState(() {
+        _searchCache = 0;
+        _userCache = 0;
+        _downloadCache = 0;
+        _isLoading = false;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Cache cleared successfully',
+            style: TextStyle(fontFamily: 'Poppins'),
+          ),
+          backgroundColor: Color(0xFF1B2236),
+          behavior: SnackBarBehavior.floating,
+          duration: Duration(seconds: 2),
         ),
-        backgroundColor: Color(0xFF1B2236),
-        behavior: SnackBarBehavior.floating,
-        duration: Duration(seconds: 2),
-      ),
-    );
+      );
+    }
   }
 
   String _fmtKb(double kb) {
@@ -68,135 +101,99 @@ class _ClearCacheScreenState extends State<ClearCacheScreen> {
             ),
           ),
           Expanded(
-            child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // ── Title ──────────────────────────────────────────────────────
-            const Text(
-              'Clear Cache',
-              style: TextStyle(
-                fontFamily: 'Poppins',
-                fontWeight: FontWeight.w700,
-                fontSize: 24,
-                color: Colors.black,
-              ),
-            ),
-            const Divider(height: 24),
+            child: _isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // ── Title ──────────────────────────────────────────────────────
+                        const Text(
+                          'Clear Cache',
+                          style: TextStyle(
+                            fontFamily: 'Poppins',
+                            fontWeight: FontWeight.w700,
+                            fontSize: 24,
+                            color: Colors.black,
+                          ),
+                        ),
+                        const Divider(height: 24),
 
-            // ── Cache rows ─────────────────────────────────────────────────
-            _CacheRow(label: 'Search Cache', valueKb: _searchCache),
-            const SizedBox(height: 6),
-            _CacheRow(label: 'User Cache', valueKb: _userCache),
-            const SizedBox(height: 6),
-            _CacheRow(label: 'Download Cache', valueKb: _downloadCache),
+                        // ── Cache rows ─────────────────────────────────────────────────
+                        CacheRow(label: 'Search Cache', valueKb: _searchCache),
+                        const SizedBox(height: 6),
+                        CacheRow(label: 'User Cache', valueKb: _userCache),
+                        const SizedBox(height: 6),
+                        CacheRow(label: 'Download Cache', valueKb: _downloadCache),
 
-            const Divider(height: 32),
+                        const Divider(height: 32),
 
-            // ── Total ──────────────────────────────────────────────────────
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  'Total Cache:',
-                  style: TextStyle(
-                    fontFamily: 'Poppins',
-                    fontWeight: FontWeight.w700,
-                    fontSize: 15,
-                    color: Colors.black,
-                  ),
-                ),
-                Text(
-                  _fmtKb(_totalCache),
-                  style: const TextStyle(
-                    fontFamily: 'Poppins',
-                    fontWeight: FontWeight.w400,
-                    fontSize: 15,
-                    color: Colors.black,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 24),
+                        // ── Total ──────────────────────────────────────────────────────
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              'Total Cache:',
+                              style: TextStyle(
+                                fontFamily: 'Poppins',
+                                fontWeight: FontWeight.w700,
+                                fontSize: 15,
+                                color: Colors.black,
+                              ),
+                            ),
+                            Text(
+                              _fmtKb(_totalCache),
+                              style: const TextStyle(
+                                fontFamily: 'Poppins',
+                                fontWeight: FontWeight.w400,
+                                fontSize: 15,
+                                color: Colors.black,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 24),
 
-            // ── Clear Cache button (right-aligned) ─────────────────────────
-            Align(
-              alignment: Alignment.centerRight,
-              child: GestureDetector(
-                onTap: _clearAllCache,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 24,
-                    vertical: 12,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                    boxShadow: const [
-                      BoxShadow(
-                        color: Color(0x1A000000),
-                        blurRadius: 10,
-                        offset: Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: const Text(
-                    'Clear Cache',
-                    style: TextStyle(
-                      fontFamily: 'Poppins',
-                      fontWeight: FontWeight.w500,
-                      fontSize: 14,
-                      color: Colors.black,
+                        // ── Clear Cache button (right-aligned) ─────────────────────────
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: GestureDetector(
+                            onTap: _clearAllCache,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 24,
+                                vertical: 12,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(12),
+                                boxShadow: const [
+                                  BoxShadow(
+                                    color: Color(0x1A000000),
+                                    blurRadius: 10,
+                                    offset: Offset(0, 2),
+                                  ),
+                                ],
+                              ),
+                              child: const Text(
+                                'Clear Cache',
+                                style: TextStyle(
+                                  fontFamily: 'Poppins',
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 14,
+                                  color: Colors.black,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                ),
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
-    ),
-  ],
-),
-    );
-  }
-}
-
-class _CacheRow extends StatelessWidget {
-  final String label;
-  final double valueKb;
-
-  const _CacheRow({required this.label, required this.valueKb});
-
-  @override
-  Widget build(BuildContext context) {
-    final display = valueKb == 0
-        ? '0 kb'
-        : '${valueKb.toStringAsFixed(0)} kb';
-
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          label,
-          style: const TextStyle(
-            fontFamily: 'Poppins',
-            fontWeight: FontWeight.w400,
-            fontSize: 13,
-            color: Colors.black87,
-          ),
-        ),
-        Text(
-          display,
-          style: const TextStyle(
-            fontFamily: 'Poppins',
-            fontWeight: FontWeight.w400,
-            fontSize: 13,
-            color: Colors.black87,
-          ),
-        ),
-      ],
     );
   }
 }
