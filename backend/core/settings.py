@@ -58,6 +58,7 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'dj_rest_auth.registration',
+    'users',
 ]
 
 SITE_ID = 1
@@ -131,6 +132,8 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+AUTH_USER_MODEL = 'users.User'
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/6.0/topics/i18n/
@@ -173,4 +176,4 @@ SIMPLE_JWT = {
 }
 
 CORS_ALLOW_ALL_ORIGINS = True # For development
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend' # Output email to console
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
