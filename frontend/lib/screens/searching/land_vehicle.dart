@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:swifttrip_frontend/screens/cart/models/promotion_models.dart';
 import 'package:swifttrip_frontend/screens/cart/promotions.dart';
-import 'package:swifttrip_frontend/screens/cart/widgets/cart_bottom_bar.dart' hide TotalConfirmBar;
+
 import '../../widgets/top_bar.dart';
 import '../customer_service/onboarding.dart';
-
-
 import '../cart/checkout/checkout.dart';
 import 'models/detail_row.dart';
 import 'models/ride_option.dart';
@@ -14,6 +12,8 @@ import 'widgets/map_placeholder.dart';
 import 'widgets/purchase_details_card.dart';
 import 'widgets/ride_card.dart';
 import 'widgets/total_confirm_bar.dart';
+import 'widgets/apply_promotions_row.dart';
+import 'services/searching_service.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // PAGE
@@ -30,42 +30,34 @@ class _LandVehicleSearchState extends State<LandVehicleSearch> {
   int? _selectedRideIndex;
   Promotion? _appliedPromo;
 
-  // TODO: Replace with data fetched from backend (e.g. GET /land-vehicles/options)
-  final List<RideOption> _rideOptions = const [
-    RideOption(
-      name: 'boom boom boogie',
-      duration: '2 hrs',
-      passengerCapacity: 4,
-      priceRp: 50000,
-      icon: Icons.directions_car_outlined,
-    ),
-    RideOption(
-      name: 'boom boom bus',
-      duration: '3 hrs',
-      passengerCapacity: 0,
-      priceRp: 50000,
-      icon: Icons.directions_bus_outlined,
-    ),
-    RideOption(
-      name: 'boom boom train',
-      duration: '4 hrs',
-      passengerCapacity: 0,
-      priceRp: 75000,
-      icon: Icons.train_outlined,
-    ),
-  ];
+  List<RideOption> _rideOptions = [];
+  List<DetailRow> _purchaseDetails = [];
+  bool _isLoading = true;
 
-  // TODO: Replace with dynamic purchase details from backend
-  final List<DetailRow> _purchaseDetails = const [
-    DetailRow(label: 'Tiket Kereta', amount: 'Rp 14.000.000'),
-    DetailRow(label: 'Voucher', amount: '-Rp 300.000'),
-    DetailRow(label: 'Diskon liburan', amount: '-Rp 1.800.000'),
-    DetailRow(label: 'PPN 10%', amount: 'Rp 110.700'),
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _fetchData();
+  }
+
+  Future<void> _fetchData() async {
+    const service = SearchingService();
+    final results = await Future.wait([
+      service.getRideOptions(),
+      service.getPurchaseDetails(),
+    ]);
+
+    if (mounted) {
+      setState(() {
+        _rideOptions = results[0] as List<RideOption>;
+        _purchaseDetails = results[1] as List<DetailRow>;
+        _isLoading = false;
+      });
+    }
+  }
 
   int get _total {
-    // TODO: Calculate total from backend pricing + selected ride
-    if (_selectedRideIndex != null) {
+    if (_selectedRideIndex != null && _rideOptions.isNotEmpty) {
       return _rideOptions[_selectedRideIndex!].priceRp;
     }
     return 300000;
@@ -105,44 +97,48 @@ class _LandVehicleSearchState extends State<LandVehicleSearch> {
                   const SizedBox(height: 30),
 
                   // ── Choose Ride Section ───────────────────────────────
-                  const Text(
-                    'Choose ride:',
-                    style: TextStyle(
-                      fontFamily: 'Poppins',
-                      fontWeight: FontWeight.w600,
-                      fontSize: 18,
-                      color: Colors.black,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-
-                  SizedBox(
-                    height: 176,
-                    child: ListView.separated(
-                      scrollDirection: Axis.horizontal,
-                      clipBehavior: Clip.none,
-                      itemCount: _rideOptions.length,
-                      separatorBuilder: (_, __) => const SizedBox(width: 12),
-                      itemBuilder: (_, i) => RideCard(
-                        option: _rideOptions[i],
-                        isSelected: _selectedRideIndex == i,
-                        onTap: () => setState(() {
-                          _selectedRideIndex = _selectedRideIndex == i
-                              ? null
-                              : i;
-                        }),
-                        formatRp: formatRp,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-
-                  // ── Purchase Details ──────────────────────────────────
-                  // TODO: Replace total with computed value from backend
-                  PurchaseDetailsCard(
-                    details: _purchaseDetails,
-                    total: 'Rp 12.000.000',
-                  ),
+                  _isLoading
+                      ? const Center(child: CircularProgressIndicator())
+                      : Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'Choose ride:',
+                              style: TextStyle(
+                                fontFamily: 'Poppins',
+                                fontWeight: FontWeight.w600,
+                                fontSize: 18,
+                                color: Colors.black,
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            SizedBox(
+                              height: 176,
+                              child: ListView.separated(
+                                scrollDirection: Axis.horizontal,
+                                clipBehavior: Clip.none,
+                                itemCount: _rideOptions.length,
+                                separatorBuilder: (_, _) =>
+                                    const SizedBox(width: 12),
+                                itemBuilder: (_, i) => RideCard(
+                                  option: _rideOptions[i],
+                                  isSelected: _selectedRideIndex == i,
+                                  onTap: () => setState(() {
+                                    _selectedRideIndex = _selectedRideIndex == i
+                                        ? null
+                                        : i;
+                                  }),
+                                  formatRp: formatRp,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 20),
+                            PurchaseDetailsCard(
+                              details: _purchaseDetails,
+                              total: 'Rp 12.000.000',
+                            ),
+                          ],
+                        ),
                 ],
               ),
             ),
@@ -161,6 +157,7 @@ class _LandVehicleSearchState extends State<LandVehicleSearch> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            const SizedBox(height: 10),
             // ── Apply Promotions ────────────────────────────────────────
             ApplyPromotionsRow(
               appliedPromo: _appliedPromo,
@@ -198,5 +195,3 @@ class _LandVehicleSearchState extends State<LandVehicleSearch> {
     );
   }
 }
-
-

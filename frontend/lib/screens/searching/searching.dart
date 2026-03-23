@@ -38,9 +38,9 @@ class SearchingPage extends StatelessWidget {
                   );
                 },
               ),
-              Expanded(
+              const Expanded(
                 child: SingleChildScrollView(
-                  padding: const EdgeInsets.only(
+                  padding: EdgeInsets.only(
                     left: 20,
                     right: 20,
                     bottom: 100,
@@ -48,10 +48,10 @@ class SearchingPage extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const SizedBox(height: 100),
-                      const FlightSearchCard(),
-                      const SizedBox(height: 30),
-                      const CouponSection(),
+                      SizedBox(height: 100),
+                      FlightSearchCard(),
+                      SizedBox(height: 30),
+                      CouponSection(),
                     ],
                   ),
                 ),

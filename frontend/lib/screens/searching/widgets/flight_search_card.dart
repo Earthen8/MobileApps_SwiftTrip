@@ -4,7 +4,8 @@ import '../land_vehicle.dart';
 import '../../main/main_screen.dart';
 import '../../cart/checkout/checkout.dart';
 import '../models/flight_leg.dart';
-import '../services/flight_search_service.dart';
+import '../services/searching_service.dart';
+import 'search_input_field.dart';
 
 class FlightSearchCard extends StatefulWidget {
   const FlightSearchCard({super.key});
@@ -19,58 +20,51 @@ class _PesanButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      // TODO: Navigate to ticket booking/detail page
-      onTap: () {},
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const CheckoutPage(),
+          ),
+        );
+      },
       child: SizedBox(
         width: double.infinity,
         height: 40,
         child: Stack(
           children: [
-            // ── Blue pill background ──────────────────────────────────
             Positioned(
               left: 43,
               top: 0,
               right: 0,
-              child: GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const CheckoutPage(),
-                    ),
-                  );
-                },
-                child: Container(
-                  height: 40,
-                  decoration: ShapeDecoration(
-                    color: const Color(0xFF2B99E3),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    shadows: const [
-                      BoxShadow(
-                        color: Color(0x4C000000),
-                        blurRadius: 20,
-                        offset: Offset(0, 4),
-                      ),
-                    ],
+              child: Container(
+                height: 40,
+                decoration: ShapeDecoration(
+                  color: const Color(0xFF2B99E3),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
                   ),
-                  alignment: Alignment.center,
-                  child: const Text(
-                    'Pesan Tiket Sekarang',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontFamily: 'Poppins',
-                      fontWeight: FontWeight.w400,
-                      fontSize: 12,
-                      color: Color(0xFFE5E5E5),
+                  shadows: const [
+                    BoxShadow(
+                      color: Color(0x4C000000),
+                      blurRadius: 20,
+                      offset: Offset(0, 4),
                     ),
+                  ],
+                ),
+                alignment: Alignment.center,
+                child: const Text(
+                  'Pesan Tiket Sekarang',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontFamily: 'Poppins',
+                    fontWeight: FontWeight.w400,
+                    fontSize: 12,
+                    color: Color(0xFFE5E5E5),
                   ),
                 ),
               ),
             ),
-
-            // ── White circle icon on the left ─────────────────────────
             Positioned(
               left: 0,
               top: 3,
@@ -123,13 +117,13 @@ class _FlightSearchCardState extends State<FlightSearchCard>
     with SingleTickerProviderStateMixin {
   String _fromLabel = 'Jakarta (JKTA)';
   String _toLabel = 'Malang (MLA)';
-  String _dateLabel = 'Friday, 20 Feb 2026';
-  String _passengerLabel = '1 Passenger';
-  String _classLabel = 'Economy';
+  final String _dateLabel = 'Friday, 20 Feb 2026';
+  final String _passengerLabel = '1 Passenger';
+  final String _classLabel = 'Economy';
   bool _isSwapped = false;
   bool _isMultiCity = false;
   bool _isSearching = false;
-  bool? _ticketFound; // null = not searched, true = found, false = not found
+  bool? _ticketFound; 
   late final AnimationController _toastController;
   late final Animation<Offset> _toastSlide;
 
@@ -154,8 +148,7 @@ class _FlightSearchCardState extends State<FlightSearchCard>
 
   Future<void> _handleSearch() async {
     setState(() => _isSearching = true);
-
-    final bool found = await const FlightSearchService().search(
+    final bool found = await const SearchingService().searchFlights(
       multiCityLegs: _multiCityLegs,
       from: _fromLabel,
       to: _toLabel,
@@ -164,19 +157,16 @@ class _FlightSearchCardState extends State<FlightSearchCard>
       flightClass: _classLabel,
       isMultiCity: _isMultiCity,
     );
-
     if (!mounted) return;
     setState(() {
       _isSearching = false;
       _ticketFound = found;
     });
-
     await _toastController.forward();
     await Future.delayed(const Duration(milliseconds: 1500));
     if (mounted) await _toastController.reverse();
   }
 
-  // TODO: Each leg will carry from/to/date — send as array to backend
   final List<FlightLeg> _multiCityLegs = [
     const FlightLeg(
       from: 'Malang (MLA)',
@@ -235,7 +225,6 @@ class _FlightSearchCardState extends State<FlightSearchCard>
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Tabs
               Row(
                 children: [
                   Expanded(
@@ -251,7 +240,7 @@ class _FlightSearchCardState extends State<FlightSearchCard>
                             bottom: BorderSide(
                               color: !_isMultiCity
                                   ? const Color(0xFF2B99E3)
-                                  : Colors.black.withOpacity(0.1),
+                                  : Colors.black.withValues(alpha: 0.1),
                               width: !_isMultiCity ? 2 : 1,
                             ),
                           ),
@@ -284,7 +273,7 @@ class _FlightSearchCardState extends State<FlightSearchCard>
                             bottom: BorderSide(
                               color: _isMultiCity
                                   ? const Color(0xFF2B99E3)
-                                  : Colors.black.withOpacity(0.1),
+                                  : Colors.black.withValues(alpha: 0.1),
                               width: _isMultiCity ? 2 : 1,
                             ),
                           ),
@@ -307,21 +296,18 @@ class _FlightSearchCardState extends State<FlightSearchCard>
                 ],
               ),
               const SizedBox(height: 16),
-
-              // Inputs
               if (!_isMultiCity) ...[
-                // ── Round-trip layout ──────────────────────────────
                 Stack(
                   alignment: Alignment.centerRight,
                   children: [
                     Column(
                       children: [
-                        _SearchInputField(
+                        SearchInputField(
                           label: 'From',
                           icon: Icons.flight_takeoff,
                           value: _fromLabel,
                         ),
-                        _SearchInputField(
+                        SearchInputField(
                           label: 'To',
                           icon: Icons.flight_land,
                           value: _toLabel,
@@ -343,7 +329,7 @@ class _FlightSearchCardState extends State<FlightSearchCard>
                               color: Colors.white,
                               shape: BoxShape.circle,
                               border: Border.all(
-                                color: Colors.black.withOpacity(0.1),
+                                color: Colors.black.withValues(alpha: 0.1),
                               ),
                               boxShadow: const [
                                 BoxShadow(
@@ -364,7 +350,7 @@ class _FlightSearchCardState extends State<FlightSearchCard>
                     ),
                   ],
                 ),
-                _SearchInputField(
+                SearchInputField(
                   label: 'Date',
                   icon: Icons.calendar_today_outlined,
                   value: _dateLabel,
@@ -372,7 +358,7 @@ class _FlightSearchCardState extends State<FlightSearchCard>
                 Row(
                   children: [
                     Expanded(
-                      child: _SearchInputField(
+                      child: SearchInputField(
                         label: 'Penumpang',
                         icon: Icons.person_outline,
                         value: _passengerLabel,
@@ -380,7 +366,7 @@ class _FlightSearchCardState extends State<FlightSearchCard>
                     ),
                     const SizedBox(width: 16),
                     Expanded(
-                      child: _SearchInputField(
+                      child: SearchInputField(
                         label: 'Flight Class',
                         icon: Icons.airline_seat_recline_normal,
                         value: _classLabel,
@@ -389,25 +375,24 @@ class _FlightSearchCardState extends State<FlightSearchCard>
                   ],
                 ),
                 if (_ticketFound == true)
-                  _SearchInputFieldWithTrailing(
+                  const SearchInputField(
                     label: 'Penerbangan',
                     icon: Icons.airplanemode_active,
-                    value: 'Citilink', // TODO: Replace with backend response
-                    trailing: const Icon(
+                    value: 'Citilink',
+                    trailing: Icon(
                       Icons.keyboard_arrow_down,
                       size: 20,
                       color: Colors.black54,
                     ),
                   ),
               ] else ...[
-                // ── Multi-city layout ───────────────────────────────────────────
                 ...List.generate(_multiCityLegs.length, (i) {
                   final leg = _multiCityLegs[i];
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       if (i == 0)
-                        _SearchInputField(
+                        SearchInputField(
                           label: 'From',
                           icon: Icons.flight_takeoff,
                           value: leg.from,
@@ -415,7 +400,7 @@ class _FlightSearchCardState extends State<FlightSearchCard>
                       Row(
                         children: [
                           Expanded(
-                            child: _SearchInputField(
+                            child: SearchInputField(
                               label: 'To',
                               icon: Icons.flight_land,
                               value: leg.to,
@@ -438,12 +423,10 @@ class _FlightSearchCardState extends State<FlightSearchCard>
                     ],
                   );
                 }),
-
-                // ── Add leg button ──────────────────────────────────────────────
                 GestureDetector(
                   onTap: _addLeg,
-                  child: Padding(
-                    padding: const EdgeInsets.only(bottom: 12),
+                  child: const Padding(
+                    padding: EdgeInsets.only(bottom: 12),
                     child: Row(
                       children: [
                         Icon(
@@ -451,13 +434,12 @@ class _FlightSearchCardState extends State<FlightSearchCard>
                           size: 20,
                           color: Colors.black54,
                         ),
-                        const SizedBox(width: 8),
+                        SizedBox(width: 8),
                       ],
                     ),
                   ),
                 ),
-
-                _SearchInputField(
+                SearchInputField(
                   label: 'Date',
                   icon: Icons.calendar_today_outlined,
                   value: _dateLabel,
@@ -465,7 +447,7 @@ class _FlightSearchCardState extends State<FlightSearchCard>
                 Row(
                   children: [
                     Expanded(
-                      child: _SearchInputField(
+                      child: SearchInputField(
                         label: 'Penumpang',
                         icon: Icons.person_outline,
                         value: _passengerLabel,
@@ -473,7 +455,7 @@ class _FlightSearchCardState extends State<FlightSearchCard>
                     ),
                     const SizedBox(width: 16),
                     Expanded(
-                      child: _SearchInputField(
+                      child: SearchInputField(
                         label: 'Flight Class',
                         icon: Icons.airline_seat_recline_normal,
                         value: _classLabel,
@@ -481,24 +463,19 @@ class _FlightSearchCardState extends State<FlightSearchCard>
                     ),
                   ],
                 ),
-
-                // ── Penerbangan (airline picker) ────────────────────────────────
                 if (_ticketFound == true)
-                  _SearchInputFieldWithTrailing(
+                  const SearchInputField(
                     label: 'Penerbangan',
                     icon: Icons.airplanemode_active,
-                    value: 'Citilink', // TODO: Replace with backend response
-                    trailing: const Icon(
+                    value: 'Citilink',
+                    trailing: Icon(
                       Icons.keyboard_arrow_down,
                       size: 20,
                       color: Colors.black54,
                     ),
                   ),
               ],
-
               const SizedBox(height: 20),
-
-              // Action Buttons
               AnimatedSwitcher(
                 duration: const Duration(milliseconds: 350),
                 child: _ticketFound == true
@@ -524,7 +501,7 @@ class _FlightSearchCardState extends State<FlightSearchCard>
                                   color: Colors.white,
                                   borderRadius: BorderRadius.circular(20),
                                   border: Border.all(
-                                    color: Colors.black.withOpacity(0.1),
+                                    color: Colors.black.withValues(alpha: 0.1),
                                   ),
                                 ),
                                 child: const Text(
@@ -595,7 +572,6 @@ class _FlightSearchCardState extends State<FlightSearchCard>
                   height: 82,
                   child: Stack(
                     children: [
-                      // ── Shadow layer behind the arrow ─────────────────────────
                       Positioned(
                         left: 21,
                         top: 20,
@@ -605,7 +581,7 @@ class _FlightSearchCardState extends State<FlightSearchCard>
                           decoration: BoxDecoration(
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.15),
+                                color: Colors.black.withValues(alpha: 0.15),
                                 blurRadius: 6,
                                 offset: const Offset(0, 3),
                               ),
@@ -613,8 +589,6 @@ class _FlightSearchCardState extends State<FlightSearchCard>
                           ),
                         ),
                       ),
-
-                      // ── Left arrow background (reusable for both states) ──────
                       SvgPicture.string(
                         '''<svg width="266" height="82" viewBox="0 0 266 82" fill="none" xmlns="http://www.w3.org/2000/svg">
 <g filter="url(#filter0_d_1149_1712)">
@@ -633,14 +607,11 @@ class _FlightSearchCardState extends State<FlightSearchCard>
 <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_1149_1712" result="shape"/>
 </filter>
 </defs>
-</svg>
-''',
+</svg>''',
                         width: 266,
                         height: 82,
                         fit: BoxFit.fill,
                       ),
-
-                      // ── Text + state icon row ─────────────────────────────────
                       Positioned.fill(
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -658,8 +629,6 @@ class _FlightSearchCardState extends State<FlightSearchCard>
                               ),
                             ),
                             const SizedBox(width: 8),
-
-                            // ── Success or failure icon ───────────────────────
                             SvgPicture.string(
                               _ticketFound!
                                   ? '''<svg width="124" height="124" viewBox="0 0 124 124" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -678,13 +647,11 @@ class _FlightSearchCardState extends State<FlightSearchCard>
 <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_482_1238" result="shape"/>
 </filter>
 </defs>
-</svg>
-'''
+</svg>'''
                                   : '''<svg width="37" height="37" viewBox="0 0 37 37" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path fill-rule="evenodd" clip-rule="evenodd" d="M25.5796 35.5918C23.3351 36.5215 20.9295 37 18.5 37C13.5935 37 8.88795 35.0509 5.41852 31.5815C1.9491 28.112 0 23.4065 0 18.5C0 13.5935 1.9491 8.88795 5.41852 5.41852C8.88795 1.9491 13.5935 7.31126e-08 18.5 0C20.9295 -3.62017e-08 23.3351 0.478516 25.5796 1.40823C27.8242 2.33794 29.8636 3.70064 31.5815 5.41852C33.2994 7.13641 34.6621 9.17583 35.5918 11.4204C36.5215 13.6649 37 16.0705 37 18.5C37 20.9295 36.5215 23.3351 35.5918 25.5796C34.6621 27.8242 33.2994 29.8636 31.5815 31.5815C29.8636 33.2994 27.8242 34.6621 25.5796 35.5918Z" fill="#E25142"/>
+<path fill-rule="evenodd" clip-rule="evenodd" d="M25.5796 35.5918C23.3351 36.5215 20.9295 37 18.5 37C13.5935 37 8.88795 35.0509 5.41852 31.5815C1.9491 28.112 0 23.4065 0 18.5002C0 13.5937 1.9491 8.88812 5.41852 5.4187C8.88795 1.94927 13.5935 3.65482e-05 18.5 3.65482e-05C20.9295 3.65482e-05 23.3351 0.478552 25.5796 1.40826C27.8242 2.33798 29.8636 3.70068 31.5815 5.41857C33.2994 7.13645 34.6621 9.17587 35.5918 11.4204C36.5215 13.665 37 16.0706 37 18.5C37 20.9295 36.5215 23.3351 35.5918 25.5796C34.6621 27.8242 33.2994 29.8636 31.5815 31.5815C29.8636 33.2994 27.8242 34.6621 25.5796 35.5918Z" fill="#E25142"/>
 <path d="M25.6592 12.4336L19.8486 18.2441C19.6611 18.4317 19.5557 18.686 19.5557 18.9512C19.5557 19.2164 19.6611 19.4707 19.8486 19.6582L25.6592 25.4688L24.5664 26.5615L18.7559 20.751C18.5683 20.5634 18.314 20.458 18.0488 20.458C17.8167 20.458 17.593 20.5387 17.415 20.6846L17.3418 20.751L11.5312 26.5615L10.4385 25.4688L16.249 19.6582C16.4366 19.4707 16.542 19.2164 16.542 18.9512C16.542 18.686 16.4366 18.4317 16.249 18.2441L10.4385 12.4336L11.5312 11.3408L17.3418 17.1514C17.5293 17.3389 17.7836 17.4443 18.0488 17.4443C18.314 17.4443 18.5683 17.3389 18.7559 17.1514L24.5664 11.3408L25.6592 12.4336Z" fill="white" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-</svg>
-''',
+</svg>''',
                               width: 36,
                               height: 36,
                             ),
@@ -698,121 +665,6 @@ class _FlightSearchCardState extends State<FlightSearchCard>
             ),
           ),
       ],
-    );
-  }
-}
-
-class _SearchInputField extends StatelessWidget {
-  final String? label;
-  final IconData? icon;
-  final String? value;
-
-  const _SearchInputField({this.label, this.icon, this.value});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            label ?? '',
-            style: TextStyle(
-              fontFamily: 'Poppins',
-              color: Colors.black.withOpacity(0.60),
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Row(
-            children: [
-              Icon(icon ?? Icons.circle, size: 20, color: Colors.black),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Container(
-                  padding: const EdgeInsets.only(bottom: 8),
-                  decoration: BoxDecoration(
-                    border: Border(
-                      bottom: BorderSide(color: Colors.black.withOpacity(0.2)),
-                    ),
-                  ),
-                  child: Text(
-                    value ?? '-',
-                    style: const TextStyle(
-                      fontFamily: 'Poppins',
-                      color: Colors.black,
-                      fontSize: 14,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _SearchInputFieldWithTrailing extends StatelessWidget {
-  final String? label;
-  final IconData? icon;
-  final String? value;
-  final Widget? trailing;
-
-  const _SearchInputFieldWithTrailing({
-    this.label,
-    this.icon,
-    this.value,
-    this.trailing,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            label ?? '',
-            style: TextStyle(
-              fontFamily: 'Poppins',
-              color: Colors.black.withOpacity(0.60),
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Row(
-            children: [
-              Icon(icon ?? Icons.circle, size: 20, color: Colors.black),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Container(
-                  padding: const EdgeInsets.only(bottom: 8),
-                  decoration: BoxDecoration(
-                    border: Border(
-                      bottom: BorderSide(color: Colors.black.withOpacity(0.2)),
-                    ),
-                  ),
-                  child: Text(
-                    value ?? '-',
-                    style: const TextStyle(
-                      fontFamily: 'Poppins',
-                      color: Colors.black,
-                      fontSize: 14,
-                    ),
-                  ),
-                ),
-              ),
-              if (trailing != null) ...[const SizedBox(width: 8), trailing!],
-            ],
-          ),
-        ],
-      ),
     );
   }
 }

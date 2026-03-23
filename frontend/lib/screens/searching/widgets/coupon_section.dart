@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/coupon_model.dart';
 import 'coupon_card.dart';
 import 'coupon_overlay.dart';
+import '../services/searching_service.dart';
 
 class CouponSection extends StatefulWidget {
   const CouponSection({super.key});
@@ -12,60 +13,39 @@ class CouponSection extends StatefulWidget {
 
 class _CouponSectionState extends State<CouponSection> {
   final TextEditingController _couponController = TextEditingController();
+  final SearchingService _service = const SearchingService();
+  List<String> _categories = [];
+  List<CouponModel> _activeCoupons = [];
   int _activeCategory = 0;
+  bool _isLoading = true;
 
-  // TODO: Fetch categories from backend
-  static const List<String> _categories = [
-    'Coupon Raya',
-    'Coupon Ticket Plane',
-    'Australia',
-    'Indonesia',
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _initData();
+  }
 
-  // TODO: Replace with backend data keyed by category
-  static const Map<String, List<CouponModel>> _couponsByCategory = {
-    'Coupon Raya': [
-      CouponModel(
-        title: 'Raya Special',
-        description: 'Get 10% off this Raya',
-        code: 'RAYA10',
-      ),
-      CouponModel(
-        title: 'Raya Extra',
-        description: 'Get 15% off this Raya',
-        code: 'RAYA15',
-      ),
-    ],
-    'Coupon Ticket Plane': [
-      CouponModel(
-        title: 'Plane Saver',
-        description: 'Get 20% off flights',
-        code: 'PLANE20',
-      ),
-      CouponModel(
-        title: 'Fly More',
-        description: 'Get 25% off flights',
-        code: 'FLY25',
-      ),
-    ],
-    'Australia': [
-      CouponModel(
-        title: 'AUS Deal',
-        description: 'Get 30% off to Australia',
-        code: 'AUS30',
-      ),
-    ],
-    'Indonesia': [
-      CouponModel(
-        title: 'IDN Deal',
-        description: 'Get 5% off domestic',
-        code: 'IDN05',
-      ),
-    ],
-  };
+  Future<void> _initData() async {
+    final cats = await _service.getCouponCategories();
+    if (!mounted) return;
+    setState(() {
+      _categories = cats;
+      _isLoading = _categories.isEmpty;
+    });
+    if (_categories.isNotEmpty) {
+      _fetchCoupons();
+    }
+  }
 
-  List<CouponModel> get _activeCoupons =>
-      _couponsByCategory[_categories[_activeCategory]] ?? [];
+  Future<void> _fetchCoupons() async {
+    setState(() => _isLoading = true);
+    final coupons = await _service.getCouponsByCategory(_categories[_activeCategory]);
+    if (!mounted) return;
+    setState(() {
+      _activeCoupons = coupons;
+      _isLoading = false;
+    });
+  }
 
   @override
   void dispose() {
@@ -131,7 +111,7 @@ class _CouponSectionState extends State<CouponSection> {
               return GestureDetector(
                 onTap: () {
                   setState(() => _activeCategory = index);
-                  // TODO: Fetch coupons by _categories[index] from backend
+                  _fetchCoupons();
                 },
                 child: Container(
                   margin: const EdgeInsets.only(right: 8),
@@ -163,14 +143,16 @@ class _CouponSectionState extends State<CouponSection> {
 
         // ── Coupon cards ───────────────────────────────────────────────
         // TODO: Replace _activeCoupons with API response filtered by active category
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Row(
-            children: _activeCoupons
-                .map((coupon) => CouponCard(coupon: coupon))
-                .toList(),
-          ),
-        ),
+        _isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: _activeCoupons
+                      .map((coupon) => CouponCard(coupon: coupon))
+                      .toList(),
+                ),
+              ),
       ],
     );
   }
