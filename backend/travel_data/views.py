@@ -1,9 +1,9 @@
 from rest_framework import viewsets, views, status, permissions
 from rest_framework.response import Response
 from rest_framework.decorators import action
-from .models import Category, Destination, Recommendation, Schedule, Coupon, RideOption, UserFavorite
+from .models import Destination, Recommendation, Schedule, Coupon, RideOption, UserFavorite
 from .serializers import (
-    CategorySerializer, DestinationSerializer, RecommendationSerializer, 
+    DestinationSerializer, RecommendationSerializer, 
     ScheduleSerializer, CouponSerializer, RideOptionSerializer
 )
 
@@ -34,7 +34,7 @@ class DestinationViewSet(viewsets.ReadOnlyModelViewSet):
         queryset = super().get_queryset()
         category_label = self.request.query_params.get('category')
         if category_label:
-            queryset = queryset.filter(category__label__iexact=category_label)
+            queryset = queryset.filter(category__iexact=category_label)
         
         is_hot = self.request.query_params.get('is_hot')
         if is_hot:
@@ -56,11 +56,6 @@ class DestinationViewSet(viewsets.ReadOnlyModelViewSet):
             return Response({'isFavorite': False}, status=status.HTTP_200_OK)
         
         return Response({'isFavorite': True}, status=status.HTTP_201_CREATED)
-
-class CategoryViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = Category.objects.all()
-    serializer_class = CategorySerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
 class SearchView(views.APIView):
     """

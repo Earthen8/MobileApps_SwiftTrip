@@ -2,17 +2,6 @@ import os
 from django.db import models
 from django.conf import settings
 
-class Category(models.Model):
-    label = models.CharField(max_length=100)
-    icon_path = models.CharField(max_length=255, null=True, blank=True)
-    icon_svg = models.TextField(null=True, blank=True)
-
-    class Meta:
-        verbose_name_plural = "Categories"
-
-    def __str__(self):
-        return self.label
-
 class Destination(models.Model):
     name = models.CharField(max_length=255)
     image_url = models.URLField(max_length=500)
@@ -22,7 +11,7 @@ class Destination(models.Model):
     features = models.JSONField(default=list)
     has_discount = models.BooleanField(default=False)
     is_hot = models.BooleanField(default=False)
-    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='destinations')
+    category = models.CharField(max_length=100)
 
     def __str__(self):
         return self.name
@@ -66,7 +55,6 @@ class RideOption(models.Model):
     duration = models.CharField(max_length=50)
     passenger_capacity = models.IntegerField()
     price_rp = models.IntegerField()
-    icon_code_point = models.IntegerField()
 
     def __str__(self):
         return self.name

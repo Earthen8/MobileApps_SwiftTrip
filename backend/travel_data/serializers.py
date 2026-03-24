@@ -1,13 +1,5 @@
 from rest_framework import serializers
-from .models import Category, Destination, Recommendation, Schedule, Coupon, RideOption, UserFavorite
-
-class CategorySerializer(serializers.ModelSerializer):
-    iconPath = serializers.CharField(source='icon_path', allow_null=True, required=False)
-    iconSvg = serializers.CharField(source='icon_svg', allow_null=True, required=False)
-
-    class Meta:
-        model = Category
-        fields = ['label', 'iconPath', 'iconSvg']
+from .models import Destination, Recommendation, Schedule, Coupon, RideOption, UserFavorite
 
 class DestinationSerializer(serializers.ModelSerializer):
     imageUrl = serializers.URLField(source='image_url')
@@ -16,7 +8,7 @@ class DestinationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Destination
-        fields = ['id', 'name', 'imageUrl', 'rating', 'description', 'price', 'features', 'hasDiscount', 'isFavorite']
+        fields = ['id', 'name', 'imageUrl', 'rating', 'description', 'price', 'features', 'category', 'hasDiscount', 'isFavorite']
 
     def get_isFavorite(self, obj):
         user = self.context.get('request').user
@@ -48,8 +40,7 @@ class CouponSerializer(serializers.ModelSerializer):
 class RideOptionSerializer(serializers.ModelSerializer):
     passengerCapacity = serializers.IntegerField(source='passenger_capacity')
     priceRp = serializers.IntegerField(source='price_rp')
-    iconCodePoint = serializers.IntegerField(source='icon_code_point')
 
     class Meta:
         model = RideOption
-        fields = ['name', 'duration', 'passengerCapacity', 'priceRp', 'iconCodePoint']
+        fields = ['name', 'duration', 'passengerCapacity', 'priceRp']

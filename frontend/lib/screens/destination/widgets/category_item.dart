@@ -44,15 +44,21 @@ class CategoryItem extends StatelessWidget {
                         BlendMode.srcIn,
                       ),
                     )
-                  : SvgPicture.asset(
-                      category.iconPath!,
-                      width: 30,
-                      height: 30,
-                      colorFilter: const ColorFilter.mode(
-                        Colors.black,
-                        BlendMode.srcIn,
-                      ),
-                    ),
+                  : (category.iconPath != null
+                      ? SvgPicture.asset(
+                          category.iconPath!,
+                          width: 30,
+                          height: 30,
+                          colorFilter: const ColorFilter.mode(
+                            Colors.black,
+                            BlendMode.srcIn,
+                          ),
+                        )
+                      : const Icon(
+                          Icons.category_outlined,
+                          size: 30,
+                          color: Colors.black,
+                        )),
             ),
           ),
           const SizedBox(height: 8),

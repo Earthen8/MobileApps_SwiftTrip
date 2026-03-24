@@ -1,10 +1,5 @@
 from django.contrib import admin
-from .models import Category, Destination, UserFavorite, Recommendation, Schedule, Coupon, RideOption
-
-@admin.register(Category)
-class CategoryAdmin(admin.ModelAdmin):
-    list_display = ('id', 'label')
-    search_fields = ('label',)
+from .models import Destination, UserFavorite, Recommendation, Schedule, Coupon, RideOption
 
 @admin.register(Destination)
 class DestinationAdmin(admin.ModelAdmin):

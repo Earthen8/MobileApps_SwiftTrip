@@ -15,23 +15,42 @@ class RideOption {
     required this.icon,
   });
 
-  factory RideOption.fromJson(Map<String, dynamic> json) => RideOption(
-        name: json['name'] as String,
-        duration: json['duration'] as String,
-        passengerCapacity: json['passengerCapacity'] as int,
-        priceRp: json['priceRp'] as int,
-        icon: IconData(
-          json['iconCodePoint'] as int,
-          fontFamily: 'MaterialIcons',
-        ),
-      );
+  factory RideOption.fromJson(Map<String, dynamic> json) {
+    final name = json['name'] as String;
+    IconData icon;
+    
+    // Assign static icons based on name (case-insensitive)
+    switch (name.toLowerCase()) {
+      case 'car':
+        icon = Icons.directions_car_outlined;
+        break;
+      case 'bus':
+        icon = Icons.directions_bus_outlined;
+        break;
+      case 'train':
+        icon = Icons.train_outlined;
+        break;
+      case 'flight':
+      case 'plane':
+        icon = Icons.airplanemode_active_outlined;
+        break;
+      default:
+        icon = Icons.directions_transit_outlined;
+    }
+
+    return RideOption(
+      name: name,
+      duration: json['duration'] as String,
+      passengerCapacity: json['passenger_capacity'] ?? json['passengerCapacity'] ?? 0,
+      priceRp: json['price_rp'] ?? json['priceRp'] ?? 0,
+      icon: icon,
+    );
+  }
 
   Map<String, dynamic> toJson() => {
-        'name': name,
-        'duration': duration,
-        'passengerCapacity': passengerCapacity,
-        'priceRp': priceRp,
-        'iconCodePoint': icon.codePoint,
-      };
+    'name': name,
+    'duration': duration,
+    'passenger_capacity': passengerCapacity,
+    'price_rp': priceRp,
+  };
 }
-
