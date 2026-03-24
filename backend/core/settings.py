@@ -27,15 +27,9 @@ load_dotenv(os.path.join(BASE_DIR, '.env'))
 SECRET_KEY = 'django-insecure-5y569tb)79fj9b4b)we%t$#5&l4qarei)t12amvh#p-(2t3v3*'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
-ALLOWED_HOSTS = [
-    '127.0.0.1', 
-    'localhost', 
-    '192.168.1.11',
-    '[IP_ADDRESS]',
-    '192.168.1.27',
-]
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -61,6 +55,7 @@ INSTALLED_APPS = [
     'users',
     'travel_data',
     'bookings',
+    'support',
 ]
 
 SITE_ID = 1
