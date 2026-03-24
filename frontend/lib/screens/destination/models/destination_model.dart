@@ -23,10 +23,13 @@ class DestinationModel {
 
   factory DestinationModel.fromJson(Map<String, dynamic> json) {
     return DestinationModel(
-      id: json['id'] as String,
+      id: json['id']?.toString() ?? '',
       name: json['name'] as String,
       imageUrl: json['imageUrl'] as String,
-      rating: (json['rating'] as num).toDouble(),
+      rating: (json['rating'] as num?)?.toDouble() ?? 0.0,
+      description: json['description'] as String? ?? '',
+      price: (json['price'] as num?)?.toDouble() ?? 0.0,
+      features: (json['features'] as List<dynamic>?)?.map((e) => e.toString()).toList() ?? [],
       hasDiscount: json['hasDiscount'] as bool? ?? false,
       isFavorite: json['isFavorite'] as bool? ?? false,
     );
