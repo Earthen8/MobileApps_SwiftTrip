@@ -24,27 +24,10 @@ import 'review.dart';
 // CONSTANTS / MOCK DATA
 // ─────────────────────────────────────────────
 
-final _recommendations = [
-  RecommendationItem(
-    name: 'Bali',
-    description: 'The island of the gods is second to none',
-    imageAsset: 'assets/images/home/bali_recommendation.jpg',
-  ),
-  RecommendationItem(
-    name: 'Malang',
-    description: 'The Paris of East Java, wrapped in morning mist',
-    imageAsset: 'assets/images/home/malang_recommendation.jpg',
-  ),
-  RecommendationItem(
-    name: 'Japan',
-    description: 'The land of the rising sun and endless wonders',
-    imageAsset: 'assets/images/home/japan_recommendation.jpg',
-  ),
-  RecommendationItem(
-    name: 'Egypt',
-    description: 'The cradle of civilizations, etched in golden sand',
-    imageAsset: 'assets/images/home/egypt_recommendation.jpg',
-  ),
+const _bannerImages = [
+  'assets/images/home/carousel1.png',
+  'assets/images/home/carousel2.png',
+  'assets/images/home/carousel3.png',
 ];
 
 // ─────────────────────────────────────────────
@@ -71,7 +54,6 @@ class _HomePageState extends State<HomePage> {
 
   // -- Backend-friendly Data States --
   bool _isLoading = true;
-  List<String> _serverBanners = [];
   List<ScheduleItem> _serverSchedules = [];
   List<RecommendationItem> _serverRecommendations = [];
 
@@ -86,12 +68,10 @@ class _HomePageState extends State<HomePage> {
     setState(() => _isLoading = true);
     final homeService = HomeService();
     try {
-      final banners = await homeService.fetchBanners();
       final schedules = await homeService.fetchSchedules();
       final recs = await homeService.fetchRecommendations();
       if (mounted) {
         setState(() {
-          _serverBanners = banners;
           _serverSchedules = schedules;
           _serverRecommendations = recs;
         });
@@ -109,10 +89,9 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _playNextBanner() {
-    if (_serverBanners.isEmpty) return;
     _bannerTimer = Timer(const Duration(seconds: 2), () {
       if (!mounted) return;
-      final nextPage = (_currentBanner + 1) % _serverBanners.length;
+      final nextPage = (_currentBanner + 1) % _bannerImages.length;
       if (_bannerController.hasClients) {
         _bannerController
             .animateToPage(
@@ -176,24 +155,23 @@ class _HomePageState extends State<HomePage> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              if (_serverBanners.isNotEmpty)
-                                Stack(
-                                  alignment: Alignment.bottomCenter,
-                                  children: [
-                                    BannerCarousel(
-                                      images: _serverBanners,
-                                      controller: _bannerController,
-                                      currentIndex: _currentBanner,
-                                      onPageChanged: (i) =>
-                                          setState(() => _currentBanner = i),
-                                      onTap: widget.onNavigateToDestination,
-                                    ),
-                                    const Positioned(
-                                      bottom: 0,
-                                      child: SearchBarWidget(),
-                                    ),
-                                  ],
-                                ),
+                              Stack(
+                                alignment: Alignment.bottomCenter,
+                                children: [
+                                  BannerCarousel(
+                                    images: _bannerImages,
+                                    controller: _bannerController,
+                                    currentIndex: _currentBanner,
+                                    onPageChanged: (i) =>
+                                        setState(() => _currentBanner = i),
+                                    onTap: widget.onNavigateToDestination,
+                                  ),
+                                  const Positioned(
+                                    bottom: 0,
+                                    child: SearchBarWidget(),
+                                  ),
+                                ],
+                              ),
 
                               const SizedBox(height: 20),
 

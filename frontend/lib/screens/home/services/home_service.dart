@@ -2,15 +2,6 @@ import 'package:swifttrip_frontend/models/recommendation_item.dart';
 import 'package:swifttrip_frontend/models/schedule_item.dart';
 
 class HomeService {
-  Future<List<String>> fetchBanners() async {
-    await Future.delayed(const Duration(milliseconds: 600));
-    return const [
-      'assets/images/banner1.png',
-      'assets/images/banner1.png',
-      'assets/images/banner1.png',
-    ];
-  }
-
   Future<List<ScheduleItem>> fetchSchedules() async {
     await Future.delayed(const Duration(milliseconds: 600));
     return const [
