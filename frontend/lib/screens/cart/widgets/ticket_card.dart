@@ -36,12 +36,12 @@ class TicketCard extends StatelessWidget {
           CardHeader(
             type: ticket.type,
             bookingId: ticket.bookingId,
-            color: ticket.type == 'Accommodation'
+            color: ticket.type == 'Accommodation Ticket'
                 ? const Color(0xFFA83029)
                 : const Color(0xFF0098FF),
           ),
 
-          if (ticket.type == 'Accommodation') ...[
+          if (ticket.type == 'Accommodation Ticket') ...[
             // ── Hotel image ──────────────────────────────────────────
             ClipRRect(
               child: ticket.imageUrl != null

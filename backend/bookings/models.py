@@ -1,0 +1,55 @@
+from django.db import models
+from django.conf import settings
+
+class Booking(models.Model):
+    STATUS_CHOICES = [
+        ('IN_CART', 'In Cart'),
+        ('PENDING', 'Pending'),
+        ('PAID', 'Paid'),
+        ('CANCELLED', 'Cancelled'),
+    ]
+    
+    TYPE_CHOICES = [
+        ('CAR_TICKET', 'Car Ticket'),
+        ('BUS_TICKET', 'Bus Ticket'),
+        ('TRAIN_TICKET', 'Train Ticket'),
+        ('PLANE_TICKET', 'Plane Ticket'),
+        ('ACCOMMODATION', 'Accommodation Ticket'),
+    ]
+
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='bookings')
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='IN_CART')
+    booking_type = models.CharField(max_length=20, choices=TYPE_CHOICES)
+    price_rp = models.IntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    # Transport fields
+    from_location = models.CharField(max_length=255, null=True, blank=True)
+    to_location = models.CharField(max_length=255, null=True, blank=True)
+    date = models.CharField(max_length=100, null=True, blank=True)
+    departure_time = models.CharField(max_length=100, null=True, blank=True)
+    arrival_time = models.CharField(max_length=100, null=True, blank=True)
+    train_number = models.CharField(max_length=100, null=True, blank=True)
+    carriage = models.CharField(max_length=50, null=True, blank=True)
+    seat_number = models.CharField(max_length=50, null=True, blank=True)
+    class_label = models.CharField(max_length=100, null=True, blank=True)
+
+    # Accommodation fields
+    image_url = models.URLField(max_length=500, null=True, blank=True)
+    stay_date = models.CharField(max_length=100, null=True, blank=True)
+    stay_duration = models.CharField(max_length=100, null=True, blank=True)
+    bed_type = models.CharField(max_length=100, null=True, blank=True)
+    location_name = models.CharField(max_length=255, null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.user.username} - {self.booking_type} - {self.status}"
+
+class PurchaseItem(models.Model):
+    booking = models.ForeignKey(Booking, on_delete=models.CASCADE, related_name='purchase_items')
+    label = models.CharField(max_length=255)
+    amount_rp = models.IntegerField()
+    is_discount = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.label}: {self.amount_rp}"

@@ -60,6 +60,7 @@ INSTALLED_APPS = [
     'dj_rest_auth.registration',
     'users',
     'travel_data',
+    'bookings',
 ]
 
 SITE_ID = 1

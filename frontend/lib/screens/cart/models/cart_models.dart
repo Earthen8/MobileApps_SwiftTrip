@@ -2,7 +2,8 @@ import 'package:flutter/foundation.dart';
 
 @immutable
 class CartTicket {
-  final String type; // 'Train Ticket' | 'Accommodation'
+  final String
+  type; // 'Car Ticket', 'Bus Ticket', 'Train Ticket', 'Plane Ticket', 'Accommodation Ticket'
   final String bookingId;
   final String classLabel;
   final int priceRp;
