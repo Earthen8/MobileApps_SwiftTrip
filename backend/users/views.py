@@ -11,7 +11,8 @@ import resend
 
 from .serializers import (
     UserSerializer, RegisterSerializer, LoginSerializer,
-    OTPSerializer, OTPVerifySerializer, PasswordResetSerializer
+    OTPSerializer, OTPVerifySerializer, PasswordResetSerializer,
+    ProfileUpdateSerializer
 )
 
 User = get_user_model()
@@ -123,7 +124,7 @@ class AuthViewSet(viewsets.GenericViewSet):
             return Response(serializer.data)
         
         # PATCH
-        serializer = UserSerializer(request.user, data=request.data, partial=True)
+        serializer = ProfileUpdateSerializer(request.user, data=request.data, partial=True, context={'request': request})
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data)

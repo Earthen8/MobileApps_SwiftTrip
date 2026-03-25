@@ -173,4 +173,13 @@ SIMPLE_JWT = {
 }
 
 CORS_ALLOW_ALL_ORIGINS = True # For development
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'sandbox.smtp.mailtrap.io'
+EMAIL_HOST_USER = os.getenv('MAILTRAP_USER')
+EMAIL_HOST_PASSWORD = os.getenv('MAILTRAP_PASSWORD')
+EMAIL_PORT = '2525'
+EMAIL_USE_TLS = True
+EMAIL_USE_SSL = False
+
+# This can be anything since it's a sandbox!
+DEFAULT_FROM_EMAIL = 'noreply@swifttrip.com'
