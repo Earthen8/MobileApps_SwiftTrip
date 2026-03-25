@@ -173,25 +173,19 @@ SIMPLE_JWT = {
 }
 
 CORS_ALLOW_ALL_ORIGINS = True # For development
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'sandbox.smtp.mailtrap.io'
-EMAIL_HOST_USER = os.getenv('MAILTRAP_USER')
-EMAIL_HOST_PASSWORD = os.getenv('MAILTRAP_PASSWORD')
-EMAIL_PORT = '2525'
-EMAIL_USE_TLS = True
-EMAIL_USE_SSL = False
+# Mailtrap Shared Guest Credentials (Shared Inbox for Collaborators)
+SHARED_MAILTRAP_USER = 'f59a23706b292c'
+SHARED_MAILTRAP_PASSWORD = '8490b6b1b312b6'
 
-DEFAULT_FROM_EMAIL = 'admin@swifttrip.com'
+# User-specific Mailtrap login (from .env) with fallback to Shared Guest
+MAILTRAP_USER = os.getenv('MAILTRAP_USER', SHARED_MAILTRAP_USER)
+MAILTRAP_PASSWORD = os.getenv('MAILTRAP_PASSWORD', SHARED_MAILTRAP_PASSWORD)
 
-# Mailtrap Shared Guest Credentials
-MAILTRAP_USER = os.getenv('MAILTRAP_USER', 'your_mailtrap_username')
-MAILTRAP_PASSWORD = os.getenv('MAILTRAP_PASSWORD', 'your_mailtrap_password')
-
+# Global Email Configuration
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'sandbox.smtp.mailtrap.io'
 EMAIL_PORT = '2525'
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = MAILTRAP_USER
 EMAIL_HOST_PASSWORD = MAILTRAP_PASSWORD
-
 DEFAULT_FROM_EMAIL = 'noreply@swifttrip.com'

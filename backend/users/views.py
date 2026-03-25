@@ -197,13 +197,18 @@ class RequestProfileUpdateView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        new_name = request.data.get('full_name')
+        first_name = request.data.get('first_name')
+        last_name = request.data.get('last_name')
         new_email = request.data.get('email')
         user = request.user
 
-        # 1. Update Name Immediately
-        if new_name:
-            user.first_name = new_name
+        # 1. Update Names Immediately
+        if first_name:
+            user.first_name = first_name
+        if last_name:
+            user.last_name = last_name
+        
+        if first_name or last_name:
             user.save()
 
         # 2. Check if Email is actually different
