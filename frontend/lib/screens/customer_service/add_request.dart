@@ -8,6 +8,7 @@ import 'your_ticket.dart';
 import 'models/cs_request.dart';
 import 'widgets/cs_search_bar.dart';
 import 'widgets/cs_dropdown_field.dart';
+import 'widgets/cs_dropdown_label.dart';
 import 'widgets/cs_input_field.dart';
 import 'widgets/cs_upload_field.dart';
 import 'widgets/cs_section_label.dart';
@@ -193,24 +194,30 @@ class _AddRequestPageState extends State<AddRequestPage>
                       const SizedBox(height: 16),
 
                       // ── Dropdowns ──────────────────────────────────────────────
+                      const CsDropdownLabel(text: 'Problem Type'),
+                      const SizedBox(height: 4),
                       CsDropdownField(
-                        hint: 'Problem Type?',
+                        hint: '- - -',
                         value: _selectedProblemType,
                         items: _problemTypes,
                         onChanged: (val) =>
                             setState(() => _selectedProblemType = val),
                       ),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 12),
+                      const CsDropdownLabel(text: 'Location'),
+                      const SizedBox(height: 4),
                       CsDropdownField(
-                        hint: 'Where Is It Located?',
+                        hint: '- - -',
                         value: _selectedLocation,
                         items: _locations,
                         onChanged: (val) =>
                             setState(() => _selectedLocation = val),
                       ),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 12),
+                      const CsDropdownLabel(text: 'Publish Type'),
+                      const SizedBox(height: 4),
                       CsDropdownField(
-                        hint: 'Publish Type?',
+                        hint: '- - -',
                         value: _selectedPublishType,
                         items: _publishTypes,
                         onChanged: (val) =>
