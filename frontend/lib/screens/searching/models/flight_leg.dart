@@ -1,15 +1,31 @@
 class FlightLeg {
-  final String from;
-  final String to;
-  final String date;
+  final String originLocationCode;
+  final String destinationLocationCode;
+  final String originLabel;
+  final String destinationLabel;
+  final String departureDate;
 
-  const FlightLeg({required this.from, required this.to, required this.date});
+  const FlightLeg({
+    required this.originLocationCode,
+    required this.destinationLocationCode,
+    required this.originLabel,
+    required this.destinationLabel,
+    required this.departureDate,
+  });
 
   factory FlightLeg.fromJson(Map<String, dynamic> json) => FlightLeg(
-    from: json['from'] as String,
-    to: json['to'] as String,
-    date: json['date'] as String,
-  );
+        originLocationCode: json['originLocationCode'] as String,
+        destinationLocationCode: json['destinationLocationCode'] as String,
+        originLabel: json['originLabel'] as String? ?? json['originLocationCode'] as String,
+        destinationLabel: json['destinationLabel'] as String? ?? json['destinationLocationCode'] as String,
+        departureDate: json['departureDate'] as String,
+      );
 
-  Map<String, dynamic> toJson() => {'from': from, 'to': to, 'date': date};
+  Map<String, dynamic> toJson() => {
+        'originLocationCode': originLocationCode,
+        'destinationLocationCode': destinationLocationCode,
+        'originLabel': originLabel,
+        'destinationLabel': destinationLabel,
+        'departureDate': departureDate,
+      };
 }

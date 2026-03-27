@@ -110,24 +110,76 @@ class SearchingService {
 
   // ── Flights ────────────────────────────────────────────────────────────────
 
-  /// Searches for flights based on parameters.
+  /// Searches for flights based on Amadeus API parameters.
   Future<bool> searchFlights({
     required List<FlightLeg> multiCityLegs,
-    required String from,
-    required String to,
-    required String date,
-    required String passengers,
-    required String flightClass,
+    required String from, // originLocationCode (IATA)
+    required String to, // destinationLocationCode (IATA)
+    required String date, // departureDate (YYYY-MM-DD)
+    required String passengers, // total adults
+    required String flightClass, // ECONOMY, etc.
     required bool isMultiCity,
   }) async {
-    // TODO: POST to backend API
+    // ── Prepare Amadeus Payload ──────────────────────────────────────────────
+    
+    // ignore: unused_local_variable
+    final Map<String, dynamic> payload;
+    
+    if (isMultiCity) {
+      payload = {
+        'currencyCode': 'IDR',
+        'originDestinations': multiCityLegs.asMap().entries.map((entry) {
+          final i = entry.key;
+          final leg = entry.value;
+          return {
+            'id': (i + 1).toString(),
+            'originLocationCode': leg.originLocationCode,
+            'destinationLocationCode': leg.destinationLocationCode,
+            'departureDateTimeRange': {
+              'date': leg.departureDate,
+            },
+          };
+        }).toList(),
+        'travelers': List.generate(int.parse(passengers), (i) => {
+          'id': (i + 1).toString(),
+          'travelerType': 'ADULT',
+        }),
+        'sources': ['GDS'],
+        'searchCriteria': {
+          'maxFlightOffers': 2,
+          'flightFilters': {
+            'cabinRestrictions': [
+              {
+                'cabin': flightClass,
+                'originDestinationIds': multiCityLegs.asMap().keys.map((k) => (k+1).toString()).toList(),
+              }
+            ]
+          }
+        }
+      };
+    } else {
+      payload = {
+        'originLocationCode': from,
+        'destinationLocationCode': to,
+        'departureDate': date,
+        'adults': passengers,
+        'travelClass': flightClass,
+        'max': 2,
+      };
+    }
+
+    // Log the payload to verify Amadeus mapping
+    debugPrint('Searching flights with payload: $payload');
+
+    // TODO: POST to backend API (e.g., Dio.post('/api/flights/search', data: payload))
     await Future.delayed(const Duration(seconds: 1));
-    // Implementation logic from FlightSearchService
+
+    // Mock logic for demonstration
     if (isMultiCity) {
       return multiCityLegs.any(
-        (leg) => leg.from.contains('Malang') || leg.to.contains('Malang'),
+        (leg) => leg.originLocationCode == 'CGK' || leg.destinationLocationCode == 'CGK',
       );
     }
-    return from.contains('Malang') || to.contains('Malang');
+    return from == 'CGK' || to == 'CGK';
   }
 }

@@ -197,20 +197,24 @@ class _FlightSearchCardState extends State<FlightSearchCard>
 
   final List<FlightLeg> _multiCityLegs = [
     const FlightLeg(
-      from: 'Jakarta (CGK)',
-      to: 'Denpasar (DPS)',
-      date: 'Friday, 20 Feb 2026',
+      originLocationCode: 'CGK',
+      originLabel: 'Jakarta (CGK)',
+      destinationLocationCode: 'DPS',
+      destinationLabel: 'Denpasar (DPS)',
+      departureDate: '2026-02-20',
     ),
   ];
 
   void _addLeg() {
     setState(() {
-      final String lastTo = _multiCityLegs.last.to;
+      final lastLeg = _multiCityLegs.last;
       _multiCityLegs.add(
         FlightLeg(
-          from: lastTo,
-          to: 'Singapore (SIN)',
-          date: 'Monday, 23 Feb 2026',
+          originLocationCode: lastLeg.destinationLocationCode,
+          originLabel: lastLeg.destinationLabel,
+          destinationLocationCode: 'SIN',
+          destinationLabel: 'Singapore (SIN)',
+          departureDate: '2026-02-23',
         ),
       );
     });
@@ -260,9 +264,13 @@ class _FlightSearchCardState extends State<FlightSearchCard>
     setState(() {
       final leg = _multiCityLegs[index];
       _multiCityLegs[index] = FlightLeg(
-        from: isTo ? leg.from : result.displayLabel,
-        to: isTo ? result.displayLabel : leg.to,
-        date: leg.date,
+        originLocationCode: isTo ? leg.originLocationCode : result.iataCode,
+        originLabel: isTo ? leg.originLabel : result.displayLabel,
+        destinationLocationCode: isTo
+            ? result.iataCode
+            : leg.destinationLocationCode,
+        destinationLabel: isTo ? result.displayLabel : leg.destinationLabel,
+        departureDate: leg.departureDate,
       );
     });
   }
@@ -501,7 +509,7 @@ class _FlightSearchCardState extends State<FlightSearchCard>
                           child: SearchInputField(
                             label: 'From',
                             icon: Icons.flight_takeoff,
-                            value: leg.from,
+                            value: leg.originLabel,
                             trailing: const Icon(
                               Icons.keyboard_arrow_down,
                               size: 18,
@@ -517,7 +525,7 @@ class _FlightSearchCardState extends State<FlightSearchCard>
                               child: SearchInputField(
                                 label: 'To',
                                 icon: Icons.flight_land,
-                                value: leg.to,
+                                value: leg.destinationLabel,
                                 trailing: const Icon(
                                   Icons.keyboard_arrow_down,
                                   size: 18,
