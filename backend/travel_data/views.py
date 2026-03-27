@@ -92,3 +92,20 @@ class SearchView(views.APIView):
             'rideOptions': RideOptionSerializer(rides, many=True).data,
             'coupons': CouponSerializer(coupons, many=True).data
         })
+
+
+class AirportSearchView(views.APIView):
+    """
+    Returns airport/city suggestions for autocomplete.
+    Query param: ?q=<keyword>
+    """
+    permission_classes = [permissions.AllowAny]
+
+    def get(self, request):
+        query = request.query_params.get('q', '').strip()
+        if len(query) < 2:
+            return Response({'results': []})
+
+        amadeus = AmadeusService()
+        results = amadeus.search_airports(query)
+        return Response({'results': results})

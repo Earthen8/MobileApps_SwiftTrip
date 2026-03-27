@@ -6,6 +6,7 @@ import '../../checkout/checkout.dart';
 import '../models/flight_leg.dart';
 import '../services/searching_service.dart';
 import 'search_input_field.dart';
+import 'airport_picker_sheet.dart';
 
 class FlightSearchCard extends StatefulWidget {
   const FlightSearchCard({super.key});
@@ -113,8 +114,10 @@ class _PesanButton extends StatelessWidget {
 
 class _FlightSearchCardState extends State<FlightSearchCard>
     with SingleTickerProviderStateMixin {
-  String _fromLabel = 'Jakarta (JKTA)';
-  String _toLabel = 'Malang (MLA)';
+  String _fromLabel = 'Jakarta (CGK)';
+  String _fromCode = 'CGK';
+  String _toLabel = 'Malang (MLG)';
+  String _toCode = 'MLG';
   final String _dateLabel = 'Friday, 20 Feb 2026';
   final String _passengerLabel = '1 Passenger';
   final String _classLabel = 'Economy';
@@ -194,10 +197,46 @@ class _FlightSearchCardState extends State<FlightSearchCard>
 
   void _swap() {
     setState(() {
-      final temp = _fromLabel;
+      final tempLabel = _fromLabel;
+      final tempCode = _fromCode;
       _fromLabel = _toLabel;
-      _toLabel = temp;
+      _fromCode = _toCode;
+      _toLabel = tempLabel;
+      _toCode = tempCode;
       _isSwapped = !_isSwapped;
+    });
+  }
+
+  Future<void> _pickAirport({required bool isFrom}) async {
+    final result = await showAirportPicker(
+      context,
+      label: isFrom ? 'From' : 'To',
+    );
+    if (result == null || !mounted) return;
+    setState(() {
+      if (isFrom) {
+        _fromCode = result.iataCode;
+        _fromLabel = result.displayLabel;
+      } else {
+        _toCode = result.iataCode;
+        _toLabel = result.displayLabel;
+      }
+    });
+  }
+
+  Future<void> _pickAirportForLeg(int index, {required bool isTo}) async {
+    final result = await showAirportPicker(
+      context,
+      label: isTo ? 'To' : 'From',
+    );
+    if (result == null || !mounted) return;
+    setState(() {
+      final leg = _multiCityLegs[index];
+      _multiCityLegs[index] = FlightLeg(
+        from: isTo ? leg.from : result.displayLabel,
+        to: isTo ? result.displayLabel : leg.to,
+        date: leg.date,
+      );
     });
   }
 
@@ -300,15 +339,31 @@ class _FlightSearchCardState extends State<FlightSearchCard>
                   children: [
                     Column(
                       children: [
-                        SearchInputField(
-                          label: 'From',
-                          icon: Icons.flight_takeoff,
-                          value: _fromLabel,
+                        GestureDetector(
+                          onTap: () => _pickAirport(isFrom: true),
+                          child: SearchInputField(
+                            label: 'From',
+                            icon: Icons.flight_takeoff,
+                            value: _fromLabel,
+                            trailing: const Icon(
+                              Icons.keyboard_arrow_down,
+                              size: 18,
+                              color: Colors.black38,
+                            ),
+                          ),
                         ),
-                        SearchInputField(
-                          label: 'To',
-                          icon: Icons.flight_land,
-                          value: _toLabel,
+                        GestureDetector(
+                          onTap: () => _pickAirport(isFrom: false),
+                          child: SearchInputField(
+                            label: 'To',
+                            icon: Icons.flight_land,
+                            value: _toLabel,
+                            trailing: const Icon(
+                              Icons.keyboard_arrow_down,
+                              size: 18,
+                              color: Colors.black38,
+                            ),
+                          ),
                         ),
                       ],
                     ),
@@ -390,18 +445,34 @@ class _FlightSearchCardState extends State<FlightSearchCard>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       if (i == 0)
-                        SearchInputField(
-                          label: 'From',
-                          icon: Icons.flight_takeoff,
-                          value: leg.from,
+                        GestureDetector(
+                          onTap: () => _pickAirportForLeg(i, isTo: false),
+                          child: SearchInputField(
+                            label: 'From',
+                            icon: Icons.flight_takeoff,
+                            value: leg.from,
+                            trailing: const Icon(
+                              Icons.keyboard_arrow_down,
+                              size: 18,
+                              color: Colors.black38,
+                            ),
+                          ),
                         ),
                       Row(
                         children: [
                           Expanded(
-                            child: SearchInputField(
-                              label: 'To',
-                              icon: Icons.flight_land,
-                              value: leg.to,
+                            child: GestureDetector(
+                              onTap: () => _pickAirportForLeg(i, isTo: true),
+                              child: SearchInputField(
+                                label: 'To',
+                                icon: Icons.flight_land,
+                                value: leg.to,
+                                trailing: const Icon(
+                                  Icons.keyboard_arrow_down,
+                                  size: 18,
+                                  color: Colors.black38,
+                                ),
+                              ),
                             ),
                           ),
                           if (i > 0)

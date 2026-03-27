@@ -83,6 +83,41 @@ class AmadeusService:
             })
         return results
 
+    def search_airports(self, keyword):
+        """
+        Searches airports/cities by keyword using Amadeus Location API.
+        Returns list of {iataCode, name, cityName, countryCode}.
+        """
+        token = self._get_token()
+        if not token:
+            return []
+
+        url = f"{self.BASE_URL}/v1/reference-data/locations"
+        headers = {"Authorization": f"Bearer {token}"}
+        params = {
+            "subType": "AIRPORT,CITY",
+            "keyword": keyword,
+            "page[limit]": 10,
+            "view": "LIGHT",
+        }
+        try:
+            res = requests.get(url, headers=headers, params=params, timeout=8)
+            if res.status_code == 200:
+                data = res.json().get("data", [])
+                return [
+                    {
+                        "iataCode": loc.get("iataCode", ""),
+                        "name": loc.get("name", ""),
+                        "cityName": loc.get("address", {}).get("cityName", ""),
+                        "countryCode": loc.get("address", {}).get("countryCode", ""),
+                    }
+                    for loc in data
+                    if loc.get("iataCode")
+                ]
+        except requests.RequestException:
+            pass
+        return []
+
     def _fallback_search(self, origin, destination, date):
         # We try to interpret 'date' as YYYY-MM-DD
         try:
