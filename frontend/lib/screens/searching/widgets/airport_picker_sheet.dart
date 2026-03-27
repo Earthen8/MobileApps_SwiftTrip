@@ -25,40 +25,34 @@ class _AirportPickerSheet extends StatefulWidget {
 class _AirportPickerSheetState extends State<_AirportPickerSheet> {
   final _controller = TextEditingController();
   final _service = AirportSearchService();
-  Timer? _debounce;
 
   List<AirportResult> _results = [];
-  bool _isLoading = false;
   bool _searched = false;
 
   @override
   void dispose() {
-    _debounce?.cancel();
     _controller.dispose();
     super.dispose();
   }
 
-  void _onQueryChanged(String query) {
-    _debounce?.cancel();
-    if (query.trim().length < 2) {
-      setState(() {
-        _results = [];
-        _searched = false;
-        _isLoading = false;
-      });
-      return;
-    }
-    setState(() => _isLoading = true);
-    _debounce = Timer(const Duration(milliseconds: 350), () async {
-      final results = await _service.searchAirports(query);
+  void _onQueryChanged(String query) async {
+    if (query.trim().isEmpty) {
       if (mounted) {
         setState(() {
-          _results = results;
-          _isLoading = false;
-          _searched = true;
+          _results = [];
+          _searched = false;
         });
       }
-    });
+      return;
+    }
+    
+    final results = await _service.searchAirports(query);
+    if (mounted) {
+      setState(() {
+        _results = results;
+        _searched = true;
+      });
+    }
   }
 
   @override
@@ -157,17 +151,6 @@ class _AirportPickerSheetState extends State<_AirportPickerSheet> {
   }
 
   Widget _buildBody() {
-    if (_isLoading) {
-      return const Padding(
-        padding: EdgeInsets.symmetric(vertical: 32),
-        child: Center(
-          child: CircularProgressIndicator(
-            color: Color(0xFF2B99E3),
-            strokeWidth: 2.5,
-          ),
-        ),
-      );
-    }
 
     if (_searched && _results.isEmpty) {
       return Padding(
