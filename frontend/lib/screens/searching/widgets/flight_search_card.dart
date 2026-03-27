@@ -131,7 +131,11 @@ class _FlightSearchCardState extends State<FlightSearchCard>
   bool _isSwapped = false;
   bool _isMultiCity = false;
   bool _isSearching = false;
-  bool? _ticketFound;
+
+  bool _searchPerformed = false;
+  List<String> _foundAirlines = [];
+  String? _selectedAirline;
+
   late final AnimationController _toastController;
   late final Animation<Offset> _toastSlide;
 
@@ -155,34 +159,95 @@ class _FlightSearchCardState extends State<FlightSearchCard>
   }
 
   Future<void> _handleSearch() async {
-    setState(() => _isSearching = true);
-    final bool found = await const SearchingService().searchFlights(
-      multiCityLegs: _multiCityLegs,
-      from: _fromCode,
-      to: _toCode,
-      date: _dateApiValue,
-      passengers: _passengers.total.toString(),
-      flightClass: _flightClassApi,
-      isMultiCity: _isMultiCity,
+    if (_fromCode == _toCode) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Origin and destination cannot be the same.'),
+        ),
+      );
+      return;
+    }
+
+    final today = DateTime.now();
+    final todayOnly = DateTime(today.year, today.month, today.day);
+    final departureOnly = DateTime(
+      _departureDate.year,
+      _departureDate.month,
+      _departureDate.day,
     );
-    if (!mounted) return;
-    setState(() {
-      _isSearching = false;
-      _ticketFound = found;
-    });
-    await _toastController.forward();
-    await Future.delayed(const Duration(milliseconds: 1500));
-    if (mounted) await _toastController.reverse();
+    if (departureOnly.isBefore(todayOnly)) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Departure date cannot be in the past.')),
+      );
+      return;
+    }
+
+    if (_passengers.adults < 1) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Minimum 1 adult passenger is required.')),
+      );
+      return;
+    }
+
+    setState(() => _isSearching = true);
+    try {
+      final List<String> airlines = await const SearchingService()
+          .searchFlights(
+            multiCityLegs: _multiCityLegs,
+            from: _fromCode,
+            to: _toCode,
+            date: _dateApiValue,
+            passengers: _passengers.total.toString(),
+            flightClass: _flightClassApi,
+            isMultiCity: _isMultiCity,
+          );
+
+      if (!mounted) return;
+      setState(() {
+        _isSearching = false;
+        _searchPerformed = true;
+        _foundAirlines = airlines;
+        _selectedAirline = airlines.isNotEmpty ? airlines.first : null;
+      });
+      await _toastController.forward();
+      await Future.delayed(const Duration(milliseconds: 1500));
+      if (mounted) await _toastController.reverse();
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _isSearching = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.toString().replaceAll('Exception: ', ''))),
+      );
+    }
+  }
+
+  void _resetSearchState() {
+    _searchPerformed = false;
+    _foundAirlines = [];
+    _selectedAirline = null;
   }
 
   Future<void> _pickDate() async {
     final picked = await showFlightDatePicker(context, _departureDate);
-    if (picked != null && mounted) setState(() => _departureDate = picked);
+    if (picked != null && mounted) {
+      setState(() {
+        _departureDate = picked;
+        _resetSearchState();
+      });
+    }
   }
 
   Future<void> _pickPassengers() async {
     final result = await showPassengerPicker(context, _passengers);
-    if (result != null && mounted) setState(() => _passengers = result);
+    if (result != null && mounted) {
+      setState(() {
+        _passengers = result;
+        _resetSearchState();
+      });
+    }
   }
 
   Future<void> _pickFlightClass() async {
@@ -191,7 +256,53 @@ class _FlightSearchCardState extends State<FlightSearchCard>
       setState(() {
         _flightClassDisplay = result.$1;
         _flightClassApi = result.$2;
+        _resetSearchState();
       });
+    }
+  }
+
+  Future<void> _pickAirline() async {
+    if (_foundAirlines.isEmpty) return;
+    final result = await showModalBottomSheet<String>(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return Container(
+          padding: const EdgeInsets.symmetric(vertical: 20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                'Pilih Maskapai',
+                style: TextStyle(
+                  fontFamily: 'Poppins',
+                  fontWeight: FontWeight.w600,
+                  fontSize: 16,
+                ),
+              ),
+              const SizedBox(height: 16),
+              ..._foundAirlines.map(
+                (airline) => ListTile(
+                  title: Text(
+                    airline,
+                    style: const TextStyle(fontFamily: 'Poppins'),
+                  ),
+                  trailing: _selectedAirline == airline
+                      ? const Icon(Icons.check, color: Color(0xFF2B99E3))
+                      : null,
+                  onTap: () => Navigator.pop(context, airline),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+
+    if (result != null && mounted) {
+      setState(() => _selectedAirline = result);
     }
   }
 
@@ -235,6 +346,7 @@ class _FlightSearchCardState extends State<FlightSearchCard>
       _toLabel = tempLabel;
       _toCode = tempCode;
       _isSwapped = !_isSwapped;
+      _resetSearchState();
     });
   }
 
@@ -252,6 +364,7 @@ class _FlightSearchCardState extends State<FlightSearchCard>
         _toCode = result.iataCode;
         _toLabel = result.displayLabel;
       }
+      _resetSearchState();
     });
   }
 
@@ -272,6 +385,7 @@ class _FlightSearchCardState extends State<FlightSearchCard>
         destinationLabel: isTo ? result.displayLabel : leg.destinationLabel,
         departureDate: leg.departureDate,
       );
+      _resetSearchState();
     });
   }
 
@@ -303,7 +417,9 @@ class _FlightSearchCardState extends State<FlightSearchCard>
                     child: GestureDetector(
                       onTap: () => setState(() {
                         _isMultiCity = false;
-                        _ticketFound = null;
+                        _searchPerformed = false;
+                        _foundAirlines = [];
+                        _selectedAirline = null;
                       }),
                       child: Container(
                         padding: const EdgeInsets.only(bottom: 8),
@@ -336,7 +452,9 @@ class _FlightSearchCardState extends State<FlightSearchCard>
                     child: GestureDetector(
                       onTap: () => setState(() {
                         _isMultiCity = true;
-                        _ticketFound = null;
+                        _searchPerformed = false;
+                        _foundAirlines = [];
+                        _selectedAirline = null;
                       }),
                       child: Container(
                         padding: const EdgeInsets.only(bottom: 8),
@@ -486,15 +604,18 @@ class _FlightSearchCardState extends State<FlightSearchCard>
                     ),
                   ],
                 ),
-                if (_ticketFound == true)
-                  const SearchInputField(
-                    label: 'Penerbangan',
-                    icon: Icons.airplanemode_active,
-                    value: 'Citilink',
-                    trailing: Icon(
-                      Icons.keyboard_arrow_down,
-                      size: 20,
-                      color: Colors.black54,
+                if (_searchPerformed && _foundAirlines.isNotEmpty)
+                  GestureDetector(
+                    onTap: _pickAirline,
+                    child: SearchInputField(
+                      label: 'Penerbangan',
+                      icon: Icons.airplanemode_active,
+                      value: _selectedAirline ?? 'Pilih Maskapai',
+                      trailing: const Icon(
+                        Icons.keyboard_arrow_down,
+                        size: 20,
+                        color: Colors.black54,
+                      ),
                     ),
                   ),
               ] else ...[
@@ -615,22 +736,25 @@ class _FlightSearchCardState extends State<FlightSearchCard>
                     ),
                   ],
                 ),
-                if (_ticketFound == true)
-                  const SearchInputField(
-                    label: 'Penerbangan',
-                    icon: Icons.airplanemode_active,
-                    value: 'Citilink',
-                    trailing: Icon(
-                      Icons.keyboard_arrow_down,
-                      size: 20,
-                      color: Colors.black54,
+                if (_searchPerformed && _foundAirlines.isNotEmpty)
+                  GestureDetector(
+                    onTap: _pickAirline,
+                    child: SearchInputField(
+                      label: 'Penerbangan',
+                      icon: Icons.airplanemode_active,
+                      value: _selectedAirline ?? 'Pilih Maskapai',
+                      trailing: const Icon(
+                        Icons.keyboard_arrow_down,
+                        size: 20,
+                        color: Colors.black54,
+                      ),
                     ),
                   ),
               ],
               const SizedBox(height: 20),
               AnimatedSwitcher(
                 duration: const Duration(milliseconds: 350),
-                child: _ticketFound == true
+                child: _searchPerformed && _foundAirlines.isNotEmpty
                     ? _PesanButton(key: const ValueKey('pesan'))
                     : Row(
                         key: const ValueKey('search'),
@@ -712,7 +836,7 @@ class _FlightSearchCardState extends State<FlightSearchCard>
             ],
           ),
         ),
-        if (_ticketFound != null)
+        if (_searchPerformed)
           Positioned(
             top: -80,
             right: 0,
@@ -770,7 +894,7 @@ class _FlightSearchCardState extends State<FlightSearchCard>
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             Text(
-                              _ticketFound!
+                              _foundAirlines.isNotEmpty
                                   ? 'Tiket Ditemukan'
                                   : 'Tidak Ditemukan',
                               style: const TextStyle(
@@ -782,7 +906,7 @@ class _FlightSearchCardState extends State<FlightSearchCard>
                             ),
                             const SizedBox(width: 8),
                             SvgPicture.string(
-                              _ticketFound!
+                              _foundAirlines.isNotEmpty
                                   ? '''<svg width="124" height="124" viewBox="0 0 124 124" fill="none" xmlns="http://www.w3.org/2000/svg">
 <g filter="url(#filter0_d_482_1238)">
 <path fill-rule="evenodd" clip-rule="evenodd" d="M61.75 115.5C69.3338 115.5 76.8434 114.006 83.85 111.104C90.8565 108.202 97.2228 103.948 102.585 98.5854C107.948 93.2228 112.202 86.8565 115.104 79.85C118.006 72.8434 119.5 65.3338 119.5 57.75C119.5 50.1662 118.006 42.6566 115.104 35.65C112.202 28.6435 107.948 22.2772 102.585 16.9146C97.2228 11.552 90.8565 7.29817 83.85 4.39596C76.8434 1.49375 69.3338 -1.13008e-07 61.75 0C46.4337 2.2823e-07 31.7448 6.08436 20.9146 16.9146C10.0844 27.7448 4 42.4337 4 57.75C4 73.0663 10.0844 87.7552 20.9146 98.5854C31.7448 109.416 46.4337 115.5 61.75 115.5ZM60.2613 81.1067L92.3447 42.6067L82.4887 34.3933L54.897 67.4969L40.6199 53.2134L31.5468 62.2866L50.7967 81.5366L55.7633 86.5031L60.2613 81.1067Z" fill="#02C518"/>

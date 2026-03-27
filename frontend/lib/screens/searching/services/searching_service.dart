@@ -1,4 +1,6 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import '../../../../core/constants.dart';
 import '../models/ride_option.dart';
 import '../models/detail_row.dart';
 import '../models/coupon_model.dart';
@@ -110,76 +112,88 @@ class SearchingService {
 
   // ── Flights ────────────────────────────────────────────────────────────────
 
-  /// Searches for flights based on Amadeus API parameters.
-  Future<bool> searchFlights({
+  /// Searches for flights based on Amadeus API parameters using django backend.
+  Future<List<String>> searchFlights({
     required List<FlightLeg> multiCityLegs,
-    required String from, // originLocationCode (IATA)
-    required String to, // destinationLocationCode (IATA)
-    required String date, // departureDate (YYYY-MM-DD)
-    required String passengers, // total adults
-    required String flightClass, // ECONOMY, etc.
+    required String from,
+    required String to,
+    required String date,
+    required String passengers,
+    required String flightClass,
     required bool isMultiCity,
   }) async {
-    // ── Prepare Amadeus Payload ──────────────────────────────────────────────
-    
-    // ignore: unused_local_variable
-    final Map<String, dynamic> payload;
-    
-    if (isMultiCity) {
-      payload = {
-        'currencyCode': 'IDR',
-        'originDestinations': multiCityLegs.asMap().entries.map((entry) {
-          final i = entry.key;
-          final leg = entry.value;
-          return {
-            'id': (i + 1).toString(),
-            'originLocationCode': leg.originLocationCode,
-            'destinationLocationCode': leg.destinationLocationCode,
-            'departureDateTimeRange': {
-              'date': leg.departureDate,
-            },
-          };
-        }).toList(),
-        'travelers': List.generate(int.parse(passengers), (i) => {
-          'id': (i + 1).toString(),
-          'travelerType': 'ADULT',
-        }),
-        'sources': ['GDS'],
-        'searchCriteria': {
-          'maxFlightOffers': 2,
-          'flightFilters': {
-            'cabinRestrictions': [
-              {
-                'cabin': flightClass,
-                'originDestinationIds': multiCityLegs.asMap().keys.map((k) => (k+1).toString()).toList(),
-              }
-            ]
+    final dio = Dio(
+      BaseOptions(
+        baseUrl: Constants.travelUrl,
+        connectTimeout: const Duration(seconds: 15),
+        receiveTimeout: const Duration(seconds: 15),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+      ),
+    );
+
+    try {
+      if (isMultiCity) {
+        // NOTE: The current backend `/api/travel/search/` with Amadeus integration
+        // only supports one origin and destination right now via query params.
+        // We will execute a search for the first leg to demonstrate capability.
+        if (multiCityLegs.isEmpty) return [];
+        final leg = multiCityLegs.first;
+        
+        final response = await dio.get('search/', queryParameters: {
+          'origin': leg.originLocationCode,
+          'destination': leg.destinationLocationCode,
+          'date': leg.departureDate,
+          'passengers': passengers,
+          'class': flightClass,
+        });
+
+        if (response.statusCode == 200) {
+          final flights = response.data['flights'] as List<dynamic>? ?? [];
+          final Set<String> airlines = {};
+          for (var item in flights) {
+            final al = item['airline']?.toString();
+            if (al != null && al.isNotEmpty) {
+              airlines.add(al);
+            }
           }
+          return airlines.toList();
         }
-      };
-    } else {
-      payload = {
-        'originLocationCode': from,
-        'destinationLocationCode': to,
-        'departureDate': date,
-        'adults': passengers,
-        'travelClass': flightClass,
-        'max': 2,
-      };
+      } else {
+        // Round trip implementation
+        final response = await dio.get('search/', queryParameters: {
+          'origin': from,
+          'destination': to,
+          'date': date,
+          'passengers': passengers,
+          'class': flightClass,
+        });
+
+        if (response.statusCode == 200) {
+          final flights = response.data['flights'] as List<dynamic>? ?? [];
+          final Set<String> airlines = {};
+          for (var item in flights) {
+            final al = item['airline']?.toString();
+            if (al != null && al.isNotEmpty) {
+              airlines.add(al);
+            }
+          }
+          return airlines.toList();
+        }
+      }
+    } on DioException catch (e) {
+      final data = e.response?.data;
+      String message = 'Failed to fetch flights.';
+      if (data is Map && data.containsKey('error')) {
+        message = data['error'];
+      }
+      throw Exception(message);
+    } catch (_) {
+        throw Exception('An unexpected network error occurred.');
     }
 
-    // Log the payload to verify Amadeus mapping
-    debugPrint('Searching flights with payload: $payload');
-
-    // TODO: POST to backend API (e.g., Dio.post('/api/flights/search', data: payload))
-    await Future.delayed(const Duration(seconds: 1));
-
-    // Mock logic for demonstration
-    if (isMultiCity) {
-      return multiCityLegs.any(
-        (leg) => leg.originLocationCode == 'CGK' || leg.destinationLocationCode == 'CGK',
-      );
-    }
-    return from == 'CGK' || to == 'CGK';
+    return [];
   }
 }
