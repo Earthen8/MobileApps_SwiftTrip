@@ -68,6 +68,80 @@ class _CartPageState extends State<CartPage> {
     return 'Rp. ${buffer.toString()}';
   }
 
+  Widget _buildEmptyState() {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 40),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: 120,
+              height: 120,
+              decoration: BoxDecoration(
+                color: const Color(0xFF2B99E3).withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.shopping_cart_outlined,
+                size: 60,
+                color: Color(0xFF2B99E3),
+              ),
+            ),
+            const SizedBox(height: 24),
+            const Text(
+              'Your cart is empty',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontFamily: 'Poppins',
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
+                color: Colors.black87,
+              ),
+            ),
+            const SizedBox(height: 12),
+            const Text(
+              'Looks like you haven\'t added any tickets yet. Let\'s find your next adventure!',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontFamily: 'Poppins',
+                fontSize: 14,
+                color: Colors.black54,
+                height: 1.5,
+              ),
+            ),
+            const SizedBox(height: 32),
+            ElevatedButton(
+              onPressed: () {
+                // Navigate back to home/search (index 0)
+                // Assuming CartPage is inside a MainScreen with a controller or nested Navigator
+                // For now, we can pop if we're in a stack, or just pop back to index 0.
+                Navigator.of(context).popUntil((route) => route.isFirst);
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF2B99E3),
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                elevation: 0,
+              ),
+              child: const Text(
+                'Explore Flights',
+                style: TextStyle(
+                  fontFamily: 'Poppins',
+                  fontWeight: FontWeight.w500,
+                  fontSize: 14,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -89,39 +163,30 @@ class _CartPageState extends State<CartPage> {
             child: _isLoading
                 ? const Center(child: CircularProgressIndicator())
                 : _tickets.isEmpty
-                    ? const Center(
-                        child: Text(
-                          'No tickets in cart',
-                          style: TextStyle(
-                            fontFamily: 'Poppins',
-                            fontSize: 16,
-                            color: Colors.grey,
+                ? _buildEmptyState()
+                : SingleChildScrollView(
+                    padding: const EdgeInsets.only(
+                      top: 20,
+                      left: 20,
+                      right: 20,
+                      bottom: 40,
+                    ),
+                    child: Column(
+                      children: [
+                        ...List.generate(
+                          _tickets.length,
+                          (i) => Padding(
+                            padding: const EdgeInsets.only(bottom: 16),
+                            child: TicketCard(
+                              ticket: _tickets[i],
+                              formatRp: _formatRp,
+                              onDelete: () => _removeTicket(i),
+                            ),
                           ),
                         ),
-                      )
-                    : SingleChildScrollView(
-                        padding: const EdgeInsets.only(
-                          top: 20,
-                          left: 20,
-                          right: 20,
-                          bottom: 40,
-                        ),
-                        child: Column(
-                          children: [
-                            ...List.generate(
-                              _tickets.length,
-                              (i) => Padding(
-                                padding: const EdgeInsets.only(bottom: 16),
-                                child: TicketCard(
-                                  ticket: _tickets[i],
-                                  formatRp: _formatRp,
-                                  onDelete: () => _removeTicket(i),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+                      ],
+                    ),
+                  ),
           ),
 
           const SizedBox(height: 10),
