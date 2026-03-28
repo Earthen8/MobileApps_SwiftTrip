@@ -13,7 +13,7 @@ class NextTripService {
       date: '19/2/2026',
       departure: '9:00',
       arrive: '11:00',
-      train: '1234',
+      operator: '1234',
       carriage: '01',
       seat: 'A12',
       priceRp: 100000,

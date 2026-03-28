@@ -14,6 +14,49 @@ class TicketCard extends StatelessWidget {
     this.onDelete,
   });
 
+  List<Widget> _buildTypeSpecificRow(CartTicket ticket) {
+    switch (ticket.type) {
+      case 'Train Ticket':
+        return [
+          LabelValue(label: 'OPERATOR', value: ticket.operator ?? '-'),
+          const SizedBox(width: 40),
+          LabelValue(label: 'CARRIAGE', value: ticket.carriage ?? '-'),
+          const SizedBox(width: 40),
+          LabelValue(label: 'SEAT', value: ticket.seat ?? '-'),
+        ];
+
+      case 'Plane Ticket':
+        return [
+          LabelValue(label: 'OPERATOR', value: ticket.operator ?? '-'),
+          const SizedBox(width: 40),
+          LabelValue(label: 'FLIGHT', value: ticket.flightNumber ?? '-'),
+          const SizedBox(width: 40),
+          LabelValue(label: 'CLASS', value: ticket.flightClass ?? '-'),
+        ];
+
+      case 'Bus Ticket':
+        return [
+          LabelValue(label: 'OPERATOR', value: ticket.operator ?? '-'),
+          const SizedBox(width: 40),
+          LabelValue(label: 'CLASS', value: ticket.busClass ?? '-'),
+          const SizedBox(width: 40),
+          LabelValue(label: 'BUS NO.', value: ticket.busNumber ?? '-'),
+        ];
+
+      case 'Car Ticket':
+        return [
+          LabelValue(label: 'CAR', value: ticket.operator ?? '-'),
+          const SizedBox(width: 40),
+          LabelValue(label: 'PLATE', value: ticket.carPlate ?? '-'),
+          const SizedBox(width: 40),
+          LabelValue(label: 'DRIVER', value: ticket.driverName ?? '-'),
+        ];
+
+      default:
+        return [];
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -87,7 +130,7 @@ class TicketCard extends StatelessWidget {
               ),
             ),
           ] else ...[
-            // ── Class label ──────────────────────────────────────────
+            // ── Class label (shared for all transport) ───────────────
             Padding(
               padding: const EdgeInsets.only(left: 15, top: 10, bottom: 6),
               child: Text(
@@ -103,7 +146,7 @@ class TicketCard extends StatelessWidget {
 
             const TicketDivider(),
 
-            // ── FROM / TO ────────────────────────────────────────────
+            // ── FROM / TO (shared) ───────────────────────────────────
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
               child: Row(
@@ -117,7 +160,7 @@ class TicketCard extends StatelessWidget {
 
             const TicketDivider(),
 
-            // ── DATE / DEPARTURE / ARRIVE ────────────────────────────
+            // ── DATE / DEPARTURE / ARRIVE (shared) ───────────────────
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
               child: Row(
@@ -134,18 +177,10 @@ class TicketCard extends StatelessWidget {
               ),
             ),
 
-            // ── TRAIN / CARRIAGE / SEAT ──────────────────────────────
+            // ── Type-specific bottom row ──────────────────────────────
             Padding(
               padding: const EdgeInsets.only(left: 15, right: 15, bottom: 10),
-              child: Row(
-                children: [
-                  LabelValue(label: 'TRAIN', value: ticket.train ?? '-'),
-                  const SizedBox(width: 40),
-                  LabelValue(label: 'CARRIAGE', value: ticket.carriage ?? '-'),
-                  const SizedBox(width: 40),
-                  LabelValue(label: 'SEAT', value: ticket.seat ?? '-'),
-                ],
-              ),
+              child: Row(children: _buildTypeSpecificRow(ticket)),
             ),
           ],
 

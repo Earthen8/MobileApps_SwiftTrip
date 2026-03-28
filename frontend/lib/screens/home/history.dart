@@ -66,7 +66,7 @@ class HistoryPage extends StatelessWidget {
                       date: '10/12/2025',
                       departure: '08:00',
                       arrive: '10:00',
-                      train: 'Argo Bromo',
+                      operator: 'Argo Bromo',
                       carriage: '3',
                       seat: '12A',
                       priceRp: 500000,

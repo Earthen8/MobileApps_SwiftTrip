@@ -8,15 +8,32 @@ class CartTicket {
   final String classLabel;
   final int priceRp;
 
-  // Transport fields
+  // General operator for all transport (e.g., Avanza, Batik Air, KAI, PO Haryanto)
+  final String? operator;
+
+  // Shared transport fields
   final String? from;
   final String? to;
   final String? date;
   final String? departure;
   final String? arrive;
-  final String? train;
+
+  // Train-specific
   final String? carriage;
   final String? seat;
+
+  // Flight-specific
+  final String? flightNumber;
+  final String? terminal;
+  final String? flightClass;
+
+  // Bus-specific
+  final String? busClass;
+  final String? busNumber;
+
+  // Car rental-specific
+  final String? carPlate;
+  final String? driverName;
 
   // Accommodation fields
   final String? imageUrl;
@@ -35,9 +52,16 @@ class CartTicket {
     this.date,
     this.departure,
     this.arrive,
-    this.train,
+    this.operator,
     this.carriage,
     this.seat,
+    this.flightNumber,
+    this.terminal,
+    this.flightClass,
+    this.busClass,
+    this.busNumber,
+    this.carPlate,
+    this.driverName,
     this.imageUrl,
     this.stayDate,
     this.stayDuration,
@@ -56,9 +80,16 @@ class CartTicket {
       date: json['date'] as String?,
       departure: json['departure'] as String?,
       arrive: json['arrive'] as String?,
-      train: json['train'] as String?,
+      operator: json['operator'] as String?,
       carriage: json['carriage'] as String?,
       seat: json['seat'] as String?,
+      flightNumber: json['flight_number'] as String?,
+      terminal: json['terminal'] as String?,
+      flightClass: json['flight_class'] as String?,
+      busClass: json['bus_class'] as String?,
+      busNumber: json['bus_number'] as String?,
+      carPlate: json['car_plate'] as String?,
+      driverName: json['driver_name'] as String?,
       imageUrl: json['image_url'] as String?,
       stayDate: json['stay_date'] as String?,
       stayDuration: json['stay_duration'] as String?,
@@ -78,9 +109,16 @@ class CartTicket {
       'date': date,
       'departure': departure,
       'arrive': arrive,
-      'train': train,
+      'operator': operator,
       'carriage': carriage,
       'seat': seat,
+      'flight_number': flightNumber,
+      'terminal': terminal,
+      'flight_class': flightClass,
+      'bus_class': busClass,
+      'bus_number': busNumber,
+      'car_plate': carPlate,
+      'driver_name': driverName,
       'image_url': imageUrl,
       'stay_date': stayDate,
       'stay_duration': stayDuration,
@@ -99,9 +137,16 @@ class CartTicket {
     String? date,
     String? departure,
     String? arrive,
-    String? train,
+    String? operator,
     String? carriage,
     String? seat,
+    String? flightNumber,
+    String? terminal,
+    String? flightClass,
+    String? busClass,
+    String? busNumber,
+    String? carPlate,
+    String? driverName,
     String? imageUrl,
     String? stayDate,
     String? stayDuration,
@@ -118,9 +163,16 @@ class CartTicket {
       date: date ?? this.date,
       departure: departure ?? this.departure,
       arrive: arrive ?? this.arrive,
-      train: train ?? this.train,
+      operator: operator ?? this.operator,
       carriage: carriage ?? this.carriage,
       seat: seat ?? this.seat,
+      flightNumber: flightNumber ?? this.flightNumber,
+      terminal: terminal ?? this.terminal,
+      flightClass: flightClass ?? this.flightClass,
+      busClass: busClass ?? this.busClass,
+      busNumber: busNumber ?? this.busNumber,
+      carPlate: carPlate ?? this.carPlate,
+      driverName: driverName ?? this.driverName,
       imageUrl: imageUrl ?? this.imageUrl,
       stayDate: stayDate ?? this.stayDate,
       stayDuration: stayDuration ?? this.stayDuration,
