@@ -77,7 +77,8 @@ class AmadeusService:
 
     def _format_amadeus_response(self, data, carriers=None):
         carriers = carriers or {}
-        results = []
+        cheapest_by_airline = {}
+
         for offer in data:
             itineraries = offer.get("itineraries", [])
             if not itineraries:
@@ -91,6 +92,7 @@ class AmadeusService:
             lead_segment = segments[0]
             price_info = offer.get("price", {})
             carrier_code = lead_segment.get("carrierCode")
+            price = float(price_info.get("total", "0"))
             
             # For multi-city or round-trip, we might have multiple carriers.
             # We add all carriers found in this offer to help the frontend identify available airlines.
@@ -101,7 +103,7 @@ class AmadeusService:
                     if c_code:
                         all_carriers.add(c_code)
 
-            results.append({
+            formatted_offer = {
                 "airline": carrier_code,
                 "airlineName": carriers.get(carrier_code, carrier_code),
                 "all_airlines": list(all_carriers),
@@ -109,11 +111,16 @@ class AmadeusService:
                 "destination": lead_segment.get("arrival", {}).get("iataCode"),
                 "departure_time": lead_segment.get("departure", {}).get("at"),
                 "arrival_time": segments[-1].get("arrival", {}).get("at"), # arrival of the last segment in the first itinerary
-                "price": float(price_info.get("total", "0")),
+                "price": price,
                 "currency": price_info.get("currency", "EUR"),
                 "source": "amadeus"
-            })
-        return results
+            }
+
+            # Only keep the cheapest representative for this airline
+            if carrier_code not in cheapest_by_airline or price < cheapest_by_airline[carrier_code]["price"]:
+                cheapest_by_airline[carrier_code] = formatted_offer
+
+        return list(cheapest_by_airline.values())
 
     def search_flights_multi_city(self, legs, passengers=1, travel_class="ECONOMY"):
         """
