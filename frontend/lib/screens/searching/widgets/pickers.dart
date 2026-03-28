@@ -30,7 +30,8 @@ Future<DateTime?> showFlightDatePicker(BuildContext context, DateTime initial) {
 }
 
 /// Formats a [DateTime] for human display, e.g. "Fri, 27 Mar 2026".
-String formatDisplayDate(DateTime date) => DateFormat('EEE, d MMM yyyy').format(date);
+String formatDisplayDate(DateTime date) =>
+    DateFormat('EEE, d MMM yyyy').format(date);
 
 /// Formats a [DateTime] as ISO 8601 date string, e.g. "2026-03-27".
 String formatApiDate(DateTime date) => DateFormat('yyyy-MM-dd').format(date);
@@ -42,11 +43,7 @@ class PassengerCount {
   final int children;
   final int infants;
 
-  const PassengerCount({
-    this.adults = 1,
-    this.children = 0,
-    this.infants = 0,
-  });
+  const PassengerCount({this.adults = 1, this.children = 0, this.infants = 0});
 
   int get total => adults + children + infants;
 
@@ -120,7 +117,11 @@ class _PassengerPickerSheetState extends State<_PassengerPickerSheet> {
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
         boxShadow: const [
-          BoxShadow(color: Color(0x26000000), blurRadius: 20, offset: Offset(0, -4)),
+          BoxShadow(
+            color: Color(0x26000000),
+            blurRadius: 20,
+            offset: Offset(0, -4),
+          ),
         ],
       ),
       child: Column(
@@ -132,7 +133,7 @@ class _PassengerPickerSheetState extends State<_PassengerPickerSheet> {
           _divider(),
           _counter('Children', 'Age 2–11', 'children', _count.children),
           _divider(),
-          _counter('Infants', 'Under 2 (max = adults)', 'infants', _count.infants),
+          _counter('Infants', 'Under 2', 'infants', _count.infants),
           const SizedBox(height: 16),
           _confirmButton(),
           const SizedBox(height: 24),
@@ -142,25 +143,25 @@ class _PassengerPickerSheetState extends State<_PassengerPickerSheet> {
   }
 
   Widget _handle() => Container(
-        margin: const EdgeInsets.only(top: 12, bottom: 8),
-        width: 40,
-        height: 4,
-        decoration: BoxDecoration(
-          color: Colors.black.withValues(alpha: 0.12),
-          borderRadius: BorderRadius.circular(2),
-        ),
-      );
+    margin: const EdgeInsets.only(top: 12, bottom: 8),
+    width: 40,
+    height: 4,
+    decoration: BoxDecoration(
+      color: Colors.black.withValues(alpha: 0.12),
+      borderRadius: BorderRadius.circular(2),
+    ),
+  );
 
   Widget _sectionTitle(String title) => Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-        child: Align(
-          alignment: Alignment.centerLeft,
-          child: Text(
-            title,
-            style: _kTextStyle.copyWith(fontSize: 16, fontWeight: FontWeight.w600),
-          ),
-        ),
-      );
+    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+    child: Align(
+      alignment: Alignment.centerLeft,
+      child: Text(
+        title,
+        style: _kTextStyle.copyWith(fontSize: 16, fontWeight: FontWeight.w600),
+      ),
+    ),
+  );
 
   Widget _counter(String label, String subtitle, String category, int value) =>
       Padding(
@@ -171,13 +172,20 @@ class _PassengerPickerSheetState extends State<_PassengerPickerSheet> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(label,
-                      style: _kTextStyle.copyWith(
-                          fontSize: 14, fontWeight: FontWeight.w500)),
-                  Text(subtitle,
-                      style: _kTextStyle.copyWith(
-                          fontSize: 11,
-                          color: Colors.black.withValues(alpha: 0.4))),
+                  Text(
+                    label,
+                    style: _kTextStyle.copyWith(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  Text(
+                    subtitle,
+                    style: _kTextStyle.copyWith(
+                      fontSize: 11,
+                      color: Colors.black.withValues(alpha: 0.4),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -188,7 +196,10 @@ class _PassengerPickerSheetState extends State<_PassengerPickerSheet> {
               child: Text(
                 '$value',
                 textAlign: TextAlign.center,
-                style: _kTextStyle.copyWith(fontSize: 16, fontWeight: FontWeight.w600),
+                style: _kTextStyle.copyWith(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
             const SizedBox(width: 16),
@@ -198,47 +209,54 @@ class _PassengerPickerSheetState extends State<_PassengerPickerSheet> {
       );
 
   Widget _countButton(IconData icon, VoidCallback onTap) => GestureDetector(
-        onTap: onTap,
-        child: Container(
-          width: 32,
-          height: 32,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            border: Border.all(color: Colors.black.withValues(alpha: 0.15)),
-          ),
-          child: Icon(icon, size: 16, color: _kBlue),
-        ),
-      );
+    onTap: onTap,
+    child: Container(
+      width: 32,
+      height: 32,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        border: Border.all(color: Colors.black.withValues(alpha: 0.15)),
+      ),
+      child: Icon(icon, size: 16, color: _kBlue),
+    ),
+  );
 
   Widget _divider() => Divider(
-        height: 1,
-        indent: 20,
-        endIndent: 20,
-        color: Colors.black.withValues(alpha: 0.06),
-      );
+    height: 1,
+    indent: 20,
+    endIndent: 20,
+    color: Colors.black.withValues(alpha: 0.06),
+  );
 
   Widget _confirmButton() => Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: GestureDetector(
-          onTap: () => Navigator.of(context).pop(_count),
-          child: Container(
-            height: 44,
-            decoration: BoxDecoration(
-              color: _kBlue,
-              borderRadius: BorderRadius.circular(22),
-              boxShadow: const [
-                BoxShadow(color: Color(0x26000000), blurRadius: 10, offset: Offset(0, 4)),
-              ],
+    padding: const EdgeInsets.symmetric(horizontal: 20),
+    child: GestureDetector(
+      onTap: () => Navigator.of(context).pop(_count),
+      child: Container(
+        height: 44,
+        decoration: BoxDecoration(
+          color: _kBlue,
+          borderRadius: BorderRadius.circular(22),
+          boxShadow: const [
+            BoxShadow(
+              color: Color(0x26000000),
+              blurRadius: 10,
+              offset: Offset(0, 4),
             ),
-            alignment: Alignment.center,
-            child: Text(
-              'Confirm',
-              style: _kTextStyle.copyWith(
-                  color: Colors.white, fontWeight: FontWeight.w500, fontSize: 14),
-            ),
+          ],
+        ),
+        alignment: Alignment.center,
+        child: Text(
+          'Confirm',
+          style: _kTextStyle.copyWith(
+            color: Colors.white,
+            fontWeight: FontWeight.w500,
+            fontSize: 14,
           ),
         ),
-      );
+      ),
+    ),
+  );
 }
 
 // ── Flight Class Picker ───────────────────────────────────────────────────────
@@ -267,7 +285,8 @@ class _FlightClassPickerSheet extends StatefulWidget {
   const _FlightClassPickerSheet({required this.currentApiValue});
 
   @override
-  State<_FlightClassPickerSheet> createState() => _FlightClassPickerSheetState();
+  State<_FlightClassPickerSheet> createState() =>
+      _FlightClassPickerSheetState();
 }
 
 class _FlightClassPickerSheetState extends State<_FlightClassPickerSheet> {
@@ -287,7 +306,11 @@ class _FlightClassPickerSheetState extends State<_FlightClassPickerSheet> {
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
         boxShadow: const [
-          BoxShadow(color: Color(0x26000000), blurRadius: 20, offset: Offset(0, -4)),
+          BoxShadow(
+            color: Color(0x26000000),
+            blurRadius: 20,
+            offset: Offset(0, -4),
+          ),
         ],
       ),
       child: Column(
@@ -309,7 +332,9 @@ class _FlightClassPickerSheetState extends State<_FlightClassPickerSheet> {
               child: Text(
                 'Flight Class',
                 style: _kTextStyle.copyWith(
-                    fontSize: 16, fontWeight: FontWeight.w600),
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
           ),
@@ -320,8 +345,10 @@ class _FlightClassPickerSheetState extends State<_FlightClassPickerSheet> {
               onTap: () => Navigator.of(context).pop((display, apiValue)),
               child: Container(
                 margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 14,
+                ),
                 decoration: BoxDecoration(
                   color: isSelected
                       ? _kBlue.withValues(alpha: 0.08)
@@ -348,8 +375,7 @@ class _FlightClassPickerSheetState extends State<_FlightClassPickerSheet> {
                       ),
                     ),
                     if (isSelected)
-                      const Icon(Icons.check_circle,
-                          color: _kBlue, size: 20),
+                      const Icon(Icons.check_circle, color: _kBlue, size: 20),
                   ],
                 ),
               ),
