@@ -5,6 +5,7 @@ import '../models/ride_option.dart';
 import '../models/detail_row.dart';
 import '../models/coupon_model.dart';
 import '../models/flight_leg.dart';
+import '../models/flight_offer.dart';
 
 class SearchingService {
   const SearchingService();
@@ -113,7 +114,7 @@ class SearchingService {
   // ── Flights ────────────────────────────────────────────────────────────────
 
   /// Searches for flights based on Amadeus API parameters using django backend.
-  Future<List<String>> searchFlights({
+  Future<List<FlightOffer>> searchFlights({
     required List<FlightLeg> multiCityLegs,
     required String from,
     required String to,
@@ -150,14 +151,7 @@ class SearchingService {
 
         if (response.statusCode == 200) {
           final flights = response.data['flights'] as List<dynamic>? ?? [];
-          final Set<String> airlines = {};
-          for (var item in flights) {
-            final al = (item['airlineName'] ?? item['airline'])?.toString();
-            if (al != null && al.isNotEmpty) {
-              airlines.add(al);
-            }
-          }
-          return airlines.toList();
+          return flights.map((item) => FlightOffer.fromJson(item as Map<String, dynamic>)).toList();
         }
       } else {
         // Round trip implementation
@@ -171,14 +165,7 @@ class SearchingService {
 
         if (response.statusCode == 200) {
           final flights = response.data['flights'] as List<dynamic>? ?? [];
-          final Set<String> airlines = {};
-          for (var item in flights) {
-            final al = (item['airlineName'] ?? item['airline'])?.toString();
-            if (al != null && al.isNotEmpty) {
-              airlines.add(al);
-            }
-          }
-          return airlines.toList();
+          return flights.map((item) => FlightOffer.fromJson(item as Map<String, dynamic>)).toList();
         }
       }
     } on DioException catch (e) {

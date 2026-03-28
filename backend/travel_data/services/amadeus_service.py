@@ -60,6 +60,7 @@ class AmadeusService:
                 "departureDate": date,
                 "adults": max(1, int(passengers)),
                 "travelClass": travel_class.upper(),
+                "currencyCode": "IDR",
                 "max": 5
             }
             try:
@@ -157,7 +158,7 @@ class AmadeusService:
             })
 
         payload = {
-            "currencyCode": "EUR",
+            "currencyCode": "IDR",
             "originDestinations": origin_destinations,
             "travelers": travelers,
             "sources": ["GDS"],
