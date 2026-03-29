@@ -8,10 +8,12 @@ import 'services/cart_service.dart';
 import 'widgets/ticket_card.dart';
 import 'widgets/cart_bottom_bar.dart';
 import 'widgets/remove_dialog.dart';
+import '../main/main_screen.dart';
 
 // CART PAGE
 class CartPage extends StatefulWidget {
-  const CartPage({super.key});
+  final VoidCallback? onExploreFlights;
+  const CartPage({super.key, this.onExploreFlights});
 
   @override
   State<CartPage> createState() => _CartPageState();
@@ -113,15 +115,24 @@ class _CartPageState extends State<CartPage> {
             const SizedBox(height: 32),
             ElevatedButton(
               onPressed: () {
-                // Navigate back to home/search (index 0)
-                // Assuming CartPage is inside a MainScreen with a controller or nested Navigator
-                // For now, we can pop if we're in a stack, or just pop back to index 0.
-                Navigator.of(context).popUntil((route) => route.isFirst);
+                if (widget.onExploreFlights != null) {
+                  widget.onExploreFlights!();
+                } else {
+                  Navigator.of(context).pushAndRemoveUntil(
+                    MaterialPageRoute(
+                      builder: (context) => const MainScreen(initialIndex: 2),
+                    ),
+                    (route) => false,
+                  );
+                }
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF2B99E3),
                 foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 32,
+                  vertical: 12,
+                ),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20),
                 ),

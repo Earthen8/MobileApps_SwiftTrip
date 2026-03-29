@@ -32,7 +32,13 @@ class _MainScreenState extends State<MainScreen> {
         });
       },
     ),
-    const CartPage(),
+    CartPage(
+      onExploreFlights: () {
+        setState(() {
+          _selectedIndex = 2; // SearchingPage tab
+        });
+      },
+    ),
     const SearchingPage(),
     const DestinationPage(),
     const ProfilePage(),
