@@ -1,3 +1,6 @@
+import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
+import '../../../core/constants.dart';
 import '../models/cart_models.dart';
 import '../models/promotion_models.dart';
 
@@ -27,27 +30,18 @@ class CartService {
   }
 
   Future<List<Promotion>> fetchPromotions() async {
-    await Future.delayed(const Duration(milliseconds: 300));
-    return const [
-      Promotion(
-        id: 'promo_1',
-        title: 'Family Discount',
-        dateRange: '12 Feb 2024 - 12 Mar 2025',
-        description: 'Discount 10% with minimum Rp 1.000.000 purchases',
-      ),
-      Promotion(
-        id: 'promo_2',
-        title: 'Student Getaway',
-        dateRange: '01 Jan 2024 - 31 Dec 2024',
-        description: 'Discount 15% with valid student ID card',
-      ),
-      Promotion(
-        id: 'promo_3',
-        title: 'Weekend Flash Sale',
-        dateRange: 'Every Saturday - Sunday',
-        description: 'Cashback Rp 50.000 with no minimum purchase',
-      ),
-    ];
+    try {
+      final dio = Dio();
+      final response = await dio.get(Constants.promotionsUrl);
+      if (response.statusCode == 200) {
+        final List<dynamic> data = response.data;
+        return data.map((json) => Promotion.fromJson(json)).toList();
+      }
+      return [];
+    } catch (e) {
+      debugPrint('Error fetching promotions: $e');
+      return [];
+    }
   }
 
   int calculateDiscount(List<CartTicket> tickets, Promotion? promo) {

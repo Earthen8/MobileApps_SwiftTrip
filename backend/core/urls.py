@@ -13,4 +13,5 @@ urlpatterns = [
     path('api/travel/', include('travel_data.urls')),
     path('api/bookings/', include('bookings.urls')),
     path('api/support/', include('support.urls')),
+    path('api/promotions/', include('promotions.urls')),
 ]

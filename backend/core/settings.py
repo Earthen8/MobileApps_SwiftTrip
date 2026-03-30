@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     'travel_data',
     'bookings',
     'support',
+    'promotions',
 ]
 
 SITE_ID = 1
