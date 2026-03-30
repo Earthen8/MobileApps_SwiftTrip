@@ -7,6 +7,7 @@ import '../customer_service/onboarding.dart';
 import '../checkout/checkout.dart';
 import 'models/detail_row.dart';
 import 'models/ride_option.dart';
+import 'models/vehicle_pin.dart';
 import 'utils/rp_format.dart';
 import 'widgets/map_placeholder.dart';
 import 'widgets/purchase_details_card.dart';
@@ -14,6 +15,7 @@ import 'widgets/ride_card.dart';
 import 'widgets/total_confirm_bar.dart';
 import 'widgets/apply_promotions_row.dart';
 import 'services/searching_service.dart';
+import 'services/mock_vehicle_service.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // PAGE
@@ -27,11 +29,13 @@ class LandVehicleSearch extends StatefulWidget {
 }
 
 class _LandVehicleSearchState extends State<LandVehicleSearch> {
+  final _vehicleService = const MockVehicleService();
+
   int? _selectedRideIndex;
   Promotion? _appliedPromo;
+  VehiclePin? _selectedVehicle;
 
   List<RideOption> _rideOptions = [];
-  List<DetailRow> _purchaseDetails = [];
   bool _isLoading = true;
 
   @override
@@ -42,29 +46,70 @@ class _LandVehicleSearchState extends State<LandVehicleSearch> {
 
   Future<void> _fetchData() async {
     const service = SearchingService();
-    final results = await Future.wait([
-      service.getRideOptions(),
-      service.getPurchaseDetails(),
-    ]);
+    final options = await service.getRideOptions();
 
     if (mounted) {
       setState(() {
-        _rideOptions = results[0] as List<RideOption>;
-        _purchaseDetails = results[1] as List<DetailRow>;
+        _rideOptions = options;
+        _selectedRideIndex = 0;
         _isLoading = false;
       });
     }
   }
 
+  // ── Derived state ─────────────────────────────────────────────────────────
+
+  String get _activeType {
+    if (_selectedRideIndex == null || _rideOptions.isEmpty) return 'Car';
+    return _rideOptions[_selectedRideIndex!].name;
+  }
+
+  List<VehiclePin> get _currentPins =>
+      _vehicleService.getPinsForType(_activeType);
+
   int get _total {
+    if (_selectedVehicle != null) return _selectedVehicle!.ticket.priceRp;
     if (_selectedRideIndex != null && _rideOptions.isNotEmpty) {
       return _rideOptions[_selectedRideIndex!].priceRp;
     }
-    return 300000;
+    return 0;
   }
 
-  // Kept for now to avoid touching behavior in this file.
-  // (The widget layer uses `formatRp()` extracted into `utils/`.)
+  List<DetailRow> get _dynamicDetails {
+    if (_selectedVehicle == null) {
+      return const [DetailRow(label: 'Select a vehicle', amount: '-')];
+    }
+
+    final ticket = _selectedVehicle!.ticket;
+    return [
+      DetailRow(label: ticket.type, amount: formatRp(ticket.priceRp)),
+      if (ticket.operator != null)
+        DetailRow(label: 'Operator', amount: ticket.operator!),
+      if (ticket.from != null && ticket.to != null)
+        DetailRow(label: 'Route', amount: '${ticket.from} → ${ticket.to}'),
+      if (ticket.date != null) DetailRow(label: 'Date', amount: ticket.date!),
+      if (ticket.departure != null && ticket.arrive != null)
+        DetailRow(
+          label: 'Time',
+          amount: '${ticket.departure} – ${ticket.arrive}',
+        ),
+      if (ticket.classLabel.isNotEmpty)
+        DetailRow(label: 'Class', amount: ticket.classLabel),
+    ];
+  }
+
+  // ── Event handlers ────────────────────────────────────────────────────────
+
+  void _onRideSelected(int index) {
+    setState(() {
+      _selectedRideIndex = _selectedRideIndex == index ? null : index;
+      _selectedVehicle = null;
+    });
+  }
+
+  void _onPinSelected(VehiclePin pin) {
+    setState(() => _selectedVehicle = pin);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -92,11 +137,16 @@ class _LandVehicleSearchState extends State<LandVehicleSearch> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SizedBox(height: 10),
-                  // ── Map Placeholder ───────────────────────────────────
-                  const MapPlaceholder(),
+
+                  // ── Live Map ───────────────────────────────────────────
+                  VehicleMapWidget(
+                    pins: _currentPins,
+                    selectedPin: _selectedVehicle,
+                    onPinTap: _onPinSelected,
+                  ),
                   const SizedBox(height: 30),
 
-                  // ── Choose Ride Section ───────────────────────────────
+                  // ── Choose Ride Section ────────────────────────────────
                   _isLoading
                       ? const Center(child: CircularProgressIndicator())
                       : Column(
@@ -112,30 +162,62 @@ class _LandVehicleSearchState extends State<LandVehicleSearch> {
                               ),
                             ),
                             const SizedBox(height: 12),
+
+                            // ── Ride type cards (Car / Bus / Train) ─────
                             SizedBox(
                               height: 176,
                               child: ListView.separated(
                                 scrollDirection: Axis.horizontal,
                                 clipBehavior: Clip.none,
                                 itemCount: _rideOptions.length,
-                                separatorBuilder: (_, _) =>
+                                separatorBuilder: (_, __) =>
                                     const SizedBox(width: 12),
                                 itemBuilder: (_, i) => RideCard(
                                   option: _rideOptions[i],
                                   isSelected: _selectedRideIndex == i,
-                                  onTap: () => setState(() {
-                                    _selectedRideIndex = _selectedRideIndex == i
-                                        ? null
-                                        : i;
-                                  }),
+                                  onTap: () => _onRideSelected(i),
                                   formatRp: formatRp,
                                 ),
                               ),
                             ),
                             const SizedBox(height: 20),
+
+                            // ── Available vehicles list ─────────────────
+                            if (_selectedRideIndex != null) ...[
+                              Text(
+                                'Available ${_activeType}:',
+                                style: const TextStyle(
+                                  fontFamily: 'Poppins',
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 16,
+                                  color: Colors.black,
+                                ),
+                              ),
+                              const SizedBox(height: 12),
+                              SizedBox(
+                                height: 100, // Increased from 90 to fix overflow
+                                child: ListView.separated(
+                                  scrollDirection: Axis.horizontal,
+                                  clipBehavior: Clip.none,
+                                  itemCount: _currentPins.length,
+                                  separatorBuilder: (_, __) =>
+                                      const SizedBox(width: 12),
+                                  itemBuilder: (_, i) => _VehicleCard(
+                                    pin: _currentPins[i],
+                                    isSelected:
+                                        _selectedVehicle == _currentPins[i],
+                                    onTap: () =>
+                                        _onPinSelected(_currentPins[i]),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 20),
+                            ],
+
+                            // ── Payment Detail ──────────────────────────
                             PurchaseDetailsCard(
-                              details: _purchaseDetails,
-                              total: 'Rp 12.000.000',
+                              details: _dynamicDetails,
+                              total: formatRp(_total),
                             ),
                           ],
                         ),
@@ -158,6 +240,7 @@ class _LandVehicleSearchState extends State<LandVehicleSearch> {
           mainAxisSize: MainAxisSize.min,
           children: [
             const SizedBox(height: 10),
+
             // ── Apply Promotions ────────────────────────────────────────
             ApplyPromotionsRow(
               appliedPromo: _appliedPromo,
@@ -181,13 +264,100 @@ class _LandVehicleSearchState extends State<LandVehicleSearch> {
               totalLabel: 'Total:',
               totalAmount: formatRp(_total),
               onConfirm: () {
-                // TODO: POST selected ride + applied promo to backend
-                // TODO: Navigate to checkout or booking confirmation
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (_) => const CheckoutPage()),
                 );
               },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Vehicle selection card (horizontal list below ride-type cards)
+// ─────────────────────────────────────────────────────────────────────────────
+
+class _VehicleCard extends StatelessWidget {
+  final VehiclePin pin;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  const _VehicleCard({
+    required this.pin,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final ticket = pin.ticket;
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        width: 170,
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: isSelected ? const Color(0xFF2B99E3) : Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: isSelected
+                ? const Color(0xFF2B99E3)
+                : const Color(0xFFE0E0E0),
+            width: isSelected ? 2 : 1,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: isSelected
+                  ? const Color(0x332B99E3)
+                  : const Color(0x14000000),
+              blurRadius: isSelected ? 12 : 8,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              ticket.operator ?? 'Unknown',
+              style: TextStyle(
+                fontFamily: 'Poppins',
+                fontWeight: FontWeight.w600,
+                fontSize: 14,
+                color: isSelected ? Colors.white : Colors.black87,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+            const SizedBox(height: 4),
+            Text(
+              '${ticket.from} → ${ticket.to}',
+              style: TextStyle(
+                fontFamily: 'Poppins',
+                fontWeight: FontWeight.w400,
+                fontSize: 11,
+                color: isSelected ? Colors.white70 : const Color(0xFF9E9E9E),
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+            const SizedBox(height: 4), // Reduced from 6
+            Text(
+              formatRp(ticket.priceRp),
+              style: TextStyle(
+                fontFamily: 'Cairo',
+                fontWeight: FontWeight.w700,
+                fontSize: 13,
+                color: isSelected ? Colors.white : const Color(0xFF2B99E3),
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
           ],
         ),
