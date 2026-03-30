@@ -21,21 +21,21 @@ class SearchingService {
         name: 'Car',
         duration: '2 hrs',
         passengerCapacity: 4,
-        priceRp: 50000,
+        priceRp: 0,
         icon: Icons.directions_car_outlined,
       ),
       RideOption(
         name: 'Bus',
         duration: '3 hrs',
         passengerCapacity: 0,
-        priceRp: 50000,
+        priceRp: 0,
         icon: Icons.directions_bus_outlined,
       ),
       RideOption(
         name: 'Train',
         duration: '4 hrs',
         passengerCapacity: 0,
-        priceRp: 75000,
+        priceRp: 0,
         icon: Icons.train_outlined,
       ),
     ];
@@ -138,34 +138,45 @@ class SearchingService {
     try {
       if (isMultiCity) {
         final body = {
-          'legs': multiCityLegs.map((leg) => {
-            'origin': leg.originLocationCode,
-            'destination': leg.destinationLocationCode,
-            'date': leg.departureDate,
-          }).toList(),
+          'legs': multiCityLegs
+              .map(
+                (leg) => {
+                  'origin': leg.originLocationCode,
+                  'destination': leg.destinationLocationCode,
+                  'date': leg.departureDate,
+                },
+              )
+              .toList(),
           'passengers': passengers,
           'class': flightClass,
         };
-        
+
         final response = await dio.post('search/', data: body);
 
         if (response.statusCode == 200) {
           final flights = response.data['flights'] as List<dynamic>? ?? [];
-          return flights.map((item) => FlightOffer.fromJson(item as Map<String, dynamic>)).toList();
+          return flights
+              .map((item) => FlightOffer.fromJson(item as Map<String, dynamic>))
+              .toList();
         }
       } else {
         // Round trip implementation
-        final response = await dio.get('search/', queryParameters: {
-          'origin': from,
-          'destination': to,
-          'date': date,
-          'passengers': passengers,
-          'class': flightClass,
-        });
+        final response = await dio.get(
+          'search/',
+          queryParameters: {
+            'origin': from,
+            'destination': to,
+            'date': date,
+            'passengers': passengers,
+            'class': flightClass,
+          },
+        );
 
         if (response.statusCode == 200) {
           final flights = response.data['flights'] as List<dynamic>? ?? [];
-          return flights.map((item) => FlightOffer.fromJson(item as Map<String, dynamic>)).toList();
+          return flights
+              .map((item) => FlightOffer.fromJson(item as Map<String, dynamic>))
+              .toList();
         }
       }
     } on DioException catch (e) {
@@ -176,7 +187,7 @@ class SearchingService {
       }
       throw Exception(message);
     } catch (_) {
-        throw Exception('An unexpected network error occurred.');
+      throw Exception('An unexpected network error occurred.');
     }
 
     return [];

@@ -176,7 +176,6 @@ class _LandVehicleSearchState extends State<LandVehicleSearch> {
                                   option: _rideOptions[i],
                                   isSelected: _selectedRideIndex == i,
                                   onTap: () => _onRideSelected(i),
-                                  formatRp: formatRp,
                                 ),
                               ),
                             ),
@@ -195,7 +194,7 @@ class _LandVehicleSearchState extends State<LandVehicleSearch> {
                               ),
                               const SizedBox(height: 12),
                               SizedBox(
-                                height: 100, // Increased from 90 to fix overflow
+                                height: 100,
                                 child: ListView.separated(
                                   scrollDirection: Axis.horizontal,
                                   clipBehavior: Clip.none,

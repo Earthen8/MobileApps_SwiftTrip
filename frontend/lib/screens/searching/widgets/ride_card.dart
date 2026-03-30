@@ -5,14 +5,12 @@ class RideCard extends StatelessWidget {
   final RideOption option;
   final bool isSelected;
   final VoidCallback onTap;
-  final String Function(int) formatRp;
 
   const RideCard({
     super.key,
     required this.option,
     required this.isSelected,
     required this.onTap,
-    required this.formatRp,
   });
 
   @override
@@ -53,8 +51,7 @@ class RideCard extends StatelessWidget {
                   ),
                 ),
                 child: isSelected
-                    ? const Icon(Icons.check,
-                        size: 11, color: Colors.white)
+                    ? const Icon(Icons.check, size: 11, color: Colors.white)
                     : null,
               ),
             ),
@@ -65,8 +62,7 @@ class RideCard extends StatelessWidget {
               left: 0,
               right: 0,
               child: Center(
-                child: Icon(option.icon,
-                    size: 55, color: Colors.black87),
+                child: Icon(option.icon, size: 55, color: Colors.black87),
               ),
             ),
 
@@ -90,14 +86,22 @@ class RideCard extends StatelessWidget {
             // ── Duration + capacity ────────────────────────────────
             Positioned(
               top: 117,
-              left: 46,
-              child: Text(
-                option.duration,
-                style: const TextStyle(
-                  fontFamily: 'Cairo',
-                  fontWeight: FontWeight.w400,
-                  fontSize: 12,
-                  color: Color(0xFF9E9E9E),
+              left: 0,
+              right: option.passengerCapacity > 0 ? null : 0,
+              child: Padding(
+                padding: EdgeInsets.only(
+                    left: option.passengerCapacity > 0 ? 46 : 0),
+                child: Text(
+                  option.duration,
+                  textAlign: option.passengerCapacity > 0
+                      ? TextAlign.left
+                      : TextAlign.center,
+                  style: const TextStyle(
+                    fontFamily: 'Cairo',
+                    fontWeight: FontWeight.w400,
+                    fontSize: 12,
+                    color: Color(0xFF9E9E9E),
+                  ),
                 ),
               ),
             ),
@@ -126,27 +130,9 @@ class RideCard extends StatelessWidget {
                   ],
                 ),
               ),
-
-            // ── Price ────────────────────────────────────────────────
-            Positioned(
-              top: 151,
-              left: 0,
-              right: 0,
-              child: Text(
-                formatRp(option.priceRp),
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontFamily: 'Cairo',
-                  fontWeight: FontWeight.w400,
-                  fontSize: 12,
-                  color: Color(0xFF9E9E9E),
-                ),
-              ),
-            ),
           ],
         ),
       ),
     );
   }
 }
-

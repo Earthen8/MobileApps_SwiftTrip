@@ -18,7 +18,7 @@ class RideOption {
   factory RideOption.fromJson(Map<String, dynamic> json) {
     final name = json['name'] as String;
     IconData icon;
-    
+
     // Assign static icons based on name (case-insensitive)
     switch (name.toLowerCase()) {
       case 'car':
@@ -41,7 +41,8 @@ class RideOption {
     return RideOption(
       name: name,
       duration: json['duration'] as String,
-      passengerCapacity: json['passenger_capacity'] ?? json['passengerCapacity'] ?? 0,
+      passengerCapacity:
+          json['passenger_capacity'] ?? json['passengerCapacity'] ?? 0,
       priceRp: json['price_rp'] ?? json['priceRp'] ?? 0,
       icon: icon,
     );
