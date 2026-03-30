@@ -59,6 +59,11 @@ class _VehicleMapWidgetState extends State<VehicleMapWidget> {
 
     if (points.isEmpty) return;
 
+    if (points.length == 1) {
+      _mapController.move(points.first, 14.0);
+      return;
+    }
+
     final bounds = LatLngBounds.fromPoints(points);
 
     // Smoothly animate the camera to fit all points with some padding
