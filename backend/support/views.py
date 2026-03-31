@@ -68,7 +68,8 @@ class MetadataView(APIView):
 
 import os
 import json
-import google.generativeai as genai
+from google import genai
+from google.genai import types
 from travel_data.services.amadeus_service import AmadeusService
 
 class GeminiChatView(APIView):
@@ -81,24 +82,45 @@ class GeminiChatView(APIView):
         if not message:
             return Response({"error": "Message is required"}, status=status.HTTP_400_BAD_REQUEST)
 
-        genai.configure(api_key=os.environ.get("GEMINI_API_KEY"))
-        model = genai.GenerativeModel("gemini-3-flash")
+        # Initialize client with V1 API version as requested
+        client = genai.Client(
+            api_key=os.environ.get("GEMINI_API_KEY"),
+            http_options={'api_version': 'v1'}
+        )
+        
+        # Choosing gemini-2.5-flash as it's the latest available model in 2026-standard list
+        model_id = "gemini-2.5-flash"
         
         system_instruction = f"""
-        You are the SwiftTrip Assistant.
-        Context: The user is messaging from the '{context}' screen. Prioritize your responses accordingly.
-        If the user asks for travel (flight, car, bus, train), return ONLY a valid JSON: {{"intent": "SEARCH", "origin": "IATA Code or City", "destination": "IATA Code or City", "date": "YYYY-MM-DD", "type": "flight", "car", "bus", or "train"}}. Use standard 3-letter IATA for flights. For dates, default to future dates if implied.
-        If the user asks for advice/consultation on trips, return ONLY JSON: {{"intent": "CONSULT", "message": "Your helpful advice here matching the user language", "needs_data": true}}.
-        If the user reports a bug or explicitly needs customer support, return ONLY JSON: {{"intent": "SUPPORT", "message": "Your polite response acknowledging the report", "action": "CREATE_TICKET"}}.
-        Do not include ANY markdown block quotes (e.g. ```json). Your entire output must be raw valid JSON.
+        You are the SwiftTrip Assistant, a professional travel and app support bot.
+        
+        Your task is to classify the user input into one of three categories:
+        1. GREETING: If the user says hi, hello, or asks how you are. 
+           Return JSON: {{"intent": "GREETING", "message": "A friendly travel-themed greeting"}}
+        2. COMPLEX_TRAVEL: If the user asks for flights, buses, trains, or car rentals.
+           Return JSON: {{"intent": "SEARCH", "origin": "IATA/City", "destination": "IATA/City", "date": "YYYY-MM-DD", "type": "flight"|"bus"|"train"|"car"}}
+        3. OOT (Out-of-Topic): If the user asks about personal life, politics, jokes, or anything non-travel/app related.
+           Return JSON: {{"intent": "OOT", "message": "I can only assist with travel bookings and app-related support. How can I help you with your trip today?"}}
+        
+        Context: User is on '{context}' screen.
+        Rules: 
+        - Return ONLY raw JSON. 
+        - No markdown blocks.
+        - For COMPLEX_TRAVEL searches, if parameters are missing, use "UNKNOWN".
         """
         
-        # We pass system_instruction into generate_content explicitly as part of generation_config or model initialization.
-        # However, to be perfectly safe with various SDK versions, we prepend it as a system block.
-        prompt = f"System: {system_instruction}\n\nUser: {message}"
-        
         try:
-            response = model.generate_content(prompt)
+            # Fix: Using system_instruction inside GenerateContentConfig as per Python SDK standard
+            # We explicitly pass it here to avoid the camelCase conversion error in some environments
+            response = client.models.generate_content(
+                model=model_id,
+                contents=message,
+                config=types.GenerateContentConfig(
+                    system_instruction=system_instruction,
+                    temperature=0.1 # Low temperature for consistent JSON output
+                )
+            )
+            
             json_text = response.text.strip()
             
             # Failsafe string parsing
@@ -111,6 +133,14 @@ class GeminiChatView(APIView):
             intent_data = json.loads(json_text)
             intent = intent_data.get('intent', 'UNKNOWN')
             
+            # Task 3: Refuse OOT - Do not call external services
+            if intent == 'OOT':
+                return Response(intent_data)
+            
+            # Handle GREETING
+            if intent == 'GREETING':
+                return Response(intent_data)
+
             # If SEARCH and flight, do backend Amadeus search. 
             if intent == 'SEARCH' and intent_data.get('type', '').lower() == 'flight':
                 origin = intent_data.get('origin', '')
@@ -118,7 +148,7 @@ class GeminiChatView(APIView):
                 date = intent_data.get('date', '')
                 
                 flights = []
-                if len(origin) == 3 and len(destination) == 3 and date:
+                if origin != 'UNKNOWN' and destination != 'UNKNOWN' and date != 'UNKNOWN':
                     amadeus = AmadeusService()
                     flights = amadeus.search_flights(origin, destination, date) or []
                 
@@ -127,7 +157,7 @@ class GeminiChatView(APIView):
             return Response(intent_data)
         
         except Exception as e:
-            text_val = getattr(response, 'text', 'No text') if 'response' in locals() else 'No response'
+            text_val = getattr(response, 'text', 'No response') if 'response' in locals() else 'No response'
             print("GEMINI ERROR:", e, text_val)
             return Response({
                 "intent": "SUPPORT", 
