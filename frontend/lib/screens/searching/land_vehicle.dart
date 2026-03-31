@@ -204,11 +204,28 @@ class _LandVehicleSearchState extends State<LandVehicleSearch> {
                                 itemCount: _rideOptions.length,
                                 separatorBuilder: (_, __) =>
                                     const SizedBox(width: 12),
-                                itemBuilder: (_, i) => RideCard(
-                                  option: _rideOptions[i],
-                                  isSelected: _selectedRideIndex == i,
-                                  onTap: () => _onRideSelected(i),
-                                ),
+                                itemBuilder: (_, i) {
+                                  final option = _rideOptions[i];
+                                  String? duration;
+
+                                  // Only show duration if this category and a vehicle in it is picked
+                                  if (_selectedVehicle != null &&
+                                      _selectedVehicle!.ticket.type
+                                          .toLowerCase()
+                                          .contains(option.name.toLowerCase())) {
+                                    duration = MockVehicleService.calculateDuration(
+                                      _selectedVehicle!.ticket.departure,
+                                      _selectedVehicle!.ticket.arrive,
+                                    );
+                                  }
+
+                                  return RideCard(
+                                    option: option,
+                                    isSelected: _selectedRideIndex == i,
+                                    dynamicDuration: duration,
+                                    onTap: () => _onRideSelected(i),
+                                  );
+                                },
                               ),
                             ),
                             const SizedBox(height: 20),

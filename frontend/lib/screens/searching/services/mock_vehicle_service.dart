@@ -21,6 +21,28 @@ class MockVehicleService {
     };
   }
 
+  /// Calculates duration in minutes from HH:mm formatted strings.
+  static String calculateDuration(String? departure, String? arrive) {
+    if (departure == null || arrive == null) return '---';
+    try {
+      final dep = departure.split(':');
+      final arr = arrive.split(':');
+      if (dep.length != 2 || arr.length != 2) return '---';
+
+      final dH = int.parse(dep[0]);
+      final dM = int.parse(dep[1]);
+      final aH = int.parse(arr[0]);
+      final aM = int.parse(arr[1]);
+
+      int diff = (aH * 60 + aM) - (dH * 60 + dM);
+      if (diff < 0) diff += 1440; // Handle overnight (24*60)
+
+      return '$diff min';
+    } catch (_) {
+      return '---';
+    }
+  }
+
   // ── Cars ──────────────────────────────────────────────────────────────────
 
   static List<VehiclePin> get mockCars {

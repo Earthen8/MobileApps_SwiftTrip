@@ -4,12 +4,14 @@ import '../models/ride_option.dart';
 class RideCard extends StatelessWidget {
   final RideOption option;
   final bool isSelected;
+  final String? dynamicDuration;
   final VoidCallback onTap;
 
   const RideCard({
     super.key,
     required this.option,
     required this.isSelected,
+    this.dynamicDuration,
     required this.onTap,
   });
 
@@ -92,10 +94,12 @@ class RideCard extends StatelessWidget {
                 padding: EdgeInsets.only(
                     left: option.passengerCapacity > 0 ? 46 : 0),
                 child: Text(
-                  option.duration,
+                  dynamicDuration ?? '---',
                   textAlign: option.passengerCapacity > 0
                       ? TextAlign.left
                       : TextAlign.center,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
                     fontFamily: 'Cairo',
                     fontWeight: FontWeight.w400,
