@@ -53,3 +53,44 @@ class PurchaseItem(models.Model):
 
     def __str__(self):
         return f"{self.label}: {self.amount_rp}"
+
+class Destination(models.Model):
+    CATEGORY_CHOICES = [
+        ('Villa', 'Villa'),
+        ('Hotel', 'Hotel'),
+        ('Apartment', 'Apartment'),
+        ('Condo', 'Condo'),
+    ]
+
+    SECTION_TAG_CHOICES = [
+        ('Discount', 'Discount'),
+        ('Favorite', 'Favorite'),
+        ('Hot', 'Hot'),
+    ]
+
+    title = models.CharField(max_length=255)
+    category = models.CharField(max_length=50, choices=CATEGORY_CHOICES)
+    image_url = models.URLField(max_length=500)
+    location = models.CharField(max_length=255)
+    rating = models.DecimalField(max_digits=2, decimal_places=1)
+    original_price = models.DecimalField(max_digits=12, decimal_places=2)
+    discount_percentage = models.IntegerField(default=0)
+    description = models.TextField()
+    advantages = models.JSONField(default=list, help_text='Guest Favorites list')
+    section_tag = models.CharField(max_length=50, choices=SECTION_TAG_CHOICES)
+
+    @property
+    def final_price(self):
+        from decimal import Decimal
+        discount_factor = Decimal(1) - (Decimal(self.discount_percentage) / Decimal(100))
+        return (self.original_price * discount_factor).quantize(Decimal('0.01'))
+
+    def __str__(self):
+        return self.title
+
+class Wishlist(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='wishlist')
+    destinations = models.ManyToManyField(Destination, related_name='wishlisted_by')
+
+    def __str__(self):
+        return f"Wishlist for {self.user.username}"
