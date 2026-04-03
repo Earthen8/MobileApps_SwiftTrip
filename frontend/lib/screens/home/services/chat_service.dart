@@ -49,7 +49,7 @@ class ChatService {
             final f = flights.first;
             final ticket = CartTicket(
               type: 'Plane Ticket',
-              bookingId: 'FL-\${DateTime.now().millisecondsSinceEpoch}',
+              bookingId: 'FL-${DateTime.now().millisecondsSinceEpoch}',
               classLabel: 'Economy',
               priceRp: (f['price'] ?? 0).toInt(),
               operator: f['airlineName'],
@@ -71,7 +71,7 @@ class ChatService {
             final f = landOptions.first;
             final ticket = CartTicket(
               type: f['type'] ?? 'Ticket',
-              bookingId: f['bookingId'] ?? 'ID-\${DateTime.now().millisecondsSinceEpoch}',
+              bookingId: f['bookingId'] ?? 'ID-${DateTime.now().millisecondsSinceEpoch}',
               classLabel: f['classLabel'] ?? 'Regular',
               priceRp: (f['priceRp'] ?? 0).toInt(),
               operator: f['operator'],
