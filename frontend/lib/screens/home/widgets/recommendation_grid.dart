@@ -97,7 +97,7 @@ class _RecommendationCard extends StatelessWidget {
                 children: [
                   // City name
                   Text(
-                    item.name,
+                    item.title,
                     textAlign: TextAlign.center,
                     style: const TextStyle(
                       color: Colors.white,

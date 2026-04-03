@@ -80,7 +80,7 @@ class DestinationCard extends StatelessWidget {
               children: [
                 Expanded(
                   child: Text(
-                    destination.name,
+                    destination.title,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(

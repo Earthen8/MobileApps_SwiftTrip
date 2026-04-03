@@ -132,15 +132,16 @@ class CategoryItemCard extends StatelessWidget {
                         child: const Icon(Icons.image, color: Colors.grey),
                       ),
                     ),
-                    const Positioned(
-                      top: 8,
-                      left: 8,
-                      child: Icon(
-                        Icons.discount_outlined,
-                        color: Colors.white,
-                        size: 18,
+                    if (item.discountPercentage > 0)
+                      const Positioned(
+                        top: 8,
+                        left: 8,
+                        child: Icon(
+                          Icons.discount_outlined,
+                          color: Colors.white,
+                          size: 18,
+                        ),
                       ),
-                    ),
                     const Positioned(
                       top: 8,
                       right: 8,
@@ -164,7 +165,7 @@ class CategoryItemCard extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      item.name,
+                      item.title,
                       style: const TextStyle(
                         fontFamily: 'Poppins',
                         fontWeight: FontWeight.w600,

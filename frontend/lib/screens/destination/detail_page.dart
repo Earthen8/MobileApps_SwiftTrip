@@ -111,7 +111,7 @@ class _DestinationDetailPageState extends State<DestinationDetailPage> {
                           children: [
                             Expanded(
                               child: Text(
-                                widget.destination.name,
+                                widget.destination.title,
                                 style: const TextStyle(
                                   fontFamily: 'Poppins',
                                   fontWeight: FontWeight.w700,

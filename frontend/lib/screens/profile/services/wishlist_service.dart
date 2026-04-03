@@ -8,7 +8,7 @@ class WishlistService {
     return [
       DestinationModel(
         id: 'item_1',
-        name: 'The Edge Bali Villa - Uluwatu',
+        title: 'The Edge Bali Villa - Uluwatu',
         rating: 4.9,
         description:
             'Luxury cliffside villa with private pool and panoramic Indian Ocean views.',
@@ -19,7 +19,7 @@ class WishlistService {
       ),
       DestinationModel(
         id: 'item_2',
-        name: 'Plataran Komodo Resort - Labuan Bajo',
+        title: 'Plataran Komodo Resort - Labuan Bajo',
         rating: 4.8,
         description: 'Beachfront resort near Komodo with clear turquoise waters.',
         imageUrl: 'https://images.unsplash.com/photo-1518548419970-58e3b4079ab2?w=500',
@@ -29,7 +29,7 @@ class WishlistService {
       ),
       DestinationModel(
         id: 'item_3',
-        name: 'Padma Hotel Bandung - Ciumbuleuit',
+        title: 'Padma Hotel Bandung - Ciumbuleuit',
         rating: 4.8,
         description:
             'Mountain-view hotel with cool climate, infinity pool, and forest atmosphere.',
@@ -40,7 +40,7 @@ class WishlistService {
       ),
       DestinationModel(
         id: 'item_4',
-        name: 'Ayana Resort - Jimbaran Bali',
+        title: 'Ayana Resort - Jimbaran Bali',
         rating: 4.9,
         description:
             'Famous luxury resort with Rock Bar and stunning sunset ocean views.',
@@ -51,7 +51,7 @@ class WishlistService {
       ),
       DestinationModel(
         id: 'item_5',
-        name: 'The Ritz-Carlton Jakarta - Mega Kuningan',
+        title: 'The Ritz-Carlton Jakarta - Mega Kuningan',
         rating: 4.7,
         description:
             'High-end city hotel with premium service in the heart of Jakarta business district.',
