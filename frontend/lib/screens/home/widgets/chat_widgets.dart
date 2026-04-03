@@ -2,6 +2,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../../main/main_screen.dart';
+import '../../cart/services/cart_service.dart';
 import '../order_ticket.dart';
 import '../models/chat_message.dart';
 import 'package:swifttrip_frontend/screens/cart/models/cart_models.dart';
@@ -220,9 +221,17 @@ class _ChatTicketCardState extends State<ChatTicketCard> {
                 onTap: _isAdded
                     ? null
                     : () {
+                        CartService().addTicket(widget.ticket);
                         setState(() {
                           _isAdded = true;
                         });
+                        Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const MainScreen(initialIndex: 1),
+                          ),
+                          (route) => false,
+                        );
                       },
                 child: Container(
                   padding: const EdgeInsets.symmetric(
