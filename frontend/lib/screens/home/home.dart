@@ -3,9 +3,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:swifttrip_frontend/screens/home/widgets/review_popup.dart';
 
-import '../../models/recommendation_item.dart';
 import '../../models/schedule_item.dart';
 import 'services/home_service.dart';
+import '../destination/services/destination_service.dart';
+import '../destination/models/destination_model.dart';
 import 'widgets/banner_carousel.dart';
 import 'widgets/floating_buttons.dart';
 import 'widgets/recommendation_grid.dart';
@@ -55,7 +56,7 @@ class _HomePageState extends State<HomePage> {
   // -- Backend-friendly Data States --
   bool _isLoading = true;
   List<ScheduleItem> _serverSchedules = [];
-  List<RecommendationItem> _serverRecommendations = [];
+  List<DestinationModel> _serverRecommendations = [];
 
   @override
   void initState() {
@@ -67,9 +68,10 @@ class _HomePageState extends State<HomePage> {
   Future<void> _fetchHomeData() async {
     setState(() => _isLoading = true);
     final homeService = HomeService();
+    final destService = DestinationService();
     try {
       final schedules = await homeService.fetchSchedules();
-      final recs = await homeService.fetchRecommendations();
+      final recs = await destService.fetchRecommendations();
       if (mounted) {
         setState(() {
           _serverSchedules = schedules;

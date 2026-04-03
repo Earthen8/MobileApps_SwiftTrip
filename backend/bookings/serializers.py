@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Booking, PurchaseItem
+from .models import Booking, PurchaseItem, Destination
 
 class PurchaseItemSerializer(serializers.ModelSerializer):
     amount = serializers.SerializerMethodField()
@@ -13,6 +13,13 @@ class PurchaseItemSerializer(serializers.ModelSerializer):
     def get_amount(self, obj):
         prefix = "-" if obj.is_discount else ""
         return f"{prefix}Rp {obj.amount_rp:,}"
+
+class DestinationSerializer(serializers.ModelSerializer):
+    final_price = serializers.DecimalField(max_digits=12, decimal_places=2, read_only=True)
+
+    class Meta:
+        model = Destination
+        fields = '__all__'
 
 class CartTicketSerializer(serializers.ModelSerializer):
     type = serializers.SerializerMethodField()

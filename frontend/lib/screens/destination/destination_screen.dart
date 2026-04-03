@@ -6,6 +6,7 @@ import 'widgets/category_list.dart';
 import 'widgets/destination_section.dart';
 import 'search.dart';
 import 'services/destination_service.dart';
+import 'models/destination_model.dart';
 
 // --- Main Page ---
 class DestinationPage extends StatelessWidget {
@@ -59,25 +60,49 @@ class DestinationPage extends StatelessWidget {
           const SizedBox(height: 10),
           // ── Scrollable: destination sections ─────────────────────────
           Expanded(
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  DestinationSection(
-                    title: 'Discount',
-                    items: service.getDiscountDestinations(),
+            child: FutureBuilder<Map<String, List<DestinationModel>>>(
+              future: service.fetchHomeSections(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(
+                    child: CircularProgressIndicator(color: Color(0xFF2B99E3)),
+                  );
+                }
+                if (snapshot.hasError) {
+                  return const Center(
+                    child: Text('Failed to load destinations.'),
+                  );
+                }
+
+                final data = snapshot.data ?? {};
+                final discount = data['discount_destinations'] ?? [];
+                final favorite = data['favorite_destinations'] ?? [];
+                final hot = data['hot_destinations'] ?? [];
+
+                return SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (discount.isNotEmpty)
+                        DestinationSection(
+                          title: 'Discount',
+                          items: discount,
+                        ),
+                      if (favorite.isNotEmpty)
+                        DestinationSection(
+                          title: 'People’s Favorites',
+                          items: favorite,
+                        ),
+                      if (hot.isNotEmpty)
+                        DestinationSection(
+                          title: 'Hot Destinations',
+                          items: hot,
+                        ),
+                      const SizedBox(height: 80),
+                    ],
                   ),
-                  DestinationSection(
-                    title: 'People’s Favorites',
-                    items: service.getFavoriteDestinations(),
-                  ),
-                  DestinationSection(
-                    title: 'Hot Destinations',
-                    items: service.getHotDestinations(),
-                  ),
-                  const SizedBox(height: 80),
-                ],
-              ),
+                );
+              },
             ),
           ),
         ],

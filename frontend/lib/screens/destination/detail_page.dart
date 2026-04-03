@@ -57,6 +57,19 @@ class _DestinationDetailPageState extends State<DestinationDetailPage> {
     return 'Rp. ${buffer.toString().split('').reversed.join()}';
   }
 
+  String get _formattedOriginalPrice {
+    final price = widget.destination.originalPrice.toInt();
+    final str = price.toString();
+    final buffer = StringBuffer();
+    int count = 0;
+    for (int i = str.length - 1; i >= 0; i--) {
+      if (count > 0 && count % 3 == 0) buffer.write('.');
+      buffer.write(str[i]);
+      count++;
+    }
+    return 'Rp. ${buffer.toString().split('').reversed.join()}';
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -201,7 +214,9 @@ class _DestinationDetailPageState extends State<DestinationDetailPage> {
 
       // ── Bottom bar overlay ────────────────────────────────────────────────
       bottomNavigationBar: _BottomBar(
+        destination: widget.destination,
         formattedPrice: _formattedPrice,
+        formattedOriginalPrice: _formattedOriginalPrice,
         onAddToCart: () {
           // TODO: POST add to cart to backend with destination ID + price
           ScaffoldMessenger.of(context).showSnackBar(
@@ -323,10 +338,17 @@ class _FeatureRow extends StatelessWidget {
 // ─────────────────────────────────────────────────────────────────────────────
 
 class _BottomBar extends StatelessWidget {
+  final DestinationModel destination;
   final String formattedPrice;
+  final String formattedOriginalPrice;
   final VoidCallback onAddToCart;
 
-  const _BottomBar({required this.formattedPrice, required this.onAddToCart});
+  const _BottomBar({
+    required this.destination,
+    required this.formattedPrice,
+    required this.formattedOriginalPrice,
+    required this.onAddToCart,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -361,15 +383,34 @@ class _BottomBar extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    formattedPrice,
-                    style: const TextStyle(
-                      fontFamily: 'Poppins',
-                      fontWeight: FontWeight.w300,
-                      fontSize: 20,
-                      height: 1,
-                      color: Colors.black,
-                    ),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text(
+                        formattedPrice,
+                        style: const TextStyle(
+                          fontFamily: 'Poppins',
+                          fontWeight: FontWeight.w300,
+                          fontSize: 20,
+                          height: 1,
+                          color: Colors.black,
+                        ),
+                      ),
+                      if (destination.hasDiscount) ...[
+                        const SizedBox(width: 8),
+                        Text(
+                          formattedOriginalPrice,
+                          style: const TextStyle(
+                            fontFamily: 'Poppins',
+                            fontWeight: FontWeight.w300,
+                            fontSize: 12,
+                            height: 1,
+                            color: Colors.grey,
+                            decoration: TextDecoration.lineThrough,
+                          ),
+                        ),
+                      ],
+                    ],
                   ),
                   const Text(
                     'For 1 Night',

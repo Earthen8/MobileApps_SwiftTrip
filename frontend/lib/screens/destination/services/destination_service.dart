@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import '../models/destination_model.dart';
 import '../models/category_model.dart';
 import '../categories/villa.dart';
@@ -49,89 +50,72 @@ class DestinationService {
     ];
   }
 
-  // --- Destinations ---
-  List<DestinationModel> _getMockDestinations({String category = ''}) {
-    final prefix = category.isNotEmpty ? '$category: ' : '';
-    return [
-      DestinationModel(
-        id: '1',
-        name: '${prefix}Bali - Pantai Kuta',
-        imageUrl:
-            'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=500',
-        rating: 4.8,
-        description:
-            'A beautiful beach destination in Bali, perfect for surfing and sunsets.',
-        hasDiscount: true,
-        isFavorite: false,
-      ),
-      DestinationModel(
-        id: '2',
-        name: '${prefix}Yogyakarta - Candi Borobudur',
-        imageUrl:
-            'https://images.unsplash.com/photo-1588666309990-d68f08e3d4a6?w=500',
-        rating: 4.9,
-        description:
-            'The world\'s largest Buddhist temple, a UNESCO World Heritage site.',
-        hasDiscount: false,
-        isFavorite: false,
-      ),
-      DestinationModel(
-        id: '3',
-        name: '${prefix}Labuan Bajo - Pulau Komodo',
-        imageUrl:
-            'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=500',
-        rating: 4.9,
-        description:
-            'Home to the famous Komodo dragons and stunning volcanic islands.',
-        hasDiscount: true,
-        isFavorite: false,
-      ),
-      DestinationModel(
-        id: '4',
-        name: '${prefix}Bandung - Kawah Putih',
-        imageUrl:
-            'https://images.unsplash.com/photo-1596422846543-75c6fc197f07?w=500',
-        rating: 4.7,
-        description:
-            'A striking crater lake in a volcanic cone, known for its white soil.',
-        hasDiscount: false,
-        isFavorite: false,
-      ),
-      DestinationModel(
-        id: '5',
-        name: '${prefix}Lombok - Pantai Tanjung Aan',
-        imageUrl:
-            'https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=500',
-        rating: 4.8,
-        description:
-            'A pristine beach with white sand and turquoise waters in Lombok.',
-        hasDiscount: true,
-        isFavorite: false,
-      ),
-    ];
+  // --- API Integrations ---
+  final Dio _dio = Dio(BaseOptions(
+    baseUrl: 'http://127.0.0.1:8000/api/bookings/destinations/',
+    headers: {
+      'Content-Type': 'application/json',
+      // In a real app, attach Auth token here:
+      // 'Authorization': 'Bearer <token>'
+    },
+  ));
+
+  Future<Map<String, List<DestinationModel>>> fetchHomeSections() async {
+    try {
+      final response = await _dio.get('home_sections/');
+      final data = response.data as Map<String, dynamic>;
+      
+      return {
+        'discount_destinations': (data['discount_destinations'] as List)
+            .map((e) => DestinationModel.fromJson(e))
+            .toList(),
+        'favorite_destinations': (data['favorite_destinations'] as List)
+            .map((e) => DestinationModel.fromJson(e))
+            .toList(),
+        'hot_destinations': (data['hot_destinations'] as List)
+            .map((e) => DestinationModel.fromJson(e))
+            .toList(),
+      };
+    } catch (e) {
+      print('Error fetching home sections: $e');
+      return {
+        'discount_destinations': [],
+        'favorite_destinations': [],
+        'hot_destinations': [],
+      };
+    }
   }
 
-  List<DestinationModel> getDiscountDestinations() => _getMockDestinations();
-  List<DestinationModel> getFavoriteDestinations() => _getMockDestinations();
-  List<DestinationModel> getHotDestinations() => _getMockDestinations();
-  List<DestinationModel> getRecentSearches() => _getMockDestinations();
-  List<DestinationModel> getTopRated() => _getMockDestinations();
+  Future<List<DestinationModel>> fetchRecommendations() async {
+    try {
+      final response = await _dio.get('recommendations/');
+      final data = response.data as List;
+      return data.map((e) => DestinationModel.fromJson(e)).toList();
+    } catch (e) {
+      print('Error fetching recommendations: $e');
+      return [];
+    }
+  }
 
-  List<DestinationModel> getVillaDestinations() =>
-      _getMockDestinations(category: 'Villa');
-  List<DestinationModel> getHotelDestinations() =>
-      _getMockDestinations(category: 'Hotel');
-  List<DestinationModel> getApartmentDestinations() =>
-      _getMockDestinations(category: 'Apartment');
-  List<DestinationModel> getCondoDestinations() =>
-      _getMockDestinations(category: 'Condo');
+  Future<bool> toggleWishlist(String id) async {
+    try {
+      final response = await _dio.post('$id/toggle_wishlist/');
+      return response.statusCode == 200;
+    } catch (e) {
+      print('Error toggling wishlist: $e');
+      return false;
+    }
+  }
+
+  // --- Stubs for UI compilation ---
+  List<DestinationModel> getVillaDestinations() => [];
+  List<DestinationModel> getHotelDestinations() => [];
+  List<DestinationModel> getApartmentDestinations() => [];
+  List<DestinationModel> getCondoDestinations() => [];
+  List<DestinationModel> getRecentSearches() => [];
+  List<DestinationModel> getTopRated() => [];
+  List<DestinationModel> getHotDestinations() => [];
 
   // --- Search ---
   List<String> getTrendingTags() => ['Cozy', 'Sleek', 'Airy', 'Moody'];
-
-  // Future API call methods (stubs)
-  Future<List<DestinationModel>> fetchDestinations() async {
-    await Future.delayed(const Duration(milliseconds: 500));
-    return _getMockDestinations();
-  }
 }

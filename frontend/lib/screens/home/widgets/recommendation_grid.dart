@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../models/recommendation_item.dart';
+import '../../destination/models/destination_model.dart';
 import 'dart:ui';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -7,8 +7,8 @@ import 'dart:ui';
 // ─────────────────────────────────────────────────────────────────────────────
 
 class RecommendationGrid extends StatelessWidget {
-  final List<RecommendationItem> items;
-  final Function(RecommendationItem)? onItemTap;
+  final List<DestinationModel> items;
+  final Function(DestinationModel)? onItemTap;
 
   const RecommendationGrid({super.key, required this.items, this.onItemTap});
 
@@ -41,7 +41,7 @@ class RecommendationGrid extends StatelessWidget {
 // ─────────────────────────────────────────────────────────────────────────────
 
 class _RecommendationCard extends StatelessWidget {
-  final RecommendationItem item;
+  final DestinationModel item;
 
   const _RecommendationCard({required this.item});
 
@@ -69,10 +69,7 @@ class _RecommendationCard extends StatelessWidget {
               sigmaX: 3.0,
               sigmaY: 3.0,
             ), // Adjust blur intensity here
-            child: _RecommendationImage(
-              imageAsset: item.imageAsset,
-              imageUrl: item.imageUrl,
-            ),
+            child: _RecommendationImage(imageUrl: item.imageUrl),
           ),
 
           // ── 2. Full-card dark overlay for contrast ────────────────
@@ -117,7 +114,7 @@ class _RecommendationCard extends StatelessWidget {
                   SizedBox(
                     width: 136,
                     child: Text(
-                      item.description,
+                      item.location.isEmpty ? 'Destination' : item.location,
                       textAlign: TextAlign.center,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
@@ -145,10 +142,9 @@ class _RecommendationCard extends StatelessWidget {
 // ─────────────────────────────────────────────────────────────────────────────
 
 class _RecommendationImage extends StatelessWidget {
-  final String? imageAsset;
   final String? imageUrl;
 
-  const _RecommendationImage({this.imageAsset, this.imageUrl});
+  const _RecommendationImage({this.imageUrl});
 
   @override
   Widget build(BuildContext context) {
@@ -161,7 +157,7 @@ class _RecommendationImage extends StatelessWidget {
       ),
     );
 
-    // 1. Remote URL — from backend
+    // Remote URL — from backend
     if (imageUrl != null && imageUrl!.isNotEmpty) {
       return Image.network(
         imageUrl!,
@@ -179,15 +175,6 @@ class _RecommendationImage extends StatelessWidget {
             ),
           );
         },
-      );
-    }
-
-    // 2. Local asset
-    if (imageAsset != null && imageAsset!.isNotEmpty) {
-      return Image.asset(
-        imageAsset!,
-        fit: BoxFit.cover,
-        errorBuilder: (_, __, ___) => fallback,
       );
     }
 

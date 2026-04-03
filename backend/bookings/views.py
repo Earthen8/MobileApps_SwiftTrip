@@ -1,8 +1,8 @@
 from rest_framework import viewsets, status, decorators
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from .models import Booking, PurchaseItem
-from .serializers import CartTicketSerializer, CheckoutDetailsSerializer
+from .models import Booking, PurchaseItem, Destination, Wishlist
+from .serializers import CartTicketSerializer, CheckoutDetailsSerializer, DestinationSerializer
 
 class BookingViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
@@ -72,3 +72,51 @@ class BookingViewSet(viewsets.ModelViewSet):
         booking.status = 'PAID'
         booking.save()
         return Response({"message": "Payment successful", "status": booking.status})
+
+class DestinationViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Destination.objects.all()
+    serializer_class = DestinationSerializer
+    permission_classes = [AllowAny]
+
+    @decorators.action(detail=False, methods=['get'])
+    def home_sections(self, request):
+        destinations = self.get_queryset()
+        
+        discount = destinations.filter(section_tag='Discount')
+        favorite = destinations.filter(section_tag='Favorite')
+        hot = destinations.filter(section_tag='Hot')
+
+        return Response({
+            'discount_destinations': DestinationSerializer(discount, many=True).data,
+            'favorite_destinations': DestinationSerializer(favorite, many=True).data,
+            'hot_destinations': DestinationSerializer(hot, many=True).data,
+        })
+
+    @decorators.action(detail=False, methods=['get'])
+    def recommendations(self, request):
+        destinations = self.get_queryset()
+        
+        if request.user.is_authenticated:
+            # Exclude destinations already in the user's wishlist
+            destinations = destinations.exclude(wishlisted_by__user=request.user)
+
+        # Get top 4 highest rated
+        recommendations = destinations.order_by('-rating')[:4]
+        return Response(DestinationSerializer(recommendations, many=True).data)
+
+    @decorators.action(detail=True, methods=['post'], permission_classes=[IsAuthenticated])
+    def toggle_wishlist(self, request, pk=None):
+        destination = self.get_object()
+        wishlist, created = Wishlist.objects.get_or_create(user=request.user)
+        
+        if destination in wishlist.destinations.all():
+            wishlist.destinations.remove(destination)
+            status_msg = "removed"
+        else:
+            wishlist.destinations.add(destination)
+            status_msg = "added"
+            
+        return Response({
+            "message": f"Successfully {status_msg} destination to wishlist.",
+            "status": status_msg
+        })
