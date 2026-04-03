@@ -64,7 +64,7 @@ class AirportSearchService {
       'countryCode': 'ID',
     },
 
-    // --- ASIA (Regional Favorites) ---
+    // --- ASIA ---
     {
       'iataCode': 'SIN',
       'name': 'Changi Airport',
@@ -84,6 +84,78 @@ class AirportSearchService {
       'countryCode': 'TH',
     },
     {
+      'iataCode': 'DMK',
+      'name': 'Don Mueang International Airport',
+      'cityName': 'Bangkok',
+      'countryCode': 'TH',
+    },
+    {
+      'iataCode': 'HKT',
+      'name': 'Phuket International Airport',
+      'cityName': 'Phuket',
+      'countryCode': 'TH',
+    },
+    {
+      'iataCode': 'CNX',
+      'name': 'Chiang Mai International Airport',
+      'cityName': 'Chiang Mai',
+      'countryCode': 'TH',
+    },
+    {
+      'iataCode': 'MNL',
+      'name': 'Ninoy Aquino International Airport',
+      'cityName': 'Manila',
+      'countryCode': 'PH',
+    },
+    {
+      'iataCode': 'CEB',
+      'name': 'Mactan-Cebu International Airport',
+      'cityName': 'Cebu',
+      'countryCode': 'PH',
+    },
+    {
+      'iataCode': 'SGN',
+      'name': 'Tan Son Nhat International Airport',
+      'cityName': 'Ho Chi Minh City',
+      'countryCode': 'VN',
+    },
+    {
+      'iataCode': 'HAN',
+      'name': 'Noi Bai International Airport',
+      'cityName': 'Hanoi',
+      'countryCode': 'VN',
+    },
+    {
+      'iataCode': 'DAD',
+      'name': 'Da Nang International Airport',
+      'cityName': 'Da Nang',
+      'countryCode': 'VN',
+    },
+    {
+      'iataCode': 'RGN',
+      'name': 'Yangon International Airport',
+      'cityName': 'Yangon',
+      'countryCode': 'MM',
+    },
+    {
+      'iataCode': 'PNH',
+      'name': 'Phnom Penh International Airport',
+      'cityName': 'Phnom Penh',
+      'countryCode': 'KH',
+    },
+    {
+      'iataCode': 'REP',
+      'name': 'Siem Reap International Airport',
+      'cityName': 'Siem Reap',
+      'countryCode': 'KH',
+    },
+    {
+      'iataCode': 'VTE',
+      'name': 'Wattay International Airport',
+      'cityName': 'Vientiane',
+      'countryCode': 'LA',
+    },
+    {
       'iataCode': 'HND',
       'name': 'Haneda Airport',
       'cityName': 'Tokyo',
@@ -96,9 +168,45 @@ class AirportSearchService {
       'countryCode': 'JP',
     },
     {
+      'iataCode': 'KIX',
+      'name': 'Kansai International Airport',
+      'cityName': 'Osaka',
+      'countryCode': 'JP',
+    },
+    {
+      'iataCode': 'NGO',
+      'name': 'Chubu Centrair International Airport',
+      'cityName': 'Nagoya',
+      'countryCode': 'JP',
+    },
+    {
+      'iataCode': 'CTS',
+      'name': 'New Chitose Airport',
+      'cityName': 'Sapporo',
+      'countryCode': 'JP',
+    },
+    {
+      'iataCode': 'FUK',
+      'name': 'Fukuoka Airport',
+      'cityName': 'Fukuoka',
+      'countryCode': 'JP',
+    },
+    {
       'iataCode': 'ICN',
       'name': 'Incheon International Airport',
       'cityName': 'Seoul',
+      'countryCode': 'KR',
+    },
+    {
+      'iataCode': 'GMP',
+      'name': 'Gimpo International Airport',
+      'cityName': 'Seoul',
+      'countryCode': 'KR',
+    },
+    {
+      'iataCode': 'CJU',
+      'name': 'Jeju International Airport',
+      'cityName': 'Jeju',
       'countryCode': 'KR',
     },
     {
@@ -114,26 +222,20 @@ class AirportSearchService {
       'countryCode': 'TW',
     },
     {
-      'iataCode': 'MNL',
-      'name': 'Ninoy Aquino International Airport',
-      'cityName': 'Manila',
-      'countryCode': 'PH',
-    },
-    {
-      'iataCode': 'SGN',
-      'name': 'Tan Son Nhat International Airport',
-      'cityName': 'Ho Chi Minh City',
-      'countryCode': 'VN',
-    },
-    {
-      'iataCode': 'KIX',
-      'name': 'Kansai International Airport',
-      'cityName': 'Osaka',
-      'countryCode': 'JP',
+      'iataCode': 'TSA',
+      'name': 'Songshan Airport',
+      'cityName': 'Taipei',
+      'countryCode': 'TW',
     },
     {
       'iataCode': 'PVG',
       'name': 'Pudong International Airport',
+      'cityName': 'Shanghai',
+      'countryCode': 'CN',
+    },
+    {
+      'iataCode': 'SHA',
+      'name': 'Hongqiao International Airport',
       'cityName': 'Shanghai',
       'countryCode': 'CN',
     },
@@ -144,16 +246,180 @@ class AirportSearchService {
       'countryCode': 'CN',
     },
     {
-      'iataCode': 'BOM',
-      'name': 'Chhatrapati Shivaji Maharaj Intl Airport',
-      'cityName': 'Mumbai',
-      'countryCode': 'IN',
+      'iataCode': 'PKX',
+      'name': 'Beijing Daxing International Airport',
+      'cityName': 'Beijing',
+      'countryCode': 'CN',
+    },
+    {
+      'iataCode': 'CAN',
+      'name': 'Guangzhou Baiyun International Airport',
+      'cityName': 'Guangzhou',
+      'countryCode': 'CN',
+    },
+    {
+      'iataCode': 'SZX',
+      'name': 'Shenzhen Bao\'an International Airport',
+      'cityName': 'Shenzhen',
+      'countryCode': 'CN',
+    },
+    {
+      'iataCode': 'CTU',
+      'name': 'Chengdu Tianfu International Airport',
+      'cityName': 'Chengdu',
+      'countryCode': 'CN',
+    },
+    {
+      'iataCode': 'MFM',
+      'name': 'Macau International Airport',
+      'cityName': 'Macau',
+      'countryCode': 'MO',
     },
     {
       'iataCode': 'DEL',
       'name': 'Indira Gandhi International Airport',
       'cityName': 'Delhi',
       'countryCode': 'IN',
+    },
+    {
+      'iataCode': 'BOM',
+      'name': 'Chhatrapati Shivaji Maharaj Intl Airport',
+      'cityName': 'Mumbai',
+      'countryCode': 'IN',
+    },
+    {
+      'iataCode': 'BLR',
+      'name': 'Kempegowda International Airport',
+      'cityName': 'Bangalore',
+      'countryCode': 'IN',
+    },
+    {
+      'iataCode': 'MAA',
+      'name': 'Chennai International Airport',
+      'cityName': 'Chennai',
+      'countryCode': 'IN',
+    },
+    {
+      'iataCode': 'HYD',
+      'name': 'Rajiv Gandhi International Airport',
+      'cityName': 'Hyderabad',
+      'countryCode': 'IN',
+    },
+    {
+      'iataCode': 'CCU',
+      'name': 'Netaji Subhas Chandra Bose Intl Airport',
+      'cityName': 'Kolkata',
+      'countryCode': 'IN',
+    },
+    {
+      'iataCode': 'CMB',
+      'name': 'Bandaranaike International Airport',
+      'cityName': 'Colombo',
+      'countryCode': 'LK',
+    },
+    {
+      'iataCode': 'DAC',
+      'name': 'Hazrat Shahjalal International Airport',
+      'cityName': 'Dhaka',
+      'countryCode': 'BD',
+    },
+    {
+      'iataCode': 'KTM',
+      'name': 'Tribhuvan International Airport',
+      'cityName': 'Kathmandu',
+      'countryCode': 'NP',
+    },
+    {
+      'iataCode': 'MLE',
+      'name': 'Velana International Airport',
+      'cityName': 'Male',
+      'countryCode': 'MV',
+    },
+    {
+      'iataCode': 'PEN',
+      'name': 'Penang International Airport',
+      'cityName': 'Penang',
+      'countryCode': 'MY',
+    },
+    {
+      'iataCode': 'BKI',
+      'name': 'Kota Kinabalu International Airport',
+      'cityName': 'Kota Kinabalu',
+      'countryCode': 'MY',
+    },
+    {
+      'iataCode': 'PUS',
+      'name': 'Gimhae International Airport',
+      'cityName': 'Busan',
+      'countryCode': 'KR',
+    },
+    {
+      'iataCode': 'KMG',
+      'name': 'Kunming Changshui International Airport',
+      'cityName': 'Kunming',
+      'countryCode': 'CN',
+    },
+    {
+      'iataCode': 'XIY',
+      'name': 'Xi\'an Xianyang International Airport',
+      'cityName': 'Xi\'an',
+      'countryCode': 'CN',
+    },
+    {
+      'iataCode': 'HGH',
+      'name': 'Hangzhou Xiaoshan International Airport',
+      'cityName': 'Hangzhou',
+      'countryCode': 'CN',
+    },
+
+    // --- MIDDLE EAST / WEST ASIA ---
+    {
+      'iataCode': 'DXB',
+      'name': 'Dubai International Airport',
+      'cityName': 'Dubai',
+      'countryCode': 'AE',
+    },
+    {
+      'iataCode': 'AUH',
+      'name': 'Abu Dhabi International Airport',
+      'cityName': 'Abu Dhabi',
+      'countryCode': 'AE',
+    },
+    {
+      'iataCode': 'DOH',
+      'name': 'Hamad International Airport',
+      'cityName': 'Doha',
+      'countryCode': 'QA',
+    },
+    {
+      'iataCode': 'KWI',
+      'name': 'Kuwait International Airport',
+      'cityName': 'Kuwait City',
+      'countryCode': 'KW',
+    },
+    {
+      'iataCode': 'RUH',
+      'name': 'King Khalid International Airport',
+      'cityName': 'Riyadh',
+      'countryCode': 'SA',
+    },
+    {
+      'iataCode': 'JED',
+      'name': 'King Abdulaziz International Airport',
+      'cityName': 'Jeddah',
+      'countryCode': 'SA',
+    },
+    {
+      'iataCode': 'MCT',
+      'name': 'Muscat International Airport',
+      'cityName': 'Muscat',
+      'countryCode': 'OM',
+    },
+    {
+      'iataCode': 'AMM',
+      'name': 'Queen Alia International Airport',
+      'cityName': 'Amman',
+      'countryCode': 'JO',
     },
 
     // --- AUSTRALIA & OCEANIA (Study Destinations) ---
@@ -200,19 +466,7 @@ class AirportSearchService {
       'countryCode': 'NZ',
     },
 
-    // --- MIDDLE EAST & EUROPE ---
-    {
-      'iataCode': 'DXB',
-      'name': 'Dubai International Airport',
-      'cityName': 'Dubai',
-      'countryCode': 'AE',
-    },
-    {
-      'iataCode': 'DOH',
-      'name': 'Hamad International Airport',
-      'cityName': 'Doha',
-      'countryCode': 'QA',
-    },
+    // --- EUROPE (Main Hubs) ---
     {
       'iataCode': 'IST',
       'name': 'Istanbul Airport',
