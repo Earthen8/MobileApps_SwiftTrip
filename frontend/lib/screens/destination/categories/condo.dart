@@ -22,8 +22,7 @@ class _CondoPageState extends State<CondoPage> {
   }
 
   Future<void> _fetchCondos() async {
-    final condos = DestinationService().getCondoDestinations();
-    await Future.delayed(const Duration(milliseconds: 500));
+    final condos = await DestinationService().getCondoDestinations();
     if (!mounted) return;
     setState(() {
       _items = condos;

@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/destination_model.dart';
 import '../category_page_base.dart';
 import '../detail_page.dart';
-import 'package:dio/dio.dart';
-import '../../../core/constants.dart';
+import '../services/destination_service.dart';
 
 class VillaPage extends StatefulWidget {
   const VillaPage({super.key});
@@ -23,21 +22,13 @@ class _VillaPageState extends State<VillaPage> {
   }
 
   Future<void> _fetchVillas() async {
-    final dio = Dio();
     try {
-      final response = await dio.get(
-        '${Constants.travelUrl}destinations/',
-        queryParameters: {'category': 'Villa'},
-      );
-
-      if (response.statusCode == 200) {
-        final List<dynamic> data = response.data;
-        if (!mounted) return;
-        setState(() {
-          _items = data.map((json) => DestinationModel.fromJson(json)).toList();
-          _isLoading = false;
-        });
-      }
+      final items = await DestinationService().getVillaDestinations();
+      if (!mounted) return;
+      setState(() {
+        _items = items;
+        _isLoading = false;
+      });
     } catch (e) {
       debugPrint('Error fetching villas: $e');
       if (!mounted) return;

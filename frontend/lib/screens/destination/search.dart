@@ -19,17 +19,11 @@ class _DestinationSearchPageState extends State<DestinationSearchPage> {
   final DestinationService _service = DestinationService();
 
   late final List<String> _trendingTags;
-  late final List<DestinationModel> _recentSearches;
-  late final List<DestinationModel> _topRated;
-  late final List<DestinationModel> _hotDestinations;
 
   @override
   void initState() {
     super.initState();
     _trendingTags = _service.getTrendingTags();
-    _recentSearches = _service.getRecentSearches();
-    _topRated = _service.getTopRated();
-    _hotDestinations = _service.getHotDestinations();
   }
 
   @override
@@ -217,16 +211,29 @@ class _DestinationSearchPageState extends State<DestinationSearchPage> {
                     // ── Recent Searches ─────────────────────────────
                     DestinationSection(
                       title: 'Recent Searches',
-                      items: _recentSearches,
+                      items: _service.getRecentSearches(),
                     ),
 
                     // ── Top Rated ───────────────────────────────────
-                    DestinationSection(title: 'Top Rated', items: _topRated),
+                    FutureBuilder<List<DestinationModel>>(
+                      future: _service.getTopRated(),
+                      builder: (context, snapshot) {
+                        return DestinationSection(
+                          title: 'Top Rated',
+                          items: snapshot.data ?? [],
+                        );
+                      },
+                    ),
 
                     // ── Hot Destinations ────────────────────────────
-                    DestinationSection(
-                      title: 'Hot Destinations',
-                      items: _hotDestinations,
+                    FutureBuilder<List<DestinationModel>>(
+                      future: _service.fetchDestinations(sectionTag: 'Hot'),
+                      builder: (context, snapshot) {
+                        return DestinationSection(
+                          title: 'Hot Destinations',
+                          items: snapshot.data ?? [],
+                        );
+                      },
                     ),
 
                     const SizedBox(height: 40),

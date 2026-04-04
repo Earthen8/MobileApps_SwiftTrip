@@ -12,6 +12,7 @@ class DestinationModel {
   final double price;
   final String description;
   final List<String> features;
+  final List<String> tags;
   final String sectionTag;
   final ValueNotifier<bool> isFavoriteNotifier;
 
@@ -27,6 +28,7 @@ class DestinationModel {
     this.price = 0.0,
     this.description = '',
     this.features = const [],
+    this.tags = const [],
     this.sectionTag = '',
     bool isFavorite = false,
   }) : isFavoriteNotifier = ValueNotifier<bool>(isFavorite);
@@ -54,6 +56,9 @@ class DestinationModel {
               ?.map((e) => e.toString())
               .toList() ??
           [],
+      tags:
+          (json['tags'] as List<dynamic>?)?.map((e) => e.toString()).toList() ??
+          [],
       sectionTag: json['section_tag'] as String? ?? '',
     );
   }
@@ -71,6 +76,7 @@ class DestinationModel {
       'final_price': price,
       'description': description,
       'advantages': features,
+      'tags': tags,
       'section_tag': sectionTag,
     };
   }

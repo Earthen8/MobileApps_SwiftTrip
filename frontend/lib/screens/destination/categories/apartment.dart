@@ -16,14 +16,14 @@ class _ApartmentPageState extends State<ApartmentPage> {
   List<DestinationModel> _items = [];
 
   @override
+  @override
   void initState() {
     super.initState();
     _fetchApartments();
   }
 
   Future<void> _fetchApartments() async {
-    final apartments = DestinationService().getApartmentDestinations();
-    await Future.delayed(const Duration(milliseconds: 500));
+    final apartments = await DestinationService().getApartmentDestinations();
     if (!mounted) return;
     setState(() {
       _items = apartments;

@@ -22,14 +22,14 @@ class _HotelPageState extends State<HotelPage> {
   }
 
   Future<void> _fetchHotels() async {
-    final hotels = DestinationService().getHotelDestinations();
-    await Future.delayed(const Duration(milliseconds: 500));
+    final hotels = await DestinationService().getHotelDestinations();
     if (!mounted) return;
     setState(() {
       _items = hotels;
       _isLoading = false;
     });
   }
+
 
   @override
   Widget build(BuildContext context) {

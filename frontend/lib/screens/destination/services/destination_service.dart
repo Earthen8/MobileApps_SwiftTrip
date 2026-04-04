@@ -53,12 +53,35 @@ class DestinationService {
   // --- API Integrations ---
   final Dio _dio = Dio(BaseOptions(
     baseUrl: 'http://127.0.0.1:8000/api/bookings/destinations/',
+    connectTimeout: const Duration(seconds: 5),
+    receiveTimeout: const Duration(seconds: 5),
     headers: {
       'Content-Type': 'application/json',
-      // In a real app, attach Auth token here:
-      // 'Authorization': 'Bearer <token>'
     },
   ));
+
+  /// Generic fetcher to handle category, tag, ordering, and section_tag
+  Future<List<DestinationModel>> fetchDestinations({
+    String? category,
+    String? tag,
+    String? sectionTag,
+    String? ordering,
+  }) async {
+    try {
+      final queryParams = <String, dynamic>{};
+      if (category != null) queryParams['category'] = category;
+      if (tag != null) queryParams['tag'] = tag;
+      if (sectionTag != null) queryParams['section_tag'] = sectionTag;
+      if (ordering != null) queryParams['ordering'] = ordering;
+
+      final response = await _dio.get('', queryParameters: queryParams);
+      final data = response.data as List;
+      return data.map((json) => DestinationModel.fromJson(json)).toList();
+    } catch (e) {
+      print('Error fetching destinations: $e');
+      return []; // Return empty list to prevent UI crash
+    }
+  }
 
   Future<Map<String, List<DestinationModel>>> fetchHomeSections() async {
     try {
@@ -107,15 +130,16 @@ class DestinationService {
     }
   }
 
-  // --- Stubs for UI compilation ---
-  List<DestinationModel> getVillaDestinations() => [];
-  List<DestinationModel> getHotelDestinations() => [];
-  List<DestinationModel> getApartmentDestinations() => [];
-  List<DestinationModel> getCondoDestinations() => [];
+  // --- Realized Methods (Replacing Mock Stubs) ---
+  Future<List<DestinationModel>> getVillaDestinations() => fetchDestinations(category: 'Villa');
+  Future<List<DestinationModel>> getHotelDestinations() => fetchDestinations(category: 'Hotel');
+  Future<List<DestinationModel>> getApartmentDestinations() => fetchDestinations(category: 'Apartment');
+  Future<List<DestinationModel>> getCondoDestinations() => fetchDestinations(category: 'Condo');
+  
+  Future<List<DestinationModel>> getTopRated() => fetchDestinations(ordering: '-rating');
+  Future<List<DestinationModel>> fetchByTag(String tag) => fetchDestinations(tag: tag);
+  
+  // Stubs for search module
   List<DestinationModel> getRecentSearches() => [];
-  List<DestinationModel> getTopRated() => [];
-  List<DestinationModel> getHotDestinations() => [];
-
-  // --- Search ---
   List<String> getTrendingTags() => ['Cozy', 'Sleek', 'Airy', 'Moody'];
 }
