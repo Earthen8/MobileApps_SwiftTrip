@@ -162,7 +162,7 @@ class CategoryItemCard extends StatelessWidget {
                 padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     Text(
                       item.title,
@@ -191,17 +191,19 @@ class CategoryItemCard extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(height: 6),
-                    Text(
-                      item.description,
-                      style: const TextStyle(
-                        fontFamily: 'Poppins',
-                        fontWeight: FontWeight.w300,
-                        fontSize: 11,
-                        color: Colors.black54,
-                        height: 1.5,
+                    Expanded(
+                      child: Text(
+                        item.description,
+                        style: const TextStyle(
+                          fontFamily: 'Poppins',
+                          fontWeight: FontWeight.w300,
+                          fontSize: 11,
+                          color: Colors.black54,
+                          height: 1.5,
+                        ),
+                        maxLines: 3,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      maxLines: 3,
-                      overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 ),

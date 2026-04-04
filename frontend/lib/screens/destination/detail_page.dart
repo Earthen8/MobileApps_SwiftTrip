@@ -10,10 +10,7 @@ import '../../widgets/top_bar.dart';
 class DestinationDetailPage extends StatefulWidget {
   final DestinationModel destination;
 
-  const DestinationDetailPage({
-    super.key,
-    required this.destination,
-  });
+  const DestinationDetailPage({super.key, required this.destination});
 
   @override
   State<DestinationDetailPage> createState() => _DestinationDetailPageState();
@@ -198,7 +195,9 @@ class _DestinationDetailPageState extends State<DestinationDetailPage> {
                         const SizedBox(height: 16),
 
                         // ── Features list ────────────────────────────────
-                        ...widget.destination.features.map((f) => _FeatureRow(text: f)),
+                        ...widget.destination.features.map(
+                          (f) => _FeatureRow(text: f),
+                        ),
 
                         const Divider(height: 30, color: Color(0xFF000000)),
                         const SizedBox(height: 60),
@@ -318,13 +317,15 @@ class _FeatureRow extends StatelessWidget {
         children: [
           const Icon(Icons.circle, size: 8, color: Colors.black54),
           const SizedBox(width: 12),
-          Text(
-            text,
-            style: const TextStyle(
-              fontFamily: 'Poppins',
-              fontWeight: FontWeight.w400,
-              fontSize: 13,
-              color: Colors.black87,
+          Expanded(
+            child: Text(
+              text,
+              style: const TextStyle(
+                fontFamily: 'Poppins',
+                fontWeight: FontWeight.w400,
+                fontSize: 13,
+                color: Colors.black87,
+              ),
             ),
           ),
         ],
