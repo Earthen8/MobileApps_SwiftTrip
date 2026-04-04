@@ -19,7 +19,11 @@ class DestinationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Destination
-        fields = '__all__'
+        fields = [
+            'id', 'title', 'category', 'image_url', 'location', 
+            'rating', 'original_price', 'discount_percentage', 
+            'description', 'advantages', 'tags', 'section_tag', 'final_price'
+        ]
 
 class CartTicketSerializer(serializers.ModelSerializer):
     type = serializers.SerializerMethodField()

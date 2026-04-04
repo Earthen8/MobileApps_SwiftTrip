@@ -78,6 +78,24 @@ class DestinationViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = DestinationSerializer
     permission_classes = [AllowAny]
 
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        category = self.request.query_params.get('category')
+        tag = self.request.query_params.get('tag')
+        section_tag = self.request.query_params.get('section_tag')
+        ordering = self.request.query_params.get('ordering')
+
+        if category:
+            queryset = queryset.filter(category=category)
+        if tag:
+            queryset = queryset.filter(tags__contains=[tag])
+        if section_tag:
+            queryset = queryset.filter(section_tag=section_tag)
+        if ordering:
+            queryset = queryset.order_by(ordering)
+            
+        return queryset
+
     @decorators.action(detail=False, methods=['get'])
     def home_sections(self, request):
         destinations = self.get_queryset()

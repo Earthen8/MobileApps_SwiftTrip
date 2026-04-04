@@ -77,6 +77,7 @@ class Destination(models.Model):
     discount_percentage = models.IntegerField(default=0)
     description = models.TextField()
     advantages = models.JSONField(default=list, help_text='Guest Favorites list')
+    tags = models.JSONField(default=list, help_text='Searchable tags like Cozy, Airy')
     section_tag = models.CharField(max_length=50, choices=SECTION_TAG_CHOICES)
 
     @property
