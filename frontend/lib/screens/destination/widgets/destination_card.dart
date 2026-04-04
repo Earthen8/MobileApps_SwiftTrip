@@ -20,9 +20,11 @@ class DestinationCard extends StatelessWidget {
           ),
         );
       },
-      child: SizedBox(
+      child: Container(
         width: 180,
+        height: 135, // Fixed height to prevent flattening
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Stack(
@@ -32,17 +34,17 @@ class DestinationCard extends StatelessWidget {
                   child: Image.network(
                     destination.imageUrl,
                     height: 90,
-                    width: double.infinity,
+                    width: 180,
                     fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) => Container(
                       height: 90,
+                      width: 180,
                       color: Colors.grey.shade300,
                       child: const Icon(Icons.image, color: Colors.grey),
                     ),
                   ),
                 ),
-                if (destination.hasDiscount ||
-                    destination.discountPercentage > 0)
+                if (destination.hasDiscount)
                   const Positioned(
                     top: 8,
                     left: 8,

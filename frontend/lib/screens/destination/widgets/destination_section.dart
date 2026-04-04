@@ -30,7 +30,7 @@ class DestinationSection extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         SizedBox(
-          height: 150,
+          height: 135,
           child: ListView.builder(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             scrollDirection: Axis.horizontal,
@@ -38,7 +38,10 @@ class DestinationSection extends StatelessWidget {
             itemBuilder: (context, index) {
               return Padding(
                 padding: const EdgeInsets.only(right: 12),
-                child: DestinationCard(destination: items[index]),
+                child: Align(
+                  alignment: Alignment.topLeft,
+                  child: DestinationCard(destination: items[index]),
+                ),
               );
             },
           ),
