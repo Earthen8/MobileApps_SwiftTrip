@@ -96,7 +96,7 @@ class DestinationViewSet(viewsets.ReadOnlyModelViewSet):
             
         return queryset
 
-    @decorators.action(detail=False, methods=['get'])
+    @decorators.action(detail=False, methods=['get'], permission_classes=[AllowAny])
     def home_sections(self, request):
         destinations = self.get_queryset()
         
@@ -110,7 +110,7 @@ class DestinationViewSet(viewsets.ReadOnlyModelViewSet):
             'hot_destinations': DestinationSerializer(hot, many=True).data,
         })
 
-    @decorators.action(detail=False, methods=['get'])
+    @decorators.action(detail=False, methods=['get'], permission_classes=[AllowAny])
     def recommendations(self, request):
         destinations = self.get_queryset()
         

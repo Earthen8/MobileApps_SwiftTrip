@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:swifttrip_frontend/repositories/auth_repository.dart';
 import '../models/destination_model.dart';
 import '../models/category_model.dart';
 import '../categories/villa.dart';
@@ -60,6 +61,14 @@ class DestinationService {
     },
   ));
 
+  Future<Options> _getOptions() async {
+    final token = await AuthRepository().getToken();
+    return Options(headers: {
+      if (token != null) 'Authorization': 'Bearer $token',
+      'Content-Type': 'application/json',
+    });
+  }
+
   /// Generic fetcher to handle category, tag, ordering, and section_tag
   Future<List<DestinationModel>> fetchDestinations({
     String? category,
@@ -74,7 +83,8 @@ class DestinationService {
       if (sectionTag != null) queryParams['section_tag'] = sectionTag;
       if (ordering != null) queryParams['ordering'] = ordering;
 
-      final response = await _dio.get('', queryParameters: queryParams);
+      final options = await _getOptions();
+      final response = await _dio.get('', queryParameters: queryParams, options: options);
       final data = response.data as List;
       return data.map((json) => DestinationModel.fromJson(json)).toList();
     } catch (e) {
@@ -85,7 +95,8 @@ class DestinationService {
 
   Future<Map<String, List<DestinationModel>>> fetchHomeSections() async {
     try {
-      final response = await _dio.get('home_sections/');
+      final options = await _getOptions();
+      final response = await _dio.get('home_sections/', options: options);
       final data = response.data as Map<String, dynamic>;
       
       return {
@@ -111,7 +122,8 @@ class DestinationService {
 
   Future<List<DestinationModel>> fetchRecommendations() async {
     try {
-      final response = await _dio.get('recommendations/');
+      final options = await _getOptions();
+      final response = await _dio.get('recommendations/', options: options);
       final data = response.data as List;
       return data.map((e) => DestinationModel.fromJson(e)).toList();
     } catch (e) {
@@ -122,7 +134,8 @@ class DestinationService {
 
   Future<bool> toggleWishlist(String id) async {
     try {
-      final response = await _dio.post('$id/toggle_wishlist/');
+      final options = await _getOptions();
+      final response = await _dio.post('$id/toggle_wishlist/', options: options);
       return response.statusCode == 200;
     } catch (e) {
       print('Error toggling wishlist: $e');

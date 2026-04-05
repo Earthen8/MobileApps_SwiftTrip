@@ -60,6 +60,7 @@ class DestinationModel {
           (json['tags'] as List<dynamic>?)?.map((e) => e.toString()).toList() ??
           [],
       sectionTag: json['section_tag'] as String? ?? '',
+      isFavorite: json['is_favorite'] as bool? ?? false,
     );
   }
 

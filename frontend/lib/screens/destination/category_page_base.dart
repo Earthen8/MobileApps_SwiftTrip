@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:swifttrip_frontend/repositories/auth_repository.dart';
+import 'package:swifttrip_frontend/screens/auth/login.dart';
 import 'models/destination_model.dart';
+import 'services/destination_service.dart';
 import '../../widgets/top_bar.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -149,8 +152,63 @@ class CategoryItemCard extends StatelessWidget {
                         valueListenable: item.isFavoriteNotifier,
                         builder: (context, isFavorite, child) {
                           return GestureDetector(
-                            onTap: () {
-                              item.isFavorite = !isFavorite;
+                            onTap: () async {
+                              final token = await AuthRepository().getToken();
+                              if (token == null) {
+                                if (!context.mounted) return;
+                                showModalBottomSheet(
+                                  context: context,
+                                  shape: const RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                                  ),
+                                  builder: (context) => Container(
+                                    padding: const EdgeInsets.all(24),
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        const Text(
+                                          'Log in to save your favorite destinations',
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                            fontFamily: 'Poppins',
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 20),
+                                        ElevatedButton(
+                                          onPressed: () {
+                                            Navigator.pop(context);
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(builder: (context) => const LoginPage()),
+                                            );
+                                          },
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor: const Color(0xFF2B99E3),
+                                            minimumSize: const Size(double.infinity, 45),
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.circular(10),
+                                            ),
+                                          ),
+                                          child: const Text(
+                                            'Log In',
+                                            style: TextStyle(fontFamily: 'Poppins', color: Colors.white),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                );
+                                return;
+                              }
+
+                              final oldVal = item.isFavorite;
+                              item.isFavorite = !oldVal;
+                              final success = await DestinationService().toggleWishlist(item.id);
+                              if (!success) {
+                                item.isFavorite = oldVal;
+                              }
                             },
                             child: Icon(
                               isFavorite ? Icons.favorite : Icons.favorite_border,

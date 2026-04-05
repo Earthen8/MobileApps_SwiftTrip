@@ -16,14 +16,21 @@ class PurchaseItemSerializer(serializers.ModelSerializer):
 
 class DestinationSerializer(serializers.ModelSerializer):
     final_price = serializers.DecimalField(max_digits=12, decimal_places=2, read_only=True)
+    is_favorite = serializers.SerializerMethodField()
 
     class Meta:
         model = Destination
         fields = [
             'id', 'title', 'category', 'image_url', 'location', 
             'rating', 'original_price', 'discount_percentage', 
-            'description', 'advantages', 'tags', 'section_tag', 'final_price'
+            'description', 'advantages', 'tags', 'section_tag', 'final_price', 'is_favorite'
         ]
+
+    def get_is_favorite(self, obj):
+        request = self.context.get('request')
+        if request and request.user.is_authenticated:
+            return obj.wishlisted_by.filter(user=request.user).exists()
+        return False
 
 class CartTicketSerializer(serializers.ModelSerializer):
     type = serializers.SerializerMethodField()
