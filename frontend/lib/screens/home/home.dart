@@ -22,7 +22,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'review.dart';
 
 // ─────────────────────────────────────────────
-// CONSTANTS / MOCK DATA
+// CONSTANTS
 // ─────────────────────────────────────────────
 
 const _bannerImages = [
@@ -53,7 +53,6 @@ class _HomePageState extends State<HomePage> {
   );
   Timer? _bannerTimer;
 
-  // -- Backend-friendly Data States --
   bool _isLoading = true;
   List<ScheduleItem> _serverSchedules = [];
   List<DestinationModel> _serverRecommendations = [];
@@ -64,7 +63,6 @@ class _HomePageState extends State<HomePage> {
     _fetchHomeData();
   }
 
-  /// Simulates fetching data from a backend API.
   Future<void> _fetchHomeData() async {
     setState(() => _isLoading = true);
     final homeService = HomeService();
@@ -220,7 +218,6 @@ class _HomePageState extends State<HomePage> {
                               RecommendationGrid(
                                 items: _serverRecommendations,
                                 onItemTap: (item) {
-                                  // Either switch tab or push new page
                                   if (widget.onNavigateToDestination != null) {
                                     widget.onNavigateToDestination!();
                                   } else {
