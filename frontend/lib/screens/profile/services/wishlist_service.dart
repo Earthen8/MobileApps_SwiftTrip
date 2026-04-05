@@ -15,7 +15,6 @@ class WishlistService {
         imageUrl: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=500',
         price: 15000000,
         features: ['Cliffside Villa', 'Private Pool', 'Ocean View'],
-        isFavorite: true,
       ),
       DestinationModel(
         id: 'item_2',
@@ -25,7 +24,6 @@ class WishlistService {
         imageUrl: 'https://images.unsplash.com/photo-1518548419970-58e3b4079ab2?w=500',
         price: 8500000,
         features: ['Beachfront', 'Komodo View', 'Turquoise Water'],
-        isFavorite: true,
       ),
       DestinationModel(
         id: 'item_3',
@@ -36,7 +34,6 @@ class WishlistService {
         imageUrl: 'https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=500',
         price: 2500000,
         features: ['Mountain View', 'Infinity Pool', 'Forest Vibe'],
-        isFavorite: true,
       ),
       DestinationModel(
         id: 'item_4',
@@ -47,7 +44,6 @@ class WishlistService {
         imageUrl: 'https://images.unsplash.com/photo-1505739771715-9c3fcd5f1b38?w=500',
         price: 7000000,
         features: ['Rock Bar', 'Sunset View', 'Jimbaran Bay'],
-        isFavorite: true,
       ),
       DestinationModel(
         id: 'item_5',
@@ -58,7 +54,6 @@ class WishlistService {
         imageUrl: 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=500',
         price: 3500000,
         features: ['Mega Kuningan', 'Premium Service', 'City Hotel'],
-        isFavorite: true,
       ),
     ];
   }

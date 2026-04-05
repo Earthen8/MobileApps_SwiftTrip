@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:provider/provider.dart';
 import 'package:swifttrip_frontend/repositories/auth_repository.dart';
 import 'package:swifttrip_frontend/screens/auth/login.dart';
+import 'package:swifttrip_frontend/providers/wishlist_provider.dart';
 import 'models/destination_model.dart';
-import 'services/destination_service.dart';
 import '../../widgets/top_bar.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -20,30 +21,6 @@ class DestinationDetailPage extends StatefulWidget {
 }
 
 class _DestinationDetailPageState extends State<DestinationDetailPage> {
-  bool _isFavorite = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _isFavorite = widget.destination.isFavorite;
-    // Sync with model updates
-    widget.destination.isFavoriteNotifier.addListener(_syncFavorite);
-  }
-
-  @override
-  void dispose() {
-    widget.destination.isFavoriteNotifier.removeListener(_syncFavorite);
-    super.dispose();
-  }
-
-  void _syncFavorite() {
-    if (mounted) {
-      setState(() {
-        _isFavorite = widget.destination.isFavorite;
-      });
-    }
-  }
-
   String get _formattedPrice {
     final price = widget.destination.price.toInt();
     final str = price.toString();
@@ -85,66 +62,80 @@ class _DestinationDetailPageState extends State<DestinationDetailPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // ── Hero Image ───────────────────────────────────────
-                  _HeroImage(
-                    destination: widget.destination,
-                    isFavorite: _isFavorite,
-                    onToggleFavorite: () async {
-                      final token = await AuthRepository().getToken();
-                      if (token == null) {
-                        if (!context.mounted) return;
-                        showModalBottomSheet(
-                          context: context,
-                          shape: const RoundedRectangleBorder(
-                            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-                          ),
-                          builder: (context) => Container(
-                            padding: const EdgeInsets.all(24),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                const Text(
-                                  'Log in to save your favorite destinations',
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    fontFamily: 'Poppins',
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w500,
-                                  ),
+                  Consumer<WishlistProvider>(
+                    builder: (context, provider, child) {
+                      return _HeroImage(
+                        destination: widget.destination,
+                        isFavorite: provider.isFavorite(widget.destination.id),
+                        onToggleFavorite: () async {
+                          final token = await AuthRepository().getToken();
+                          if (token == null) {
+                            if (!context.mounted) return;
+                            showModalBottomSheet(
+                              context: context,
+                              shape: const RoundedRectangleBorder(
+                                borderRadius: BorderRadius.vertical(
+                                  top: Radius.circular(20),
                                 ),
-                                const SizedBox(height: 20),
-                                ElevatedButton(
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(builder: (context) => const LoginPage()),
-                                    );
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: const Color(0xFF2B99E3),
-                                    minimumSize: const Size(double.infinity, 45),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10),
+                              ),
+                              builder: (context) => Container(
+                                padding: const EdgeInsets.all(24),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    const Text(
+                                      'Log in to save your favorite destinations',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        fontFamily: 'Poppins',
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500,
+                                      ),
                                     ),
-                                  ),
-                                  child: const Text(
-                                    'Log In',
-                                    style: TextStyle(fontFamily: 'Poppins', color: Colors.white),
-                                  ),
+                                    const SizedBox(height: 20),
+                                    ElevatedButton(
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                const LoginPage(),
+                                          ),
+                                        );
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: const Color(
+                                          0xFF2B99E3,
+                                        ),
+                                        minimumSize: const Size(
+                                          double.infinity,
+                                          45,
+                                        ),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            10,
+                                          ),
+                                        ),
+                                      ),
+                                      child: const Text(
+                                        'Log In',
+                                        style: TextStyle(
+                                          fontFamily: 'Poppins',
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                              ],
-                            ),
-                          ),
-                        );
-                        return;
-                      }
+                              ),
+                            );
+                            return;
+                          }
 
-                      final oldVal = widget.destination.isFavorite;
-                      widget.destination.isFavorite = !oldVal;
-                      final success = await DestinationService().toggleWishlist(widget.destination.id);
-                      if (!success) {
-                        widget.destination.isFavorite = oldVal;
-                      }
+                          await provider.toggleWishlist(widget.destination.id);
+                        },
+                      );
                     },
                   ),
 

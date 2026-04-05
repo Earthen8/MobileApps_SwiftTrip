@@ -138,3 +138,9 @@ class DestinationViewSet(viewsets.ReadOnlyModelViewSet):
             "message": f"Successfully {status_msg} destination to wishlist.",
             "status": status_msg
         })
+
+    @decorators.action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
+    def my_wishlist_ids(self, request):
+        wishlist, created = Wishlist.objects.get_or_create(user=request.user)
+        ids = wishlist.destinations.values_list('id', flat=True)
+        return Response({"ids": list(ids)})

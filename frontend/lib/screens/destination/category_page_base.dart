@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:swifttrip_frontend/repositories/auth_repository.dart';
 import 'package:swifttrip_frontend/screens/auth/login.dart';
+import 'package:swifttrip_frontend/providers/wishlist_provider.dart';
 import 'models/destination_model.dart';
-import 'services/destination_service.dart';
 import '../../widgets/top_bar.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -146,11 +147,11 @@ class CategoryItemCard extends StatelessWidget {
                         ),
                       ),
                     Positioned(
-                      top: 8,
-                      right: 8,
-                      child: ValueListenableBuilder<bool>(
-                        valueListenable: item.isFavoriteNotifier,
-                        builder: (context, isFavorite, child) {
+                      top: 10,
+                      right: 10,
+                      child: Consumer<WishlistProvider>(
+                        builder: (context, provider, child) {
+                          final isFavorite = provider.isFavorite(item.id);
                           return GestureDetector(
                             onTap: () async {
                               final token = await AuthRepository().getToken();
@@ -203,12 +204,7 @@ class CategoryItemCard extends StatelessWidget {
                                 return;
                               }
 
-                              final oldVal = item.isFavorite;
-                              item.isFavorite = !oldVal;
-                              final success = await DestinationService().toggleWishlist(item.id);
-                              if (!success) {
-                                item.isFavorite = oldVal;
-                              }
+                              await provider.toggleWishlist(item.id);
                             },
                             child: Icon(
                               isFavorite ? Icons.favorite : Icons.favorite_border,

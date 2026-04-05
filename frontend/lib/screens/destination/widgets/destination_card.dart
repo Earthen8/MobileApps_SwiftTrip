@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:swifttrip_frontend/repositories/auth_repository.dart';
 import 'package:swifttrip_frontend/screens/auth/login.dart';
+import 'package:swifttrip_frontend/providers/wishlist_provider.dart';
 import '../detail_page.dart';
-import '../services/destination_service.dart';
 import '../models/destination_model.dart';
 
 class DestinationCard extends StatelessWidget {
@@ -59,9 +60,9 @@ class DestinationCard extends StatelessWidget {
                 Positioned(
                   top: 8,
                   right: 8,
-                  child: ValueListenableBuilder<bool>(
-                    valueListenable: destination.isFavoriteNotifier,
-                    builder: (context, isFavorite, child) {
+                  child: Consumer<WishlistProvider>(
+                    builder: (context, provider, child) {
+                      final isFavorite = provider.isFavorite(destination.id);
                       return GestureDetector(
                         onTap: () async {
                           final token = await AuthRepository().getToken();
@@ -114,12 +115,7 @@ class DestinationCard extends StatelessWidget {
                             return;
                           }
 
-                          final oldVal = destination.isFavorite;
-                          destination.isFavorite = !oldVal;
-                          final success = await DestinationService().toggleWishlist(destination.id);
-                          if (!success) {
-                            destination.isFavorite = oldVal;
-                          }
+                          await provider.toggleWishlist(destination.id);
                         },
                         child: Icon(
                           isFavorite ? Icons.favorite : Icons.favorite_border,
