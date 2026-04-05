@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/destination_model.dart';
 import '../services/destination_service.dart';
-import '../widgets/search_result_card.dart';
+import 'search_result_card.dart';
 
 class TagResultsPage extends StatefulWidget {
   final String tagLabel;
@@ -38,7 +38,9 @@ class _TagResultsPageState extends State<TagResultsPage> {
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(
-                      child: CircularProgressIndicator(color: Color(0xFF2B99E3)),
+                      child: CircularProgressIndicator(
+                        color: Color(0xFF2B99E3),
+                      ),
                     );
                   } else if (snapshot.hasError) {
                     return Center(

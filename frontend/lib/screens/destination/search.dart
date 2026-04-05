@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 import 'widgets/destination_section.dart';
 import 'widgets/search_result_card.dart';
-import 'search/tag_results_page.dart';
+import 'widgets/tag_results_page.dart';
 import 'services/destination_service.dart';
 import 'models/destination_model.dart';
 
@@ -281,7 +281,8 @@ class _DestinationSearchPageState extends State<DestinationSearchPage> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => TagResultsPage(tagLabel: tagLabel),
+                        builder: (context) =>
+                            TagResultsPage(tagLabel: tagLabel),
                       ),
                     );
                   },
@@ -380,4 +381,3 @@ class _DestinationSearchPageState extends State<DestinationSearchPage> {
     );
   }
 }
-
