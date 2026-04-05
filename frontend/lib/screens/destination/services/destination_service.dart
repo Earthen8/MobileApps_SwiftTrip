@@ -75,6 +75,7 @@ class DestinationService {
     String? tag,
     String? sectionTag,
     String? ordering,
+    String? search,
   }) async {
     try {
       final queryParams = <String, dynamic>{};
@@ -82,6 +83,7 @@ class DestinationService {
       if (tag != null) queryParams['tag'] = tag;
       if (sectionTag != null) queryParams['section_tag'] = sectionTag;
       if (ordering != null) queryParams['ordering'] = ordering;
+      if (search != null) queryParams['search'] = search;
 
       final options = await _getOptions();
       final response = await _dio.get('', queryParameters: queryParams, options: options);
@@ -167,6 +169,10 @@ class DestinationService {
   Future<List<DestinationModel>> getTopRated() => fetchDestinations(ordering: '-rating');
   Future<List<DestinationModel>> fetchByTag(String tag) => fetchDestinations(tag: tag);
   
+  Future<List<DestinationModel>> searchDestinations(String query) async {
+    return fetchDestinations(search: query);
+  }
+
   // Stubs for search module
   List<DestinationModel> getRecentSearches() => [];
   List<String> getTrendingTags() => ['Cozy', 'Sleek', 'Airy', 'Moody'];

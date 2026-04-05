@@ -1,6 +1,7 @@
 from rest_framework import viewsets, status, decorators
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
+from django.db.models import Q
 from .models import Booking, PurchaseItem, Destination, Wishlist
 from .serializers import CartTicketSerializer, CheckoutDetailsSerializer, DestinationSerializer
 
@@ -84,6 +85,7 @@ class DestinationViewSet(viewsets.ReadOnlyModelViewSet):
         tag = self.request.query_params.get('tag')
         section_tag = self.request.query_params.get('section_tag')
         ordering = self.request.query_params.get('ordering')
+        search = self.request.query_params.get('search')
 
         if category:
             queryset = queryset.filter(category=category)
@@ -91,6 +93,10 @@ class DestinationViewSet(viewsets.ReadOnlyModelViewSet):
             queryset = queryset.filter(tags__contains=[tag])
         if section_tag:
             queryset = queryset.filter(section_tag=section_tag)
+        if search:
+            queryset = queryset.filter(
+                Q(title__icontains=search) | Q(location__icontains=search)
+            )
         if ordering:
             queryset = queryset.order_by(ordering)
             
