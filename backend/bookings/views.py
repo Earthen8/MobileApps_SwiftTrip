@@ -90,7 +90,7 @@ class DestinationViewSet(viewsets.ReadOnlyModelViewSet):
         if category:
             queryset = queryset.filter(category=category)
         if tag:
-            queryset = queryset.filter(tags__contains=[tag])
+            queryset = queryset.filter(tags__icontains=tag)
         if section_tag:
             queryset = queryset.filter(section_tag=section_tag)
         if search:
