@@ -27,11 +27,12 @@ class _PaymentDetailPageState extends State<PaymentDetailPage> {
           children: [
             TopBar(
               showBackButton: true,
-              onBackTap: () => Navigator.push(
+              onBackTap: () => Navigator.pushAndRemoveUntil(
                 context,
                 MaterialPageRoute(
                   builder: (context) => const MainScreen(initialIndex: 0),
                 ),
+                (route) => false,
               ),
               onHamburgerTap: () => Navigator.push(
                 context,

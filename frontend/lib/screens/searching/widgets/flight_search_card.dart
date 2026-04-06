@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:provider/provider.dart';
+import '../../../providers/cart_provider.dart';
 import '../land_vehicle.dart';
 import '../../main/main_screen.dart';
-import '../../cart/services/cart_service.dart';
 import '../../checkout/checkout.dart';
 import '../../checkout/models/checkout_details_model.dart';
 import '../../checkout/models/purchase_item_model.dart';
@@ -148,7 +149,7 @@ class _PesanButton extends StatelessWidget {
                       priceRp: selectedFlight!.price.toInt(),
                       flightRoute: flightRoute,
                     );
-                    CartService().addTicket(ticket);
+                    context.read<CartProvider>().addTicket(ticket);
 
                     Navigator.push(
                       context,

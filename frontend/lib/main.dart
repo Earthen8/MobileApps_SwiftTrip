@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:swifttrip_frontend/providers/wishlist_provider.dart';
+import 'package:swifttrip_frontend/providers/cart_provider.dart';
 import 'package:swifttrip_frontend/screens/splash/splash_screen.dart';
 
 void main() {
@@ -8,6 +9,7 @@ void main() {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => WishlistProvider()..loadWishlist()),
+        ChangeNotifierProvider(create: (_) => CartProvider()..loadCart()),
       ],
       child: const MyApp(),
     ),

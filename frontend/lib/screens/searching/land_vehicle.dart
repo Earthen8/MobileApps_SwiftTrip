@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../providers/cart_provider.dart';
 import 'package:swifttrip_frontend/screens/cart/models/promotion_models.dart';
 import 'package:swifttrip_frontend/screens/cart/promotions.dart';
 
@@ -162,7 +164,7 @@ class _LandVehicleSearchState extends State<LandVehicleSearch> {
       imageUrl: baseTicket.imageUrl ?? 'assets/images/train_vector.png',
     );
 
-    _cartService.addTicket(cartTicket);
+    context.read<CartProvider>().addTicket(cartTicket);
 
     Navigator.push(
       context,

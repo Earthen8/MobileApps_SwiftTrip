@@ -64,15 +64,18 @@ class BookingViewSet(viewsets.ModelViewSet):
             traceback.print_exc()
             raise
 
-    @decorators.action(detail=True, methods=['post'])
-    def pay(self, request, pk=None):
-        booking = self.get_object()
-        if booking.status == 'PAID':
-            return Response({"error": "Already paid"}, status=status.HTTP_400_BAD_REQUEST)
-        
-        booking.status = 'PAID'
-        booking.save()
-        return Response({"message": "Payment successful", "status": booking.status})
+    @decorators.action(detail=False, methods=['post'], url_path='checkout/confirm')
+    def confirm_checkout(self, request):
+        cart_items = self.get_queryset().filter(status='IN_CART')
+        count = cart_items.count()
+        cart_items.update(status='PAID')
+        return Response({"message": "Checkout confirmed", "count": count})
+
+    @decorators.action(detail=False, methods=['get'])
+    def history(self, request):
+        history_items = self.get_queryset().filter(status='PAID').order_by('-updated_at')
+        serializer = CartTicketSerializer(history_items, many=True)
+        return Response(serializer.data)
 
 class DestinationViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Destination.objects.all()

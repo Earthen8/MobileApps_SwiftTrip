@@ -12,6 +12,7 @@ class ApplyPromotionsRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
+      behavior: HitTestBehavior.opaque,
       child: Container(
         width: double.infinity,
         height: 59,
@@ -131,6 +132,7 @@ class TotalConfirmBar extends StatelessWidget {
           ),
           GestureDetector(
             onTap: onConfirm,
+            behavior: HitTestBehavior.opaque,
             child: Container(
               width: 103,
               height: 32,

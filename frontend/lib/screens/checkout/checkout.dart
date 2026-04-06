@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../providers/cart_provider.dart';
 import '../../widgets/top_bar.dart';
 import 'checkout_controller.dart';
 import 'models/checkout_details_model.dart';
@@ -109,6 +111,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
             onConfirmed: () async {
               final success = await _controller.confirmPurchase();
               if (success && mounted) {
+                context.read<CartProvider>().clearCart();
                 Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -118,8 +121,11 @@ class _CheckoutPageState extends State<CheckoutPage> {
                 );
               } else if (!success && mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Please fill in all payment details'),
+                  SnackBar(
+                    content: Text(
+                      _controller.lastErrorMessage ??
+                          'Please fill in all payment details',
+                    ),
                     behavior: SnackBarBehavior.floating,
                   ),
                 );

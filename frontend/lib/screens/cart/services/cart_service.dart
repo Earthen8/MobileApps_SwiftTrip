@@ -25,6 +25,10 @@ class CartService {
     }
   }
 
+  void clearLocalCart() {
+    _tickets.clear();
+  }
+
   Future<List<CartTicket>> fetchTickets() async {
     return List.from(_tickets);
   }

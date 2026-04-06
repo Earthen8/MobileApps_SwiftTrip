@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../providers/cart_provider.dart';
 import 'package:swifttrip_frontend/screens/customer_service/onboarding.dart';
 import '../../widgets/top_bar.dart';
 import 'promotions.dart';
-import 'models/cart_models.dart';
 import 'models/promotion_models.dart';
 import 'services/cart_service.dart';
 import 'widgets/ticket_card.dart';
@@ -24,30 +25,7 @@ class CartPage extends StatefulWidget {
 
 class _CartPageState extends State<CartPage> {
   final CartService _cartService = CartService();
-  List<CartTicket> _tickets = [];
   Promotion? _appliedPromo;
-  bool _isLoading = true;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadData();
-  }
-
-  Future<void> _loadData() async {
-    final tickets = await _cartService.fetchTickets();
-    if (mounted) {
-      setState(() {
-        _tickets = tickets;
-        _isLoading = false;
-      });
-    }
-  }
-
-  int get _baseTotal => _tickets.fold(0, (sum, t) => sum + t.priceRp);
-  int get _discountAmount =>
-      _cartService.calculateDiscount(_baseTotal, _appliedPromo);
-  int get _finalTotal => _baseTotal - _discountAmount;
 
   Future<void> _removeTicket(int index) async {
     final confirmed = await showDialog<bool>(
@@ -58,8 +36,7 @@ class _CartPageState extends State<CartPage> {
     );
 
     if (confirmed == true && mounted) {
-      _cartService.removeTicket(index);
-      setState(() => _tickets.removeAt(index));
+      context.read<CartProvider>().removeTicket(index);
     }
   }
 
@@ -158,6 +135,13 @@ class _CartPageState extends State<CartPage> {
 
   @override
   Widget build(BuildContext context) {
+    final cartProvider = context.watch<CartProvider>();
+    final tickets = cartProvider.tickets;
+
+    int baseTotalVal = tickets.fold(0, (sum, t) => sum + t.priceRp);
+    int discountAmountVal = _cartService.calculateDiscount(baseTotalVal, _appliedPromo);
+    int finalTotalVal = baseTotalVal - discountAmountVal;
+
     return Scaffold(
       backgroundColor: const Color(0xFFF6F6F6),
       body: Column(
@@ -174,9 +158,7 @@ class _CartPageState extends State<CartPage> {
 
           // ── Independent Ticket Scroll Area ────────────────────────────
           Expanded(
-            child: _isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : _tickets.isEmpty
+            child: tickets.isEmpty
                 ? _buildEmptyState()
                 : SingleChildScrollView(
                     padding: const EdgeInsets.only(
@@ -188,11 +170,11 @@ class _CartPageState extends State<CartPage> {
                     child: Column(
                       children: [
                         ...List.generate(
-                          _tickets.length,
+                          tickets.length,
                           (i) => Padding(
                             padding: const EdgeInsets.only(bottom: 16),
                             child: TicketCard(
-                              ticket: _tickets[i],
+                              ticket: tickets[i],
                               formatRp: _formatRp,
                               onDelete: () => _removeTicket(i),
                             ),
@@ -206,7 +188,7 @@ class _CartPageState extends State<CartPage> {
           const SizedBox(height: 10),
 
           // ── Pinned Bottom Section ─────────────────────────────────────
-          if (!_isLoading && _tickets.isNotEmpty)
+          if (tickets.isNotEmpty)
             Padding(
               padding: const EdgeInsets.only(left: 20, right: 20, bottom: 110),
               child: Column(
@@ -228,26 +210,26 @@ class _CartPageState extends State<CartPage> {
                   ),
                   const SizedBox(height: 12),
                   TotalConfirmBar(
-                    totalString: _formatRp(_finalTotal),
-                    discountAmount: _discountAmount,
+                    totalString: _formatRp(finalTotalVal),
+                    discountAmount: discountAmountVal,
                     onConfirm: () {
-                      if (_tickets.isEmpty) return;
+                      if (tickets.isEmpty) return;
 
                       final details = CheckoutDetailsModel(
-                        tickets: _tickets,
+                        tickets: tickets,
                         purchaseItems: [
                           PurchaseItemModel(
-                            label: 'Tickets x${_tickets.length}',
-                            amount: _formatRp(_baseTotal),
+                            label: 'Tickets x${tickets.length}',
+                            amount: _formatRp(baseTotalVal),
                           ),
-                          if (_discountAmount > 0)
+                          if (discountAmountVal > 0)
                             PurchaseItemModel(
                               label: 'Discount',
-                              amount: '- ${_formatRp(_discountAmount)}',
+                              amount: '- ${_formatRp(discountAmountVal)}',
                               isDiscount: true,
                             ),
                         ],
-                        totalPrice: _formatRp(_finalTotal),
+                        totalPrice: _formatRp(finalTotalVal),
                       );
 
                       Navigator.push(

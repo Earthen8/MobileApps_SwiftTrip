@@ -1,12 +1,26 @@
 import 'package:flutter/material.dart';
-import 'package:swifttrip_frontend/screens/cart/models/cart_models.dart';
-import 'package:swifttrip_frontend/screens/cart/widgets/ticket_card.dart';
+import '../cart/models/cart_models.dart';
+import '../cart/widgets/ticket_card.dart';
 import '../../widgets/top_bar.dart';
-import '../cart/cart.dart';
 import '../customer_service/onboarding.dart';
+import 'services/history_service.dart';
 
-class HistoryPage extends StatelessWidget {
+class HistoryPage extends StatefulWidget {
   const HistoryPage({super.key});
+
+  @override
+  State<HistoryPage> createState() => _HistoryPageState();
+}
+
+class _HistoryPageState extends State<HistoryPage> {
+  final HistoryService _historyService = HistoryService();
+  late Future<List<CartTicket>> _historyFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _historyFuture = _historyService.fetchHistory();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,33 +59,49 @@ class HistoryPage extends StatelessWidget {
             const SizedBox(height: 16),
 
             Expanded(
-              child: ListView.separated(
-                padding: const EdgeInsets.only(
-                  left: 24,
-                  right: 24,
-                  bottom:
-                      40, // Reduced padding since there is no navbar blocking it
-                ),
-                itemCount: 3,
-                separatorBuilder: (context, index) =>
-                    const SizedBox(height: 20),
-                itemBuilder: (context, index) {
-                  return TicketCard(
-                    ticket: CartTicket(
-                      type: 'Train Ticket',
-                      bookingId: 'ID-HISTORY${index}123',
-                      classLabel: 'ECONOMY CLASS',
-                      from: 'Jakarta',
-                      to: 'Bali',
-                      date: '10/12/2025',
-                      departure: '08:00',
-                      arrive: '10:00',
-                      operator: 'Argo Bromo',
-                      carriage: '3',
-                      seat: '12A',
-                      priceRp: 500000,
+              child: FutureBuilder<List<CartTicket>>(
+                future: _historyFuture,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  
+                  if (snapshot.hasError) {
+                    return Center(child: Text('Error: ${snapshot.error}'));
+                  }
+
+                  final history = snapshot.data ?? [];
+                  
+                  if (history.isEmpty) {
+                    return const Center(
+                      child: Text(
+                        'No purchase history yet.',
+                        style: TextStyle(
+                          fontFamily: 'Cairo',
+                          fontSize: 16,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    );
+                  }
+
+                  return ListView.separated(
+                    padding: const EdgeInsets.only(
+                      left: 24,
+                      right: 24,
+                      bottom: 40,
                     ),
-                    formatRp: (val) => 'Rp. $val',
+                    itemCount: history.length,
+                    separatorBuilder: (context, index) =>
+                        const SizedBox(height: 20),
+                    itemBuilder: (context, index) {
+                      final ticket = history[index];
+                      return TicketCard(
+                        ticket: ticket,
+                        formatRp: (val) => 'Rp ${val.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]}.')}',
+                        onDelete: null, // Hide delete button for history
+                      );
+                    },
                   );
                 },
               ),
