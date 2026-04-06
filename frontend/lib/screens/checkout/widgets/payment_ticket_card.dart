@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import '../models/ticket_model.dart';
+import '../../cart/models/cart_models.dart';
 
 class PaymentTicketCard extends StatelessWidget {
-  final TicketModel ticket;
+  final CartTicket ticket;
 
   const PaymentTicketCard({
     super.key,
@@ -55,7 +55,7 @@ class PaymentTicketCard extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.only(left: 15, top: 10, bottom: 6),
             child: Text(
-              ticket.classType.toUpperCase(),
+              ticket.classLabel.toUpperCase(),
               style: const TextStyle(
                 color: Colors.black,
                 fontSize: 15,
@@ -78,9 +78,9 @@ class PaymentTicketCard extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
             child: Row(
               children: [
-                _LabelValue(label: 'FROM', value: ticket.from, isLarge: true),
+                _LabelValue(label: 'FROM', value: ticket.from ?? '-', isLarge: true),
                 const SizedBox(width: 48),
-                _LabelValue(label: 'TO', value: ticket.to, isLarge: true),
+                _LabelValue(label: 'TO', value: ticket.to ?? '-', isLarge: true),
               ],
             ),
           ),
@@ -99,9 +99,9 @@ class PaymentTicketCard extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                _LabelValue(label: 'DATE', value: ticket.date),
-                _LabelValue(label: 'DEPARTURE', value: ticket.departureTime),
-                _LabelValue(label: 'ARRIVE', value: ticket.arrivalTime),
+                _LabelValue(label: 'DATE', value: ticket.date ?? '-'),
+                _LabelValue(label: 'DEPARTURE', value: ticket.departure ?? '-'),
+                _LabelValue(label: 'ARRIVE', value: ticket.arrive ?? '-'),
               ],
             ),
           ),
@@ -112,9 +112,9 @@ class PaymentTicketCard extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                _LabelValue(label: 'TRAIN', value: ticket.trainNumber ?? '-'),
+                _LabelValue(label: 'TRAIN', value: ticket.operator ?? '-'),
                 _LabelValue(label: 'CARRIAGE', value: ticket.carriage ?? '-'),
-                _LabelValue(label: 'SEAT', value: ticket.seatNumber ?? '-'),
+                _LabelValue(label: 'SEAT', value: ticket.seat ?? '-'),
               ],
             ),
           ),
