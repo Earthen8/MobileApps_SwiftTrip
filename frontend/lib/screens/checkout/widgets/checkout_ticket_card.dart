@@ -1,21 +1,31 @@
 import 'package:flutter/material.dart';
-import '../models/ticket_model.dart';
+import '../../cart/models/cart_models.dart';
 
 class CheckoutTicketCard extends StatelessWidget {
-  final TicketModel ticket;
+  final CartTicket ticket;
 
-  const CheckoutTicketCard({
-    super.key,
-    required this.ticket,
-  });
+  const CheckoutTicketCard({super.key, required this.ticket});
+
+  String _formatRp(int amount) {
+    final str = amount.toString();
+    final buffer = StringBuffer();
+    for (int i = 0; i < str.length; i++) {
+      if (i > 0 && (str.length - i) % 3 == 0) buffer.write('.');
+      buffer.write(str[i]);
+    }
+    return 'Rp. ${buffer.toString()}';
+  }
 
   @override
   Widget build(BuildContext context) {
+    final isAccommodation = ticket.type == 'Accommodation Ticket';
+    final headerColor = isAccommodation ? const Color(0xFFA83029) : const Color(0xFF0098FF);
+
     return Container(
       width: double.infinity,
       decoration: ShapeDecoration(
         color: Colors.white,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         shadows: const [
           BoxShadow(
             color: Color(0x26000000),
@@ -30,110 +40,165 @@ class CheckoutTicketCard extends StatelessWidget {
           // ── HEADER BAR ───────────────────────────────────────────────────
           Container(
             width: double.infinity,
-            height: 36,
-            padding: const EdgeInsets.symmetric(horizontal: 17),
-            decoration: const ShapeDecoration(
-              color: Color(0xFF0098FF),
-              shape: RoundedRectangleBorder(
+            height: 30,
+            padding: const EdgeInsets.symmetric(horizontal: 18),
+            decoration: ShapeDecoration(
+              color: headerColor,
+              shape: const RoundedRectangleBorder(
                 borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(16),
-                  topRight: Radius.circular(16),
+                  topLeft: Radius.circular(10),
+                  topRight: Radius.circular(10),
                 ),
               ),
             ),
-            alignment: Alignment.centerLeft,
-            child: Text(
-              ticket.type.toUpperCase(),
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 12,
-                fontFamily: 'Poppins',
-                fontWeight: FontWeight.w600,
-                letterSpacing: 0.5,
-              ),
-            ),
-          ),
-
-          // ── CLASS LABEL ──────────────────────────────────────────────────
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  ticket.classType.toUpperCase(),
+                  ticket.type,
                   style: const TextStyle(
-                    color: Colors.black,
-                    fontSize: 16,
+                    color: Colors.white,
+                    fontSize: 12,
                     fontFamily: 'Poppins',
-                    fontWeight: FontWeight.w700,
+                    fontWeight: FontWeight.w400,
                   ),
                 ),
-                if (ticket.operator != null || ticket.airline != null)
-                  Text(
-                    (ticket.operator ?? ticket.airline)!,
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Text(
+                    ticket.bookingId,
+                    textAlign: TextAlign.end,
+                    overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
-                      color: Colors.black54,
-                      fontSize: 14,
+                      color: Colors.white,
+                      fontSize: 12,
                       fontFamily: 'Poppins',
-                      fontWeight: FontWeight.w500,
+                      fontWeight: FontWeight.w400,
                     ),
                   ),
-              ],
-            ),
-          ),
-
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16),
-            child: Divider(height: 1, thickness: 1, color: Color(0x1A000000)),
-          ),
-
-          // ── FROM / TO ────────────────────────────────────────────────────
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                _TicketLabelValue(
-                  label: 'FROM',
-                  value: ticket.from,
-                  isLarge: true,
-                ),
-                const Icon(Icons.compare_arrows, color: Colors.black26),
-                _TicketLabelValue(
-                  label: 'TO',
-                  value: ticket.to,
-                  isLarge: true,
-                  crossAxisAlignment: CrossAxisAlignment.end,
                 ),
               ],
             ),
           ),
 
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16),
-            child: Divider(height: 1, thickness: 1, color: Color(0x1A000000)),
-          ),
-
-          // ── ROW 1: DATE / DEPARTURE / ARRIVE ─────────────────────────────
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                _TicketLabelValue(label: 'DATE', value: ticket.date),
-                _TicketLabelValue(label: 'DEPARTURE', value: ticket.departureTime),
-                _TicketLabelValue(label: 'ARRIVE', value: ticket.arrivalTime),
-              ],
+          if (isAccommodation) ...[
+            // ── Hotel image ──────────────────────────────────────────
+            ClipRRect(
+              child: ticket.imageUrl != null
+                  ? Image.network(
+                      ticket.imageUrl!,
+                      width: double.infinity,
+                      height: 120,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) => Container(
+                        width: double.infinity,
+                        height: 120,
+                        color: const Color(0xFFE0E0E0),
+                        alignment: Alignment.center,
+                        child: const Icon(Icons.hotel, size: 40, color: Colors.white),
+                      ),
+                    )
+                  : Container(
+                      width: double.infinity,
+                      height: 120,
+                      color: const Color(0xFFE0E0E0),
+                      alignment: Alignment.center,
+                      child: const Icon(Icons.hotel, size: 40, color: Colors.white),
+                    ),
             ),
-          ),
 
-          // ── ROW 2: DYNAMIC DETAILS ───────────────────────────────────────
+            // ── DATE / STAY / BED ─────────────────────────────────────
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+              child: Row(
+                children: [
+                  _LabelValue(label: 'DATE', value: ticket.stayDate ?? '-'),
+                  const SizedBox(width: 24),
+                  _LabelValue(label: 'STAY', value: ticket.stayDuration ?? '-'),
+                  const SizedBox(width: 24),
+                  _LabelValue(label: 'BED', value: ticket.bedType ?? '-'),
+                ],
+              ),
+            ),
+
+            // ── LOCATION ──────────────────────────────────────────────
+            Padding(
+              padding: const EdgeInsets.only(left: 15, right: 15, bottom: 10),
+              child: _LabelValue(label: 'LOCATION', value: ticket.location ?? '-'),
+            ),
+          ] else ...[
+            // ── Class label (shared for all transport) ───────────────
+            Padding(
+              padding: const EdgeInsets.only(left: 15, top: 10, bottom: 6),
+              child: Text(
+                ticket.classLabel,
+                style: const TextStyle(
+                  color: Colors.black,
+                  fontSize: 15,
+                  fontFamily: 'Cairo',
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+
+            const _TicketDivider(),
+
+            // ── FROM / TO (shared) ───────────────────────────────────
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+              child: (ticket.type == 'Plane Ticket' &&
+                      ticket.flightRoute != null &&
+                      ticket.flightRoute!.isNotEmpty)
+                  ? _FlightBreadcrumb(codes: ticket.flightRoute!)
+                  : Row(
+                      children: [
+                        _LabelValue(label: 'FROM', value: ticket.from ?? '-', isLarge: true),
+                        const SizedBox(width: 100),
+                        _LabelValue(label: 'TO', value: ticket.to ?? '-', isLarge: true),
+                      ],
+                    ),
+            ),
+
+            const _TicketDivider(),
+
+            // ── DATE / DEPARTURE / ARRIVE (shared) ───────────────────
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+              child: Row(
+                children: [
+                  _LabelValue(label: 'DATE', value: ticket.date ?? '-'),
+                  const SizedBox(width: 40),
+                  _LabelValue(label: 'DEPARTURE', value: ticket.departure ?? '-'),
+                  const SizedBox(width: 40),
+                  _LabelValue(label: 'ARRIVE', value: ticket.arrive ?? '-'),
+                ],
+              ),
+            ),
+
+            // ── Type-specific bottom row ──────────────────────────────
+            Padding(
+              padding: const EdgeInsets.only(left: 15, right: 15, bottom: 10),
+              child: Row(children: _buildTypeSpecificRow(ticket)),
+            ),
+          ],
+
+          const _TicketDivider(),
+
+          // ── Price (shared for both types) ─────────
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 20),
+            padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 10),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: _buildDynamicDetails(),
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Text(
+                  _formatRp(ticket.priceRp),
+                  style: const TextStyle(
+                    color: Color(0xFF9E9E9E),
+                    fontSize: 15,
+                    fontFamily: 'Cairo',
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+              ],
             ),
           ),
         ],
@@ -141,79 +206,74 @@ class CheckoutTicketCard extends StatelessWidget {
     );
   }
 
-  List<Widget> _buildDynamicDetails() {
-    final type = ticket.type.toLowerCase();
-    
-    if (type.contains('flight') || type.contains('plane')) {
-      return [
-        _TicketLabelValue(label: 'FLIGHT', value: ticket.flightNumber ?? '-'),
-        _TicketLabelValue(label: 'AIRLINE', value: ticket.airline ?? '-'),
-        const SizedBox(width: 40), // Spacer
-      ];
-    } else if (type.contains('train')) {
-      return [
-        _TicketLabelValue(label: 'TRAIN', value: ticket.trainNumber ?? '-'),
-        _TicketLabelValue(label: 'CARRIAGE', value: ticket.carriage ?? '-'),
-        _TicketLabelValue(label: 'SEAT', value: ticket.seatNumber ?? '-'),
-      ];
-    } else if (type.contains('bus')) {
-      return [
-        _TicketLabelValue(label: 'BUS', value: ticket.busNumber ?? '-'),
-        _TicketLabelValue(label: 'OPERATOR', value: ticket.operator ?? '-'),
-        const SizedBox(width: 40),
-      ];
-    } else if (type.contains('car')) {
-      return [
-        _TicketLabelValue(label: 'PLATE', value: ticket.carPlate ?? '-'),
-        _TicketLabelValue(label: 'OPERATOR', value: ticket.operator ?? '-'),
-        const SizedBox(width: 40),
-      ];
+  List<Widget> _buildTypeSpecificRow(CartTicket ticket) {
+    switch (ticket.type) {
+      case 'Train Ticket':
+        return [
+          _LabelValue(label: 'OPERATOR', value: ticket.operator ?? '-'),
+          const SizedBox(width: 40),
+          _LabelValue(label: 'CARRIAGE', value: ticket.carriage ?? '-'),
+          const SizedBox(width: 40),
+          _LabelValue(label: 'SEAT', value: ticket.seat ?? '-'),
+        ];
+      case 'Plane Ticket':
+        return [
+          _LabelValue(label: 'OPERATOR', value: ticket.operator ?? '-'),
+          const SizedBox(width: 40),
+          _LabelValue(label: 'FLIGHT', value: ticket.flightNumber ?? '-'),
+          const SizedBox(width: 40),
+          _LabelValue(label: 'CLASS', value: ticket.flightClass ?? '-'),
+        ];
+      case 'Bus Ticket':
+        return [
+          _LabelValue(label: 'OPERATOR', value: ticket.operator ?? '-'),
+          const SizedBox(width: 40),
+          _LabelValue(label: 'CLASS', value: ticket.busClass ?? '-'),
+          const SizedBox(width: 40),
+          _LabelValue(label: 'BUS NO.', value: ticket.busNumber ?? '-'),
+        ];
+      case 'Car Ticket':
+        return [
+          _LabelValue(label: 'CAR', value: ticket.operator ?? '-'),
+          const SizedBox(width: 40),
+          _LabelValue(label: 'PLATE', value: ticket.carPlate ?? '-'),
+          const SizedBox(width: 40),
+          _LabelValue(label: 'DRIVER', value: ticket.driverName ?? '-'),
+        ];
+      default:
+        return [];
     }
-    
-    return [
-      _TicketLabelValue(label: 'OPERATOR', value: ticket.operator ?? '-'),
-      const SizedBox(width: 40),
-      const SizedBox(width: 40),
-    ];
   }
 }
 
-class _TicketLabelValue extends StatelessWidget {
+class _LabelValue extends StatelessWidget {
   final String label;
   final String value;
   final bool isLarge;
-  final CrossAxisAlignment crossAxisAlignment;
 
-  const _TicketLabelValue({
-    required this.label,
-    required this.value,
-    this.isLarge = false,
-    this.crossAxisAlignment = CrossAxisAlignment.start,
-  });
+  const _LabelValue({required this.label, required this.value, this.isLarge = false});
 
   @override
   Widget build(BuildContext context) {
     return Column(
-      crossAxisAlignment: crossAxisAlignment,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           label,
           style: const TextStyle(
-            color: Colors.black38,
+            color: Colors.black,
             fontSize: 10,
-            fontFamily: 'Poppins',
-            fontWeight: FontWeight.w600,
-            letterSpacing: 0.5,
+            fontFamily: 'Cairo',
+            fontWeight: FontWeight.w400,
           ),
         ),
-        const SizedBox(height: 2),
         Text(
           value,
           style: TextStyle(
             color: Colors.black,
-            fontSize: isLarge ? 18 : 13,
-            fontFamily: 'Poppins',
-            fontWeight: isLarge ? FontWeight.w700 : FontWeight.w500,
+            fontSize: isLarge ? 16 : 10,
+            fontFamily: 'Cairo',
+            fontWeight: FontWeight.w400,
           ),
         ),
       ],
@@ -221,3 +281,59 @@ class _TicketLabelValue extends StatelessWidget {
   }
 }
 
+class _FlightBreadcrumb extends StatelessWidget {
+  final List<String> codes;
+  const _FlightBreadcrumb({required this.codes});
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children: [
+          for (int i = 0; i < codes.length; i++) ...[
+            Text(
+              codes[i],
+              style: const TextStyle(
+                color: Colors.black,
+                fontSize: 14,
+                fontFamily: 'Cairo',
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            if (i < codes.length - 1)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 4),
+                child: Row(
+                  children: [
+                    Container(width: 4, height: 1, color: Colors.black.withOpacity(0.2)),
+                    const SizedBox(width: 2),
+                    Transform.rotate(
+                      angle: 1.57,
+                      child: Icon(Icons.airplanemode_active, size: 10, color: Colors.black.withOpacity(0.3)),
+                    ),
+                    const SizedBox(width: 2),
+                    Container(width: 4, height: 1, color: Colors.black.withOpacity(0.2)),
+                  ],
+                ),
+              ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _TicketDivider extends StatelessWidget {
+  const _TicketDivider();
+  @override
+  Widget build(BuildContext context) {
+    return Divider(
+      height: 1,
+      thickness: 1,
+      indent: 13,
+      endIndent: 13,
+      color: Colors.black.withOpacity(0.30),
+    );
+  }
+}

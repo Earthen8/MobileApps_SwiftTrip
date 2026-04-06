@@ -13,10 +13,7 @@ import 'widgets/bottom_total_bar.dart';
 class CheckoutPage extends StatefulWidget {
   final CheckoutDetailsModel checkoutDetails;
 
-  const CheckoutPage({
-    super.key,
-    required this.checkoutDetails,
-  });
+  const CheckoutPage({super.key, required this.checkoutDetails});
 
   @override
   State<CheckoutPage> createState() => _CheckoutPageState();
@@ -74,10 +71,11 @@ class _CheckoutPageState extends State<CheckoutPage> {
                 child: Column(
                   children: [
                     const SizedBox(height: 10),
-                    CheckoutTicketCard(
-                      ticket: _controller.details!.ticket,
-                    ),
-                    const SizedBox(height: 20),
+                    ..._controller.details!.tickets.map((ticket) => Padding(
+                          padding: const EdgeInsets.only(bottom: 16),
+                          child: CheckoutTicketCard(ticket: ticket),
+                        )),
+                    const SizedBox(height: 4),
                     const Divider(color: Colors.black12, thickness: 1),
                     const SizedBox(height: 20),
 
@@ -133,4 +131,3 @@ class _CheckoutPageState extends State<CheckoutPage> {
     );
   }
 }
-

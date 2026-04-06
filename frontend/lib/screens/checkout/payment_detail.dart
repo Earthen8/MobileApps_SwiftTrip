@@ -4,7 +4,7 @@ import '../../widgets/top_bar.dart';
 import '../main/main_screen.dart';
 import 'models/checkout_details_model.dart';
 import 'services/checkout_service.dart';
-import 'widgets/payment_ticket_card.dart';
+import 'widgets/checkout_ticket_card.dart';
 import 'widgets/purchase_details_card.dart';
 
 import 'widgets/success_check_icon.dart';
@@ -76,8 +76,12 @@ class _PaymentDetailPageState extends State<PaymentDetailPage> {
 
                           const SizedBox(height: 28),
 
-                          // ── TICKET CARD ─────────────────────────────────────────
-                          if (_details != null) PaymentTicketCard(ticket: _details!.ticket),
+                          // ── TICKET CARDS ───────────────────────────────────────
+                          if (_details != null)
+                            ..._details!.tickets.map((ticket) => Padding(
+                                  padding: const EdgeInsets.only(bottom: 16),
+                                  child: CheckoutTicketCard(ticket: ticket),
+                                )),
 
                           const SizedBox(height: 16),
 

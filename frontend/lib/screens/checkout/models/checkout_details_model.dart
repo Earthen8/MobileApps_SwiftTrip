@@ -1,20 +1,22 @@
-import 'ticket_model.dart';
+import '../../cart/models/cart_models.dart';
 import 'purchase_item_model.dart';
 
 class CheckoutDetailsModel {
-  final TicketModel ticket;
+  final List<CartTicket> tickets;
   final List<PurchaseItemModel> purchaseItems;
   final String totalPrice;
 
   const CheckoutDetailsModel({
-    required this.ticket,
+    required this.tickets,
     required this.purchaseItems,
     required this.totalPrice,
   });
 
   factory CheckoutDetailsModel.fromJson(Map<String, dynamic> json) {
     return CheckoutDetailsModel(
-      ticket: TicketModel.fromJson(json['ticket'] as Map<String, dynamic>),
+      tickets: (json['tickets'] as List<dynamic>)
+          .map((item) => CartTicket.fromJson(item as Map<String, dynamic>))
+          .toList(),
       purchaseItems: (json['purchase_items'] as List<dynamic>)
           .map((item) => PurchaseItemModel.fromJson(item as Map<String, dynamic>))
           .toList(),
@@ -24,7 +26,7 @@ class CheckoutDetailsModel {
 
   Map<String, dynamic> toJson() {
     return {
-      'ticket': ticket.toJson(),
+      'tickets': tickets.map((item) => item.toJson()).toList(),
       'purchase_items': purchaseItems.map((item) => item.toJson()).toList(),
       'total_price': totalPrice,
     };

@@ -5,7 +5,6 @@ import '../../main/main_screen.dart';
 import '../../cart/services/cart_service.dart';
 import '../../checkout/checkout.dart';
 import '../../checkout/models/checkout_details_model.dart';
-import '../../checkout/models/ticket_model.dart';
 import '../../checkout/models/purchase_item_model.dart';
 import '../models/flight_leg.dart';
 import '../services/searching_service.dart';
@@ -45,28 +44,39 @@ class _PesanButton extends StatelessWidget {
           return;
         }
 
+        final displayClass = flightClassApi.toUpperCase() == 'FIRST' 
+            ? 'First Class' 
+            : flightClassApi;
+
+        final ticket = CartTicket(
+          type: 'Plane Ticket',
+          bookingId: 'ID-${DateTime.now().millisecondsSinceEpoch}',
+          classLabel: displayClass,
+          from: selectedFlight!.origin,
+          to: selectedFlight!.destination,
+          date: selectedFlight!.departureTime.split('T').first,
+          departure: selectedFlight!.departureTime.split('T').last.substring(0, 5),
+          arrive: selectedFlight!.arrivalTime.split('T').last.substring(0, 5),
+          operator: selectedFlight!.airlineName,
+          flightNumber: selectedFlight!.flightNumber,
+          flightClass: displayClass,
+          priceRp: selectedFlight!.price.toInt(),
+          flightRoute: flightRoute,
+        );
+
         final details = CheckoutDetailsModel(
-          ticket: TicketModel(
-            type: 'Fly',
-            classType: flightClassApi.toUpperCase(),
-            from: selectedFlight!.origin,
-            to: selectedFlight!.destination,
-            date: selectedFlight!.departureTime.split('T').first,
-            departureTime:
-                selectedFlight!.departureTime.split('T').last.substring(0, 5),
-            arrivalTime:
-                selectedFlight!.arrivalTime.split('T').last.substring(0, 5),
-            flightNumber: selectedFlight!.flightNumber,
-            airline: selectedFlight!.airlineName,
-            operator: selectedFlight!.airlineName,
-          ),
+          tickets: [ticket],
           purchaseItems: [
             PurchaseItemModel(
               label: 'Flight: ${selectedFlight!.airlineName}',
-              amount: 'Rp ${selectedFlight!.price.toInt()}',
+              amount: _formatRp(selectedFlight!.price.toInt()),
+            ),
+            const PurchaseItemModel(
+              label: 'Service Fee',
+              amount: 'Rp. 0',
             ),
           ],
-          totalPrice: 'Rp ${selectedFlight!.price.toInt()}',
+          totalPrice: _formatRp(selectedFlight!.price.toInt()),
         );
 
         Navigator.push(
@@ -185,6 +195,16 @@ class _PesanButton extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  String _formatRp(int amount) {
+    final str = amount.toString();
+    final buffer = StringBuffer();
+    for (int i = 0; i < str.length; i++) {
+      if (i > 0 && (str.length - i) % 3 == 0) buffer.write('.');
+      buffer.write(str[i]);
+    }
+    return 'Rp. ${buffer.toString()}';
   }
 }
 

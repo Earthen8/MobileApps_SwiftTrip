@@ -149,7 +149,8 @@ class TicketCard extends StatelessWidget {
             // ── FROM / TO (shared) ───────────────────────────────────
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-              child: (ticket.type == 'Plane Ticket' &&
+              child:
+                  (ticket.type == 'Plane Ticket' &&
                       ticket.flightRoute != null &&
                       ticket.flightRoute!.isNotEmpty)
                   ? _FlightBreadcrumb(codes: ticket.flightRoute!)
@@ -364,15 +365,25 @@ class _FlightBreadcrumb extends StatelessWidget {
                 child: Row(
                   children: [
                     Container(
-                        width: 4, height: 1, color: Colors.black.withOpacity(0.2)),
+                      width: 4,
+                      height: 1,
+                      color: Colors.black.withOpacity(0.2),
+                    ),
                     const SizedBox(width: 2),
                     Transform.rotate(
-                        angle: 1.57,
-                        child: Icon(Icons.airplanemode_active,
-                            size: 10, color: Colors.black.withOpacity(0.3))),
+                      angle: 1.57,
+                      child: Icon(
+                        Icons.airplanemode_active,
+                        size: 10,
+                        color: Colors.black.withOpacity(0.3),
+                      ),
+                    ),
                     const SizedBox(width: 2),
                     Container(
-                        width: 4, height: 1, color: Colors.black.withOpacity(0.2)),
+                      width: 4,
+                      height: 1,
+                      color: Colors.black.withOpacity(0.2),
+                    ),
                   ],
                 ),
               ),
