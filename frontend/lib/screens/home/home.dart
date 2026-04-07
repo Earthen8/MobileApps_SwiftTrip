@@ -203,7 +203,8 @@ class _HomePageState extends State<HomePage> {
                                       context,
                                       MaterialPageRoute(
                                         builder: (context) => NextTripPage(
-                                          ticket: _serverSchedules[_currentSchedule],
+                                          ticket:
+                                              _serverSchedules[_currentSchedule],
                                         ),
                                       ),
                                     );

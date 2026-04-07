@@ -159,14 +159,30 @@ class _ScheduleCard extends StatelessWidget {
               ),
 
               // ── Vacation logo illustration ─────────────────────────────
-              Positioned(
-                left: 208,
-                top: 13,
-                child: _ScheduleImage(
-                  imageAsset: 'assets/images/home/vacation_logo.png',
-                  imageUrl: item.imageUrl,
+              if (isAccommodation)
+                Positioned(
+                  top: 0,
+                  bottom: 0,
+                  right: 0,
+                  child: ClipRRect(
+                    borderRadius: const BorderRadius.horizontal(right: Radius.circular(20)),
+                    child: _ScheduleImage(
+                      imageAsset: 'assets/images/home/vacation_logo.png',
+                      imageUrl: item.imageUrl,
+                      isAccommodation: true,
+                    ),
+                  ),
+                )
+              else
+                Positioned(
+                  left: 208,
+                  top: 13,
+                  child: _ScheduleImage(
+                    imageAsset: 'assets/images/home/vacation_logo.png',
+                    imageUrl: item.imageUrl,
+                    isAccommodation: false,
+                  ),
                 ),
-              ),
             ],
           ),
         ),
@@ -183,18 +199,25 @@ class _ScheduleCard extends StatelessWidget {
 class _ScheduleImage extends StatelessWidget {
   final String imageAsset;
   final String? imageUrl;
+  final bool isAccommodation;
 
-  const _ScheduleImage({required this.imageAsset, this.imageUrl});
+  const _ScheduleImage({
+    required this.imageAsset,
+    this.imageUrl,
+    this.isAccommodation = false,
+  });
 
   @override
   Widget build(BuildContext context) {
-    const double w = 132;
-    const double h = 100;
+    final double w = isAccommodation ? 142 : 132;
+    final double h = isAccommodation ? 125 : 100;
+    final BoxFit fit = isAccommodation ? BoxFit.cover : BoxFit.contain;
 
-    final fallback = SizedBox(
+    final imageFallback = Image.asset(
+      imageAsset,
       width: w,
       height: h,
-      child: Icon(Icons.image_outlined, color: Colors.grey.shade300, size: 36),
+      fit: fit,
     );
 
     // 1. Remote URL — from backend
@@ -203,8 +226,8 @@ class _ScheduleImage extends StatelessWidget {
         imageUrl!,
         width: w,
         height: h,
-        fit: BoxFit.contain,
-        errorBuilder: (_, __, ___) => fallback,
+        fit: fit,
+        errorBuilder: (_, __, ___) => imageFallback,
       );
     }
 
@@ -213,8 +236,8 @@ class _ScheduleImage extends StatelessWidget {
       imageAsset,
       width: w,
       height: h,
-      fit: BoxFit.contain,
-      errorBuilder: (_, __, ___) => fallback,
+      fit: fit,
+      errorBuilder: (_, __, ___) => imageFallback,
     );
   }
 }
