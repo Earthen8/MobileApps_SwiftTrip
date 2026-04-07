@@ -8,12 +8,12 @@ class HomeService {
       ScheduleItem(
         title: 'Jakarta - Bandung',
         time: '14 Jan 2026',
-        imageAsset: 'assets/images/banner1.png',
+        imageAsset: 'assets/images/home/vacation_logo.png',
       ),
       ScheduleItem(
         title: 'Surabaya - Malang',
         time: '15 Jan 2026',
-        imageAsset: 'assets/images/banner1.png',
+        imageAsset: 'assets/images/home/vacation_logo.png',
       ),
     ];
   }
@@ -24,22 +24,22 @@ class HomeService {
       RecommendationItem(
         name: 'The Langham',
         description: 'Jakarta',
-        imageAsset: 'assets/images/banner1.png',
+        imageAsset: 'assets/images/home/vacation_logo.png',
       ),
       RecommendationItem(
         name: 'The Ritz-Carlton',
         description: 'Bali',
-        imageAsset: 'assets/images/banner1.png',
+        imageAsset: 'assets/images/home/vacation_logo.png',
       ),
       RecommendationItem(
         name: 'Hotel Tentrem',
         description: 'Yogyakarta',
-        imageAsset: 'assets/images/banner1.png',
+        imageAsset: 'assets/images/home/vacation_logo.png',
       ),
       RecommendationItem(
         name: 'Padma Hotel',
         description: 'Bandung',
-        imageAsset: 'assets/images/banner1.png',
+        imageAsset: 'assets/images/home/vacation_logo.png',
       ),
     ];
   }

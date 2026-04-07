@@ -13,9 +13,10 @@ class CartProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void addTicket(CartTicket ticket) {
-    _cartService.addTicket(ticket);
-    loadCart();
+  Future<void> addTicket(CartTicket ticket) async {
+    print('Debug: 2. Provider received ticket: ${ticket.type}');
+    await _cartService.addTicket(ticket);
+    await loadCart();
   }
 
   void removeTicket(int index) {

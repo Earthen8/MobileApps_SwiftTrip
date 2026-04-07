@@ -129,6 +129,7 @@ class _PesanButton extends StatelessWidget {
               top: 3,
               child: GestureDetector(
                 onTap: () {
+                  print('Debug: 1. Add to Cart Button Pressed');
                   if (selectedFlight != null) {
                     final displayClass = flightClassApi.toUpperCase() == 'FIRST' 
                         ? 'First Class' 

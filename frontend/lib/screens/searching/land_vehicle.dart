@@ -146,6 +146,7 @@ class _LandVehicleSearchState extends State<LandVehicleSearch> {
   }
 
   void _onAddToCart() {
+    print('Debug: 1. Add to Cart Button Pressed');
     if (_selectedVehicle == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(

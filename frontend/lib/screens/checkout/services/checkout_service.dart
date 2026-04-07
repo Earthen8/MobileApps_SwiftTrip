@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:dio/dio.dart';
 import '../../../core/constants.dart';
 import '../../../repositories/auth_repository.dart';
@@ -64,14 +65,16 @@ class CheckoutService {
     try {
       final token = await AuthRepository().getToken();
       final response = await _dio.post(
-        '${Constants.bookingsUrl}checkout/confirm/',
+        '${Constants.bookingsUrl}confirm_checkout/',
         options: Options(headers: {
           if (token != null) 'Authorization': 'Bearer $token',
         }),
       );
 
+      debugPrint('Debug: Checkout Response Code: ${response.statusCode}');
       return response.statusCode == 200 || response.statusCode == 201;
     } catch (e) {
+      debugPrint('Error confirming purchase: $e');
       return false;
     }
   }

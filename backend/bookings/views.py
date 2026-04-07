@@ -20,9 +20,6 @@ class BookingViewSet(viewsets.ModelViewSet):
 
     @decorators.action(detail=False, methods=['post'], url_path='cart/add')
     def add_to_cart(self, request):
-        # In a real app, we'd validate against real travel data
-        # Here we'll just create a booking from the provided data
-        
         booking = Booking.objects.create(
             user=request.user,
             status='IN_CART',
@@ -36,18 +33,27 @@ class BookingViewSet(viewsets.ModelViewSet):
             train_number=request.data.get('train'),
             carriage=request.data.get('carriage'),
             seat_number=request.data.get('seat'),
+            seat=request.data.get('seat'),
             class_label=request.data.get('class_label'),
+            operator=request.data.get('operator'),
+            flight_number=request.data.get('flight_number'),
+            terminal=request.data.get('terminal'),
+            flight_class=request.data.get('flight_class'),
+            bus_class=request.data.get('bus_class'),
+            bus_number=request.data.get('bus_number'),
+            car_plate=request.data.get('car_plate'),
+            driver_name=request.data.get('driver_name'),
+            flight_route=request.data.get('flight_route', []),
             image_url=request.data.get('image_url'),
             stay_date=request.data.get('stay_date'),
             stay_duration=request.data.get('stay_duration'),
             bed_type=request.data.get('bed_type'),
             location_name=request.data.get('location'),
         )
-        
-        # Add default purchase items for price breakdown
+
         PurchaseItem.objects.create(booking=booking, label='Ticket Price', amount_rp=booking.price_rp)
         PurchaseItem.objects.create(booking=booking, label='Service Fee', amount_rp=25000)
-        
+
         return Response({"message": "Added to cart", "id": booking.id}, status=status.HTTP_201_CREATED)
 
     @decorators.action(detail=True, methods=['get'])
@@ -64,12 +70,10 @@ class BookingViewSet(viewsets.ModelViewSet):
             traceback.print_exc()
             raise
 
-    @decorators.action(detail=False, methods=['post'], url_path='checkout/confirm')
+    @decorators.action(detail=False, methods=['post'], url_path='confirm_checkout')
     def confirm_checkout(self, request):
-        cart_items = self.get_queryset().filter(status='IN_CART')
-        count = cart_items.count()
-        cart_items.update(status='PAID')
-        return Response({"message": "Checkout confirmed", "count": count})
+        count = self.get_queryset().filter(status='IN_CART').update(status='PAID')
+        return Response({"updated": count}, status=200)
 
     @decorators.action(detail=False, methods=['get'])
     def history(self, request):

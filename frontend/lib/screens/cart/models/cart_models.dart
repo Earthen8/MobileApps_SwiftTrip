@@ -21,6 +21,7 @@ class CartTicket {
   // Train-specific
   final String? carriage;
   final String? seat;
+  final String? trainNumber;
 
   // Flight-specific
   final String? flightNumber;
@@ -58,6 +59,7 @@ class CartTicket {
     this.operator,
     this.carriage,
     this.seat,
+    this.trainNumber,
     this.flightNumber,
     this.terminal,
     this.flightClass,
@@ -87,6 +89,7 @@ class CartTicket {
       operator: json['operator'] as String?,
       carriage: json['carriage'] as String?,
       seat: json['seat'] as String?,
+      trainNumber: json['train_number'] as String?,
       flightNumber: json['flight_number'] as String?,
       terminal: json['terminal'] as String?,
       flightClass: json['flight_class'] as String?,
@@ -119,6 +122,7 @@ class CartTicket {
       'operator': operator,
       'carriage': carriage,
       'seat': seat,
+      'train_number': trainNumber,
       'flight_number': flightNumber,
       'terminal': terminal,
       'flight_class': flightClass,
@@ -148,6 +152,7 @@ class CartTicket {
     String? operator,
     String? carriage,
     String? seat,
+    String? trainNumber,
     String? flightNumber,
     String? terminal,
     String? flightClass,
@@ -175,6 +180,7 @@ class CartTicket {
       operator: operator ?? this.operator,
       carriage: carriage ?? this.carriage,
       seat: seat ?? this.seat,
+      trainNumber: trainNumber ?? this.trainNumber,
       flightNumber: flightNumber ?? this.flightNumber,
       terminal: terminal ?? this.terminal,
       flightClass: flightClass ?? this.flightClass,
