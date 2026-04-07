@@ -19,28 +19,33 @@ class HomeService {
   }
 
   Future<List<RecommendationItem>> fetchRecommendations() async {
-    await Future.delayed(const Duration(milliseconds: 600));
-    return const [
-      RecommendationItem(
-        name: 'The Langham',
-        description: 'Jakarta',
-        imageAsset: 'assets/images/home/vacation_logo.png',
-      ),
-      RecommendationItem(
-        name: 'The Ritz-Carlton',
-        description: 'Bali',
-        imageAsset: 'assets/images/home/vacation_logo.png',
-      ),
-      RecommendationItem(
-        name: 'Hotel Tentrem',
-        description: 'Yogyakarta',
-        imageAsset: 'assets/images/home/vacation_logo.png',
-      ),
-      RecommendationItem(
-        name: 'Padma Hotel',
-        description: 'Bandung',
-        imageAsset: 'assets/images/home/vacation_logo.png',
-      ),
-    ];
+    try {
+      await Future.delayed(const Duration(milliseconds: 600));
+      return const [
+        RecommendationItem(
+          name: 'The Langham',
+          description: 'Jakarta',
+          imageAsset: 'assets/images/home/vacation_logo.png',
+        ),
+        RecommendationItem(
+          name: 'The Ritz-Carlton',
+          description: 'Bali',
+          imageAsset: 'assets/images/home/vacation_logo.png',
+        ),
+        RecommendationItem(
+          name: 'Hotel Tentrem',
+          description: 'Yogyakarta',
+          imageAsset: 'assets/images/home/vacation_logo.png',
+        ),
+        RecommendationItem(
+          name: 'Padma Hotel',
+          description: 'Bandung',
+          imageAsset: 'assets/images/home/vacation_logo.png',
+        ),
+      ];
+    } catch (e) {
+      print('Debug: Recommendation Fetch Error: $e');
+      return [];
+    }
   }
 }

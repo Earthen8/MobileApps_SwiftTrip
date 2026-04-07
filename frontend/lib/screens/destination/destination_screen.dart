@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../widgets/top_bar.dart';
 import '../customer_service/onboarding.dart';
 import 'widgets/destination_search_bar.dart';
@@ -9,13 +10,31 @@ import 'services/destination_service.dart';
 import 'models/destination_model.dart';
 
 // --- Main Page ---
-class DestinationPage extends StatelessWidget {
+class DestinationPage extends StatefulWidget {
   const DestinationPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final service = DestinationService();
+  State<DestinationPage> createState() => _DestinationPageState();
+}
 
+class _DestinationPageState extends State<DestinationPage> {
+  late Future<Map<String, List<DestinationModel>>> _homeSectionsFuture;
+  final _service = DestinationService();
+
+  @override
+  void initState() {
+    super.initState();
+    _loadData();
+  }
+
+  void _loadData() {
+    setState(() {
+      _homeSectionsFuture = _service.fetchHomeSections();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF6F6F6),
       body: Column(
@@ -61,16 +80,58 @@ class DestinationPage extends StatelessWidget {
           // ── Scrollable: destination sections ─────────────────────────
           Expanded(
             child: FutureBuilder<Map<String, List<DestinationModel>>>(
-              future: service.fetchHomeSections(),
+              future: _homeSectionsFuture,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(
                     child: CircularProgressIndicator(color: Color(0xFF2B99E3)),
                   );
                 }
-                if (snapshot.hasError) {
-                  return const Center(
-                    child: Text('Failed to load destinations.'),
+                
+                // --- Updated Error State UI ---
+                if (snapshot.hasError || (snapshot.hasData && snapshot.data!.isEmpty)) {
+                  return Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(20.0),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(Icons.error_outline, color: Colors.redAccent, size: 60),
+                          const SizedBox(height: 16),
+                          Text(
+                            'Unable to load destinations',
+                            style: GoogleFonts.cairo(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: const Color(0xFF1E1E1E),
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'Please check your connection and try again.',
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.poppins(
+                              color: Colors.black54,
+                              fontSize: 14,
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+                          ElevatedButton.icon(
+                            onPressed: _loadData,
+                            icon: const Icon(Icons.refresh),
+                            label: Text(
+                              'Retry',
+                              style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF2B99E3),
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   );
                 }
 
@@ -78,6 +139,20 @@ class DestinationPage extends StatelessWidget {
                 final discount = data['discount_destinations'] ?? [];
                 final favorite = data['favorite_destinations'] ?? [];
                 final hot = data['hot_destinations'] ?? [];
+
+                // Re-verify if data is truly empty after mapping
+                if (discount.isEmpty && favorite.isEmpty && hot.isEmpty) {
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Text('No destinations found.'),
+                        const SizedBox(height: 16),
+                        TextButton(onPressed: _loadData, child: const Text('Retry')),
+                      ],
+                    ),
+                  );
+                }
 
                 return SingleChildScrollView(
                   child: Column(

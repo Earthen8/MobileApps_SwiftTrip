@@ -87,8 +87,7 @@ class DestinationService {
       if (ordering != null) queryParams['ordering'] = ordering;
       if (search != null) queryParams['search'] = search;
 
-      final options = await _getOptions();
-      final response = await _dio.get('', queryParameters: queryParams, options: options);
+      final response = await _dio.get('', queryParameters: queryParams);
       final data = response.data as List;
       return data.map((json) => DestinationModel.fromJson(json)).toList();
     } catch (e) {
@@ -99,8 +98,7 @@ class DestinationService {
 
   Future<Map<String, List<DestinationModel>>> fetchHomeSections() async {
     try {
-      final options = await _getOptions();
-      final response = await _dio.get('home_sections/', options: options);
+      final response = await _dio.get('home_sections/');
       final data = response.data as Map<String, dynamic>;
       
       return {
@@ -115,7 +113,10 @@ class DestinationService {
             .toList(),
       };
     } catch (e) {
-      print('Error fetching home sections: $e');
+      print('Debug: Home Section Fetch Error: $e');
+      if (e is DioException) {
+        print('Debug: Status Code: ${e.response?.statusCode}');
+      }
       return {
         'discount_destinations': [],
         'favorite_destinations': [],
@@ -126,8 +127,7 @@ class DestinationService {
 
   Future<List<DestinationModel>> fetchRecommendations() async {
     try {
-      final options = await _getOptions();
-      final response = await _dio.get('recommendations/', options: options);
+      final response = await _dio.get('recommendations/');
       final data = response.data as List;
       return data.map((e) => DestinationModel.fromJson(e)).toList();
     } catch (e) {

@@ -1,4 +1,5 @@
 from rest_framework import viewsets, status, decorators
+from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.db.models import Q
@@ -115,7 +116,7 @@ class DestinationViewSet(viewsets.ReadOnlyModelViewSet):
             
         return queryset
 
-    @decorators.action(detail=False, methods=['get'], permission_classes=[AllowAny])
+    @action(detail=False, methods=['get'], permission_classes=[AllowAny], url_path='home_sections')
     def home_sections(self, request):
         destinations = self.get_queryset()
         
