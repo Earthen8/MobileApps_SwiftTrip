@@ -91,9 +91,36 @@ class CartService {
     }
   }
 
-  void removeTicket(int index) {
-    if (index >= 0 && index < _tickets.length) {
-      _tickets.removeAt(index);
+  Future<bool> removeTicket(String id) async {
+    try {
+      final dio = Dio();
+      final token = await AuthRepository().getToken();
+      
+      print('Debug: Deleting ticket ID: $id');
+      
+      final response = await dio.delete(
+        '${Constants.bookingsUrl}$id/',
+        options: Options(headers: {
+          if (token != null) 'Authorization': 'Bearer $token',
+        }),
+      );
+
+      if (response.statusCode == 204 || response.statusCode == 200) {
+        _tickets.removeWhere((ticket) => ticket.bookingId == id);
+        return true;
+      } else {
+        print('Debug: Delete returned unexpected status: ${response.statusCode}');
+        return false;
+      }
+    } on DioException catch (e) {
+      print('Debug: CRITICAL ERROR deleting ticket: $e');
+      if (e.response != null) {
+        print('Debug: Server response data: ${e.response?.data}');
+      }
+      return false;
+    } catch (e) {
+      print('Debug: CRITICAL ERROR in CartService delete: $e');
+      return false;
     }
   }
 
@@ -102,7 +129,41 @@ class CartService {
   }
 
   Future<List<CartTicket>> fetchTickets() async {
-    return List.from(_tickets);
+    try {
+      final dio = Dio();
+      final token = await AuthRepository().getToken();
+      final response = await dio.get(
+        '${Constants.bookingsUrl}cart/',
+        options: Options(headers: {
+          if (token != null) 'Authorization': 'Bearer $token',
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        print('Debug: GET Cart response: ${response.data}');
+        final List<dynamic> data = response.data;
+        
+        final List<CartTicket> fetchedTickets = data.map((json) {
+          return CartTicket.fromJson(json);
+        }).toList();
+
+        _tickets.clear();
+        _tickets.addAll(fetchedTickets);
+        return _tickets;
+      } else {
+        print('Debug: GET Cart returned unexpected status ${response.statusCode}');
+        return List.from(_tickets);
+      }
+    } on DioException catch (e) {
+      print('Debug: CRITICAL ERROR fetching cart: $e');
+      if (e.response != null) {
+        print('Debug: Server response data: ${e.response?.data}');
+      }
+      return List.from(_tickets);
+    } catch (e) {
+      print('Debug: Parse Error: $e');
+      return List.from(_tickets);
+    }
   }
 
   Future<List<Promotion>> fetchPromotions() async {

@@ -19,9 +19,12 @@ class CartProvider extends ChangeNotifier {
     await loadCart();
   }
 
-  void removeTicket(int index) {
-    _cartService.removeTicket(index);
-    loadCart();
+  Future<void> removeTicket(String id) async {
+    final success = await _cartService.removeTicket(id);
+    if (success) {
+      _tickets.removeWhere((t) => t.bookingId == id);
+      notifyListeners();
+    }
   }
 
   void clearCart() {

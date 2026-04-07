@@ -12,6 +12,12 @@ class BookingViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         return self.queryset.filter(user=self.request.user)
 
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if instance.status != 'IN_CART':
+            return Response({"error": "Cannot delete non-cart item"}, status=status.HTTP_400_BAD_REQUEST)
+        return super().destroy(request, *args, **kwargs)
+
     @decorators.action(detail=False, methods=['get'])
     def cart(self, request):
         cart_items = self.get_queryset().filter(status='IN_CART')

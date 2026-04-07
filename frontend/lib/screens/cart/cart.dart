@@ -27,7 +27,15 @@ class _CartPageState extends State<CartPage> {
   final CartService _cartService = CartService();
   Promotion? _appliedPromo;
 
-  Future<void> _removeTicket(int index) async {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<CartProvider>().loadCart();
+    });
+  }
+
+  Future<void> _removeTicket(String id) async {
     final confirmed = await showDialog<bool>(
       context: context,
       barrierDismissible: true,
@@ -36,7 +44,7 @@ class _CartPageState extends State<CartPage> {
     );
 
     if (confirmed == true && mounted) {
-      context.read<CartProvider>().removeTicket(index);
+      context.read<CartProvider>().removeTicket(id);
     }
   }
 
@@ -176,7 +184,7 @@ class _CartPageState extends State<CartPage> {
                             child: TicketCard(
                               ticket: tickets[i],
                               formatRp: _formatRp,
-                              onDelete: () => _removeTicket(i),
+                              onDelete: () => _removeTicket(tickets[i].bookingId),
                             ),
                           ),
                         ),
