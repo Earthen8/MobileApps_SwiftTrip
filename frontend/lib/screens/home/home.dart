@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:swifttrip_frontend/screens/home/widgets/review_popup.dart';
 
-import '../../models/schedule_item.dart';
+import '../cart/models/cart_models.dart';
 import 'services/home_service.dart';
 import '../destination/services/destination_service.dart';
 import '../destination/models/destination_model.dart';
@@ -54,7 +54,7 @@ class _HomePageState extends State<HomePage> {
   Timer? _bannerTimer;
 
   bool _isLoading = true;
-  List<ScheduleItem> _serverSchedules = [];
+  List<CartTicket> _serverSchedules = [];
   List<DestinationModel> _serverRecommendations = [];
 
   @override
@@ -72,7 +72,7 @@ class _HomePageState extends State<HomePage> {
       final recs = await destService.fetchRecommendations();
       if (mounted) {
         setState(() {
-          _serverSchedules = schedules;
+          _serverSchedules = schedules.take(5).toList();
           _serverRecommendations = recs;
         });
       }
@@ -202,8 +202,9 @@ class _HomePageState extends State<HomePage> {
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (context) =>
-                                            const NextTripPage(),
+                                        builder: (context) => NextTripPage(
+                                          ticket: _serverSchedules[_currentSchedule],
+                                        ),
                                       ),
                                     );
                                   },

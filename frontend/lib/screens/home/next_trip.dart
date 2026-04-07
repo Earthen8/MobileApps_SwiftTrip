@@ -15,7 +15,8 @@ import 'widgets/purchase_details_card.dart';
 // ─────────────────────────────────────────────────────────────────────────────
 
 class NextTripPage extends StatefulWidget {
-  const NextTripPage({super.key});
+  final CartTicket? ticket;
+  const NextTripPage({super.key, this.ticket});
 
   @override
   State<NextTripPage> createState() => _NextTripPageState();
@@ -34,7 +35,7 @@ class _NextTripPageState extends State<NextTripPage> {
   }
 
   Future<void> _fetchData() async {
-    final ticket = await _nextTripService.getNextTrip();
+    final ticket = widget.ticket ?? await _nextTripService.getNextTrip();
     final details = await _nextTripService.getPurchaseDetails();
     if (mounted) {
       setState(() {

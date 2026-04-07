@@ -1,21 +1,31 @@
+import 'package:dio/dio.dart';
+import '../../../core/constants.dart';
+import '../../../repositories/auth_repository.dart';
+import '../../cart/models/cart_models.dart';
 import 'package:swifttrip_frontend/models/recommendation_item.dart';
-import 'package:swifttrip_frontend/models/schedule_item.dart';
 
 class HomeService {
-  Future<List<ScheduleItem>> fetchSchedules() async {
-    await Future.delayed(const Duration(milliseconds: 600));
-    return const [
-      ScheduleItem(
-        title: 'Jakarta - Bandung',
-        time: '14 Jan 2026',
-        imageAsset: 'assets/images/home/vacation_logo.png',
-      ),
-      ScheduleItem(
-        title: 'Surabaya - Malang',
-        time: '15 Jan 2026',
-        imageAsset: 'assets/images/home/vacation_logo.png',
-      ),
-    ];
+  Future<List<CartTicket>> fetchSchedules() async {
+    try {
+      final dio = Dio();
+      final token = await AuthRepository().getToken();
+      
+      final response = await dio.get(
+        Constants.historyUrl,
+        options: Options(headers: {
+          if (token != null) 'Authorization': 'Bearer $token',
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = response.data;
+        return data.map((json) => CartTicket.fromJson(json)).toList();
+      }
+      return [];
+    } catch (e) {
+      print('Debug: Home Schedule Fetch Error: $e');
+      return [];
+    }
   }
 
   Future<List<RecommendationItem>> fetchRecommendations() async {

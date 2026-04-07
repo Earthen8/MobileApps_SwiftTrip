@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import '../../../models/schedule_item.dart';
+import 'package:intl/intl.dart';
+import '../../cart/models/cart_models.dart';
 import 'page_dots.dart';
 
 class ScheduleCarousel extends StatelessWidget {
-  final List<ScheduleItem> items;
+  final List<CartTicket> items;
   final PageController controller;
   final int currentIndex;
   final ValueChanged<int> onPageChanged;
@@ -28,10 +29,7 @@ class ScheduleCarousel extends StatelessWidget {
             controller: controller,
             onPageChanged: onPageChanged,
             itemCount: items.length,
-            itemBuilder: (_, i) => _ScheduleCard(
-              item: items[i],
-              onTap: onTap,
-            ),
+            itemBuilder: (_, i) => _ScheduleCard(item: items[i], onTap: onTap),
           ),
         ),
         const SizedBox(height: 10),
@@ -41,18 +39,32 @@ class ScheduleCarousel extends StatelessWidget {
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// SCHEDULE CARD — layout based on Figma raw code
-// ─────────────────────────────────────────────────────────────────────────────
-
 class _ScheduleCard extends StatelessWidget {
-  final ScheduleItem item;
+  final CartTicket item;
   final VoidCallback? onTap;
 
   const _ScheduleCard({required this.item, this.onTap});
 
+  String _formatDate(String? rawDate) {
+    if (rawDate == null || rawDate.isEmpty) return '';
+    try {
+      final dateTime = DateTime.parse(rawDate);
+      return DateFormat('d MMM yyyy').format(dateTime);
+    } catch (e) {
+      return rawDate;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final bool isAccommodation = item.type == 'Accommodation Ticket';
+    final String displayTitle = isAccommodation
+        ? (item.location ?? 'Accommodation')
+        : '${item.from} - ${item.to}';
+    final String displayDate = _formatDate(
+      isAccommodation ? item.stayDate : item.date,
+    );
+
     return Padding(
       padding: const EdgeInsets.only(left: 12, right: 12, bottom: 16),
       child: GestureDetector(
@@ -91,8 +103,11 @@ class _ScheduleCard extends StatelessWidget {
               Positioned(
                 left: 23,
                 top: 35,
+                right: 142,
                 child: Text(
-                  item.title,
+                  displayTitle,
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
                   style: const TextStyle(
                     color: Colors.black,
                     fontSize: 16,
@@ -107,7 +122,7 @@ class _ScheduleCard extends StatelessWidget {
                 left: 23,
                 top: 59,
                 child: Text(
-                  item.time,
+                  displayDate,
                   style: const TextStyle(
                     color: Colors.black,
                     fontSize: 13,
@@ -148,8 +163,7 @@ class _ScheduleCard extends StatelessWidget {
                 left: 208,
                 top: 13,
                 child: _ScheduleImage(
-                  imageAsset:
-                      item.imageAsset ?? 'assets/images/home/vacation_logo.png',
+                  imageAsset: 'assets/images/home/vacation_logo.png',
                   imageUrl: item.imageUrl,
                 ),
               ),
