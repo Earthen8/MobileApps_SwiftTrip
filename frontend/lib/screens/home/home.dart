@@ -20,6 +20,8 @@ import '../customer_service/onboarding.dart';
 import 'next_trip.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'review.dart';
+import '../main/main_screen.dart';
+import '../../core/constants.dart';
 
 // ─────────────────────────────────────────────
 // CONSTANTS
@@ -209,7 +211,9 @@ class _HomePageState extends State<HomePage> {
                                       ),
                                     );
                                   },
-                                ),
+                                )
+                              else
+                                _EmptySchedulePlaceholder(),
 
                               const SizedBox(height: 20),
 
@@ -249,6 +253,66 @@ class _HomePageState extends State<HomePage> {
                 ),
               ],
             ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// EMPTY SCHEDULE PLACEHOLDER
+// Tapping navigates to the Search tab (index 2) with a clean nav stack.
+// ─────────────────────────────────────────────────────────────────────────────
+
+class _EmptySchedulePlaceholder extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 12, right: 12, bottom: 16),
+      child: GestureDetector(
+        onTap: () => Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const MainScreen(initialIndex: 2),
+          ),
+          (route) => false,
+        ),
+        child: Container(
+          height: 125,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: const [
+              BoxShadow(
+                color: Color(0x26000000),
+                blurRadius: 20,
+                offset: Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.add_circle_outline_rounded,
+                size: 36,
+                color: Constants.primaryBlue,
+              ),
+              const SizedBox(width: 14),
+              Flexible(
+                child: Text(
+                  'No upcoming trips.\nFind your next destination!',
+                  style: TextStyle(
+                    fontFamily: 'Poppins',
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: Constants.primaryBlue,
+                    height: 1.5,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
