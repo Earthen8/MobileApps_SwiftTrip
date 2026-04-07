@@ -23,7 +23,8 @@ class DestinationSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'title', 'category', 'image_url', 'location', 
             'rating', 'original_price', 'discount_percentage', 
-            'description', 'advantages', 'tags', 'section_tag', 'final_price', 'is_favorite'
+            'description', 'advantages', 'tags', 'section_tag', 'final_price', 'is_favorite',
+            'latitude', 'longitude'
         ]
 
     def get_is_favorite(self, obj):
@@ -57,7 +58,7 @@ class CartTicketSerializer(serializers.ModelSerializer):
             'stay_duration', 'bed_type', 'location',
             'operator', 'flight_number', 'terminal', 'flight_class',
             'bus_class', 'bus_number', 'car_plate', 'driver_name',
-            'flight_route'
+            'flight_route', 'latitude', 'longitude'
         ]
 
     def get_type(self, obj):
@@ -98,7 +99,7 @@ class TicketModelSerializer(serializers.ModelSerializer):
             'carriage', 'seat_number', 'seat', 'operator',
             'flight_number', 'terminal', 'flight_class',
             'bus_class', 'bus_number', 'car_plate', 'driver_name',
-            'flight_route'
+            'flight_route', 'latitude', 'longitude'
         ]
 
     def to_representation(self, instance):

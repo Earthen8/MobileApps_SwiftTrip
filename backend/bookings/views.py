@@ -56,6 +56,8 @@ class BookingViewSet(viewsets.ModelViewSet):
             stay_duration=request.data.get('stay_duration'),
             bed_type=request.data.get('bed_type'),
             location_name=request.data.get('location'),
+            latitude=request.data.get('latitude'),
+            longitude=request.data.get('longitude'),
         )
 
         PurchaseItem.objects.create(booking=booking, label='Ticket Price', amount_rp=booking.price_rp)

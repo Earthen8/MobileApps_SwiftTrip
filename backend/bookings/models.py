@@ -51,6 +51,8 @@ class Booking(models.Model):
     stay_duration = models.CharField(max_length=100, null=True, blank=True)
     bed_type = models.CharField(max_length=100, null=True, blank=True)
     location_name = models.CharField(max_length=255, null=True, blank=True)
+    latitude = models.FloatField(null=True, blank=True)
+    longitude = models.FloatField(null=True, blank=True)
 
     def __str__(self):
         return f"{self.user.username} - {self.booking_type} - {self.status}"
@@ -89,6 +91,8 @@ class Destination(models.Model):
     advantages = models.JSONField(default=list, help_text='Guest Favorites list')
     tags = models.JSONField(default=list, help_text='Searchable tags like Cozy, Airy')
     section_tag = models.CharField(max_length=50, choices=SECTION_TAG_CHOICES)
+    latitude = models.FloatField(null=True, blank=True)
+    longitude = models.FloatField(null=True, blank=True)
 
     @property
     def final_price(self):
