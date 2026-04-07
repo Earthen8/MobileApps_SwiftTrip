@@ -5,8 +5,14 @@ import 'feature_row.dart';
 class PlanCard extends StatelessWidget {
   final SubscriptionPlan plan;
   final bool isActive;
+  final VoidCallback? onUpgrade;
 
-  const PlanCard({super.key, required this.plan, required this.isActive});
+  const PlanCard({
+    super.key,
+    required this.plan,
+    required this.isActive,
+    this.onUpgrade,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -97,7 +103,9 @@ class PlanCard extends StatelessWidget {
             padding: const EdgeInsets.only(bottom: 30),
             child: GestureDetector(
               onTap: () {
-                // TODO: Pass plan.id to backend for subscription upgrade
+                if (!plan.isCurrent && onUpgrade != null) {
+                  onUpgrade!();
+                }
               },
               child: Container(
                 width: 228,

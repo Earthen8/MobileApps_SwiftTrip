@@ -26,6 +26,22 @@ class UserManager(BaseUserManager):
 class User(AbstractUser):
     username = None
     email = models.EmailField(_('email address'), unique=True)
+    
+    FREE = 'FREE'
+    GOLD = 'GOLD'
+    PREMIUM = 'PREMIUM'
+    
+    SUBSCRIPTION_CHOICES = [
+        (FREE, 'Free'),
+        (GOLD, 'Gold'),
+        (PREMIUM, 'Premium'),
+    ]
+    
+    subscription_tier = models.CharField(
+        max_length=20,
+        choices=SUBSCRIPTION_CHOICES,
+        default=FREE
+    )
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['first_name', 'last_name']

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:swifttrip_frontend/core/constants.dart';
 import '../profile/profile.dart';
 import 'models/subscription_plan_model.dart';
 import 'services/subscription_service.dart';
@@ -44,6 +45,33 @@ class _SubscriptionPlanScreenState extends State<SubscriptionPlanScreen> {
     } catch (e) {
       debugPrint('Error fetching plans: $e');
       if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _handleUpgrade(SubscriptionPlan plan) async {
+    try {
+      await _subscriptionService.updateUserPlan(plan.id);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Plan upgraded to ${plan.name} successfully!'),
+            backgroundColor: Constants.popupSuccess,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+        // Refresh plans to show "Currently Used"
+        _fetchPlans();
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error: ${e.toString()}'),
+            backgroundColor: Constants.popupError,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
     }
   }
 
@@ -129,9 +157,17 @@ class _SubscriptionPlanScreenState extends State<SubscriptionPlanScreen> {
                     curve: Curves.easeOutCubic,
                     child: GestureDetector(
                       onTap: () {
-                        if (!isActive) setState(() => _currentIndex = i);
+                        if (!isActive) {
+                          setState(() => _currentIndex = i);
+                        } else if (!plan.isCurrent) {
+                          _handleUpgrade(plan);
+                        }
                       },
-                      child: PlanCard(plan: plan, isActive: isActive),
+                      child: PlanCard(
+                        plan: plan,
+                        isActive: isActive,
+                        onUpgrade: () => _handleUpgrade(plan),
+                      ),
                     ),
                   ),
                 );

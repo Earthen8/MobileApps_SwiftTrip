@@ -193,6 +193,19 @@ class AuthViewSet(viewsets.GenericViewSet):
         request.user.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+    @action(detail=False, methods=['patch'], url_path='update-subscription', permission_classes=[permissions.IsAuthenticated])
+    def update_subscription(self, request):
+        tier = request.data.get('subscription_tier')
+        if tier not in [choice[0] for choice in User.SUBSCRIPTION_CHOICES]:
+            return Response({'detail': 'Invalid subscription tier.'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        request.user.subscription_tier = tier
+        request.user.save()
+        return Response({
+            'detail': 'Subscription updated successfully.',
+            'subscription_tier': request.user.subscription_tier
+        })
+
 class RequestProfileUpdateView(APIView):
     permission_classes = [IsAuthenticated]
 
