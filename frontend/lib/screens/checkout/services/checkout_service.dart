@@ -15,6 +15,7 @@ class CheckoutService {
     await Future.delayed(const Duration(milliseconds: 500));
 
     return CheckoutDetailsModel(
+      discountTotal: 1300000,
       tickets: [
         const CartTicket(
           type: 'Train Ticket',
@@ -61,11 +62,14 @@ class CheckoutService {
     );
   }
 
-  Future<bool> confirmPurchase() async {
+  Future<bool> confirmPurchase({int discountRp = 0}) async {
     try {
       final token = await AuthRepository().getToken();
       final response = await _dio.post(
         '${Constants.bookingsUrl}confirm_checkout/',
+        data: {
+          'discount_rp': discountRp,
+        },
         options: Options(headers: {
           if (token != null) 'Authorization': 'Bearer $token',
         }),

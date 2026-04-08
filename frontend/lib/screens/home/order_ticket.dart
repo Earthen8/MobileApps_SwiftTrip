@@ -88,6 +88,7 @@ class _OrderTicketPageState extends State<OrderTicketPage> {
         ),
       ],
       totalPrice: _formatRp(baseTotal + 15000),
+      discountTotal: 0,
     );
 
     Navigator.push(

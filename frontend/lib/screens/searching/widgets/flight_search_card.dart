@@ -78,6 +78,7 @@ class _PesanButton extends StatelessWidget {
             ),
           ],
           totalPrice: _formatRp(selectedFlight!.price.toInt()),
+          discountTotal: 0,
         );
 
         Navigator.push(

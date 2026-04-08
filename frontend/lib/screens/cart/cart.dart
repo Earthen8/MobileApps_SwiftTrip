@@ -147,8 +147,9 @@ class _CartPageState extends State<CartPage> {
     final tickets = cartProvider.tickets;
 
     int baseTotalVal = tickets.fold(0, (sum, t) => sum + t.priceRp);
+    int serviceFeeVal = tickets.fold(0, (sum, t) => sum + t.serviceFee);
     int discountAmountVal = _cartService.calculateDiscount(baseTotalVal, _appliedPromo);
-    int finalTotalVal = baseTotalVal - discountAmountVal;
+    int finalTotalVal = baseTotalVal + serviceFeeVal - discountAmountVal;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF6F6F6),
@@ -230,6 +231,10 @@ class _CartPageState extends State<CartPage> {
                             label: 'Tickets x${tickets.length}',
                             amount: _formatRp(baseTotalVal),
                           ),
+                          PurchaseItemModel(
+                            label: 'Service Fee (5%)',
+                            amount: _formatRp(serviceFeeVal),
+                          ),
                           if (discountAmountVal > 0)
                             PurchaseItemModel(
                               label: 'Discount',
@@ -238,6 +243,7 @@ class _CartPageState extends State<CartPage> {
                             ),
                         ],
                         totalPrice: _formatRp(finalTotalVal),
+                        discountTotal: discountAmountVal,
                       );
 
                       Navigator.push(

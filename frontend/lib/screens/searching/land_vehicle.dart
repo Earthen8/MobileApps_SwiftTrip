@@ -367,6 +367,7 @@ class _LandVehicleSearchState extends State<LandVehicleSearch> {
                       )
                       .toList(),
                   totalPrice: formatRp(_finalTotal),
+                  discountTotal: _discountAmount,
                 );
                 Navigator.push(
                   context,

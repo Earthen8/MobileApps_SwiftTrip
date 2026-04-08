@@ -46,7 +46,9 @@ class CheckoutController extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final success = await _service.confirmPurchase();
+      final success = await _service.confirmPurchase(
+        discountRp: _details?.discountTotal ?? 0,
+      );
 
       _isLoading = false;
       notifyListeners();
