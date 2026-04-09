@@ -183,7 +183,7 @@ class _HomePageState extends State<HomePage> {
                               // Your Schedule section
                               SectionHeader(
                                 title: provider.translate('schedule'),
-                                actionLabel: 'History >',
+                                actionLabel: provider.translate('history'),
                                 onAction: () {
                                   Navigator.push(
                                     context,
@@ -207,9 +207,8 @@ class _HomePageState extends State<HomePage> {
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (context) => NextTripPage(
-                                          ticket: ticket,
-                                        ),
+                                        builder: (context) =>
+                                            NextTripPage(ticket: ticket),
                                       ),
                                     );
                                   },

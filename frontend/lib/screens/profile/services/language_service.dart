@@ -28,11 +28,13 @@ class AppStrings {
       'schedule': 'Your Schedule',
       'recommendation': 'Recommendation',
       'search': 'Let AI Help Your Journey',
+      'history': 'History >',
     },
     'id': {
       'schedule': 'Jadwal Anda',
       'recommendation': 'Rekomendasi',
       'search': 'Biarkan AI Membantu Perjalanan Anda',
+      'history': 'Riwayat >',
     },
   };
 }
