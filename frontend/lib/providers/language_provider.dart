@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../screens/language/services/language_service.dart';
+import '../screens/profile/services/language_service.dart';
 
 class LanguageProvider extends ChangeNotifier {
   final LanguageService _service = LanguageService();
