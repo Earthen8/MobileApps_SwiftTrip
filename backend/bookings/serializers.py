@@ -1,5 +1,6 @@
+from datetime import date
 from rest_framework import serializers
-from .models import Booking, PurchaseItem, Destination
+from .models import Booking, PurchaseItem, Destination, Review
 
 class PurchaseItemSerializer(serializers.ModelSerializer):
     amount = serializers.SerializerMethodField()
@@ -17,14 +18,15 @@ class PurchaseItemSerializer(serializers.ModelSerializer):
 class DestinationSerializer(serializers.ModelSerializer):
     final_price = serializers.DecimalField(max_digits=12, decimal_places=2, read_only=True)
     is_favorite = serializers.SerializerMethodField()
+    review_count = serializers.SerializerMethodField()
 
     class Meta:
         model = Destination
         fields = [
-            'id', 'title', 'category', 'image_url', 'location', 
-            'rating', 'original_price', 'discount_percentage', 
+            'id', 'title', 'category', 'image_url', 'location',
+            'rating', 'original_price', 'discount_percentage',
             'description', 'advantages', 'tags', 'section_tag', 'final_price', 'is_favorite',
-            'latitude', 'longitude'
+            'latitude', 'longitude', 'review_count',
         ]
 
     def get_is_favorite(self, obj):
@@ -32,6 +34,28 @@ class DestinationSerializer(serializers.ModelSerializer):
         if request and request.user.is_authenticated:
             return obj.wishlisted_by.filter(user=request.user).exists()
         return False
+
+    def get_review_count(self, obj):
+        if hasattr(obj, 'num_reviews'):
+            return obj.num_reviews
+        return obj.reviews.count()
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        if hasattr(instance, 'avg_rating') and instance.avg_rating is not None:
+            data['rating'] = round(instance.avg_rating, 1)
+        elif hasattr(instance, 'num_reviews') and instance.num_reviews == 0:
+            data['rating'] = 0.0
+        return data
+
+
+class ReviewSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(source='user.username', read_only=True)
+
+    class Meta:
+        model = Review
+        fields = ['id', 'username', 'rating', 'feeling', 'thoughts', 'created_at']
+        read_only_fields = ['id', 'username', 'created_at']
 
 class CartTicketSerializer(serializers.ModelSerializer):
     type = serializers.SerializerMethodField()
@@ -48,6 +72,8 @@ class CartTicketSerializer(serializers.ModelSerializer):
     
     # Accommodation fields
     location = serializers.CharField(source='location_name', required=False, allow_null=True)
+    destination_id = serializers.CharField(source='destination.id', read_only=True)
+    is_reviewable = serializers.SerializerMethodField()
 
     class Meta:
         model = Booking
@@ -58,7 +84,8 @@ class CartTicketSerializer(serializers.ModelSerializer):
             'stay_duration', 'bed_type', 'location',
             'operator', 'flight_number', 'terminal', 'flight_class',
             'bus_class', 'bus_number', 'car_plate', 'driver_name',
-            'flight_route', 'latitude', 'longitude', 'service_fee', 'discount_rp'
+            'flight_route', 'latitude', 'longitude', 'service_fee', 'discount_rp',
+            'destination_id', 'is_reviewable'
         ]
 
     def get_type(self, obj):
@@ -70,6 +97,34 @@ class CartTicketSerializer(serializers.ModelSerializer):
             'ACCOMMODATION': 'Accommodation Ticket',
         }
         return mapping.get(obj.booking_type, 'Unknown')
+
+    def get_is_reviewable(self, obj):
+        request = self.context.get('request')
+        if not request or not request.user.is_authenticated:
+            return False
+
+        if obj.status != 'PAID':
+            return False
+
+        if not obj.destination:
+            return False
+
+        # Check manual trigger
+        if obj.manual_review_trigger:
+            return not Review.objects.filter(user=request.user, destination=obj.destination).exists()
+
+        # Check date
+        target_date_str = obj.stay_date or obj.date
+        if target_date_str:
+            try:
+                # Format: YYYY-MM-DD
+                target_date = date.fromisoformat(target_date_str)
+                if target_date <= date.today():
+                    return not Review.objects.filter(user=request.user, destination=obj.destination).exists()
+            except (ValueError, TypeError):
+                pass
+
+        return False
 
     def to_representation(self, instance):
         ret = super().to_representation(instance)

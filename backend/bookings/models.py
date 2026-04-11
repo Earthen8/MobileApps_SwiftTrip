@@ -25,6 +25,14 @@ class Booking(models.Model):
     discount_rp = models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    destination = models.ForeignKey(
+        'Destination',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='bookings'
+    )
+    manual_review_trigger = models.BooleanField(default=False)
 
     # Transport fields
     from_location = models.CharField(max_length=255, null=True, blank=True)
@@ -111,3 +119,26 @@ class Wishlist(models.Model):
 
     def __str__(self):
         return f"Wishlist for {self.user.username}"
+
+
+class Review(models.Model):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='reviews',
+    )
+    destination = models.ForeignKey(
+        Destination,
+        on_delete=models.CASCADE,
+        related_name='reviews',
+    )
+    rating = models.IntegerField()
+    feeling = models.CharField(max_length=100, null=True, blank=True)
+    thoughts = models.TextField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('user', 'destination')
+
+    def __str__(self):
+        return f"{self.user.username} - {self.destination.title} - {self.rating} stars"

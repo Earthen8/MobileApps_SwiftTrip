@@ -2,9 +2,9 @@ from rest_framework import viewsets, status, decorators
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from django.db.models import Q
-from .models import Booking, PurchaseItem, Destination, Wishlist
-from .serializers import CartTicketSerializer, CheckoutDetailsSerializer, DestinationSerializer
+from django.db.models import Q, Avg, Count
+from .models import Booking, PurchaseItem, Destination, Wishlist, Review
+from .serializers import CartTicketSerializer, CheckoutDetailsSerializer, DestinationSerializer, ReviewSerializer
 
 class BookingViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
@@ -99,6 +99,10 @@ class DestinationViewSet(viewsets.ReadOnlyModelViewSet):
 
     def get_queryset(self):
         queryset = super().get_queryset()
+        queryset = queryset.annotate(
+            avg_rating=Avg('reviews__rating'),
+            num_reviews=Count('reviews'),
+        )
         category = self.request.query_params.get('category')
         tag = self.request.query_params.get('tag')
         section_tag = self.request.query_params.get('section_tag')
@@ -117,21 +121,22 @@ class DestinationViewSet(viewsets.ReadOnlyModelViewSet):
             )
         if ordering:
             queryset = queryset.order_by(ordering)
-            
+
         return queryset
 
     @action(detail=False, methods=['get'], permission_classes=[AllowAny], url_path='home_sections')
     def home_sections(self, request):
         destinations = self.get_queryset()
-        
+
         discount = destinations.filter(section_tag='Discount', discount_percentage__gt=0)
         favorite = destinations.filter(section_tag='Favorite')
         hot = destinations.filter(section_tag='Hot')
 
+        ctx = {'request': request}
         return Response({
-            'discount_destinations': DestinationSerializer(discount, many=True).data,
-            'favorite_destinations': DestinationSerializer(favorite, many=True).data,
-            'hot_destinations': DestinationSerializer(hot, many=True).data,
+            'discount_destinations': DestinationSerializer(discount, many=True, context=ctx).data,
+            'favorite_destinations': DestinationSerializer(favorite, many=True, context=ctx).data,
+            'hot_destinations': DestinationSerializer(hot, many=True, context=ctx).data,
         })
 
     @decorators.action(detail=False, methods=['get'], permission_classes=[AllowAny])
@@ -175,3 +180,40 @@ class DestinationViewSet(viewsets.ReadOnlyModelViewSet):
         wishlist, created = Wishlist.objects.get_or_create(user=request.user)
         ids = wishlist.destinations.values_list('id', flat=True)
         return Response({"ids": list(ids)})
+
+    @decorators.action(
+        detail=True,
+        methods=['get', 'post'],
+        permission_classes=[AllowAny],
+        url_path='reviews',
+    )
+    def reviews(self, request, pk=None):
+        destination = self.get_object()
+
+        if request.method == 'GET':
+            review_list = Review.objects.filter(
+                destination=destination,
+            ).order_by('-created_at')
+            serializer = ReviewSerializer(review_list, many=True)
+            return Response(serializer.data)
+
+        if not request.user.is_authenticated:
+            return Response(
+                {'error': 'Authentication required'},
+                status=status.HTTP_401_UNAUTHORIZED,
+            )
+
+        existing = Review.objects.filter(
+            user=request.user, destination=destination,
+        ).first()
+        if existing:
+            return Response(
+                {'error': 'You have already reviewed this destination'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        serializer = ReviewSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(user=request.user, destination=destination)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

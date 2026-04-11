@@ -6,6 +6,7 @@ class DestinationModel {
   final String imageUrl;
   final String location;
   final double rating;
+  final int reviewCount;
   final double originalPrice;
   final int discountPercentage;
   final double price;
@@ -23,6 +24,7 @@ class DestinationModel {
     required this.imageUrl,
     this.location = '',
     required this.rating,
+    this.reviewCount = 0,
     this.originalPrice = 0.0,
     this.discountPercentage = 0,
     this.price = 0.0,
@@ -44,6 +46,7 @@ class DestinationModel {
       imageUrl: json['image_url'] as String? ?? '',
       location: json['location'] as String? ?? '',
       rating: double.tryParse(json['rating']?.toString() ?? '0.0') ?? 0.0,
+      reviewCount: json['review_count'] as int? ?? 0,
       originalPrice:
           double.tryParse(json['original_price']?.toString() ?? '0.0') ?? 0.0,
       discountPercentage: json['discount_percentage'] as int? ?? 0,
@@ -71,6 +74,7 @@ class DestinationModel {
       'image_url': imageUrl,
       'location': location,
       'rating': rating,
+      'review_count': reviewCount,
       'original_price': originalPrice,
       'discount_percentage': discountPercentage,
       'final_price': price,

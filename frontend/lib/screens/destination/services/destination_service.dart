@@ -3,6 +3,7 @@ import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:swifttrip_frontend/repositories/auth_repository.dart';
 import '../models/destination_model.dart';
+import '../models/review_model.dart';
 import '../models/category_model.dart';
 import '../categories/villa.dart';
 import '../categories/hotel.dart';
@@ -238,4 +239,40 @@ class DestinationService {
   }
 
   List<String> getTrendingTags() => ['Cozy', 'Sleek', 'Airy', 'Moody'];
+
+  // --- Review API ---
+  Future<List<ReviewModel>> getReviewsByDestination(String destinationId) async {
+    try {
+      final response = await _dio.get('$destinationId/reviews/');
+      final data = response.data as List;
+      return data.map((json) => ReviewModel.fromJson(json)).toList();
+    } catch (e) {
+      print('Error fetching reviews: $e');
+      return [];
+    }
+  }
+
+  Future<bool> submitReview({
+    required String destinationId,
+    required int rating,
+    String? feeling,
+    String? thoughts,
+  }) async {
+    try {
+      final options = await _getOptions();
+      final body = <String, dynamic>{'rating': rating};
+      if (feeling != null && feeling.isNotEmpty) body['feeling'] = feeling;
+      if (thoughts != null && thoughts.isNotEmpty) body['thoughts'] = thoughts;
+
+      final response = await _dio.post(
+        '$destinationId/reviews/',
+        data: body,
+        options: options,
+      );
+      return response.statusCode == 201;
+    } catch (e) {
+      print('Error submitting review: $e');
+      return false;
+    }
+  }
 }

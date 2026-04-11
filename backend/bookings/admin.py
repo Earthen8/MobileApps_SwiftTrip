@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Booking, PurchaseItem, Destination, Wishlist
+from .models import Booking, PurchaseItem, Destination, Wishlist, Review
 
 @admin.register(Booking)
 class BookingAdmin(admin.ModelAdmin):
@@ -26,3 +26,11 @@ class WishlistAdmin(admin.ModelAdmin):
     def item_count(self, obj):
         return obj.destinations.count()
     item_count.short_description = 'Destinations Count'
+
+
+@admin.register(Review)
+class ReviewAdmin(admin.ModelAdmin):
+    list_display = ('id', 'user', 'destination', 'rating', 'feeling', 'created_at')
+    list_filter = ('rating', 'created_at')
+    search_fields = ('user__username', 'destination__title')
+    ordering = ('-created_at',)
