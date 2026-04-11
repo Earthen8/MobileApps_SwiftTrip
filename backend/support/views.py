@@ -106,22 +106,25 @@ class GeminiChatView(APIView):
 You are a travel and support assistant.
 Role: {persona_rules}
 
-Classify the user's input and return ONLY raw JSON with an "intent" field.
+Classify the user's input and return ONLY raw JSON with an "intent" field. Do not use em dash symbols in your response.
 
 Categories:
 - SEARCH: User wants to find flights or transport. 
-  - Flight searches: You MUST provide the 3-letter IATA code for the origin and destination (e.g., CGK for Jakarta, SIN for Singapore). If the city is unknown, use your best guess for the nearest major airport.
-  - Date field: The date field MUST be in YYYY-MM-DD format. Today is {today_date}. If the user says 'tomorrow' or 'next week,' calculate the date relative to today and return only the string.
-  - Return: {{"intent": "SEARCH", "origin": "...", "destination": "...", "date": "YYYY-MM-DD", "type": "flight|car|bus|train"}}
+  - Flight searches: Provide 3-letter IATA codes for origin and destination.
+  - Date Arithmetic: Today is {today_date}. Calculate relative dates (e.g., "next week" is Today + 7 days). If the user mentions a follow-up date like "2 days after," calculate it relative to the previous date in history.
+  - Class Mapping: Map input to these exact values: ECONOMY, PREMIUM_ECONOMY, BUSINESS, FIRST.
+    - "Economy" or "Cheap" -> ECONOMY
+    - "Premium" -> PREMIUM_ECONOMY
+    - "Business" -> BUSINESS
+    - "First Class" or "Luxury" -> FIRST
+    Do not default to ECONOMY if another class is mentioned.
+  - Confirmation: In the "message" field, explicitly state the Class and Date you processed.
+  - Return: {{"intent": "SEARCH", "origin": "...", "destination": "...", "date": "YYYY-MM-DD", "class": "ECONOMY|PREMIUM_ECONOMY|BUSINESS|FIRST", "type": "flight|car|bus|train", "message": "Confirming [Class] search for [Date]..."}}
 
-- CONSULTATION: User wants travel advice or comparisons.
-  Return: {{"intent": "CONSULTATION", "message": "your helpful response here"}}
-- SUPPORT: User has an app problem or bug.
-  Return: {{"intent": "SUPPORT", "message": "...", "action": "CREATE_TICKET"}}
-- CHITCHAT: Greetings or general talk.
-  Return: {{"intent": "CHITCHAT", "message": "your friendly response + briefly mention your capabilities"}}
-- OOT: Off-topic. Refuse politely.
-  Return: {{"intent": "OOT", "message": "polite refusal"}}
+- CONSULTATION: User wants travel advice or comparisons. Return: {{"intent": "CONSULTATION", "message": "your helpful response here"}}
+- SUPPORT: User has an app problem or bug. Return: {{"intent": "SUPPORT", "message": "...", "action": "CREATE_TICKET"}}
+- CHITCHAT: Greetings or general talk. Return: {{"intent": "CHITCHAT", "message": "..."}}
+- OOT: Off-topic, refuse politely. Return: {{"intent": "OOT", "message": "..."}}
 
 Return ONLY raw JSON. No markdown, no backticks.
 """
@@ -172,6 +175,7 @@ Return ONLY raw JSON. No markdown, no backticks.
                 origin = intent_data.get('origin', '')
                 destination = intent_data.get('destination', '')
                 date = intent_data.get('date', '')
+                travel_class = intent_data.get('class', 'ECONOMY').upper()
 
                 has_required = all(
                     v and v.upper() != 'UNKNOWN'
@@ -182,7 +186,7 @@ Return ONLY raw JSON. No markdown, no backticks.
                     flights = []
                     if has_required:
                         amadeus = AmadeusService()
-                        flights = amadeus.search_flights(origin, destination, date) or []
+                        flights = amadeus.search_flights(origin, destination, date, travel_class=travel_class) or []
                     
                     intent_data['flights'] = flights
                     if not flights:

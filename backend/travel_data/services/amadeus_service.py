@@ -66,7 +66,7 @@ class AmadeusService:
                     json_res = res.json()
                     data = json_res.get("data", [])
                     if data:
-                        return self._format_amadeus_response(data, json_res.get("dictionaries", {}).get("carriers", {}))
+                        return self._format_amadeus_response(data, json_res.get("dictionaries", {}).get("carriers", {}), travel_class)
             except requests.RequestException:
                 pass
 
@@ -116,12 +116,13 @@ class AmadeusService:
                 "arrival_time": arrive.strftime("%Y-%m-%dT%H:%M:%S"),
                 "price": float(air["price"] * multiplier * num_passengers),
                 "currency": "IDR",
+                "travel_class": travel_class.upper(),
                 "source": "generative_mock"
             })
         
         return results
 
-    def _format_amadeus_response(self, data, carriers=None):
+    def _format_amadeus_response(self, data, carriers=None, travel_class="ECONOMY"):
         carriers = carriers or {}
         cheapest_by_airline = {}
 
@@ -160,6 +161,7 @@ class AmadeusService:
                 "arrival_time": segments[-1].get("arrival", {}).get("at"), # arrival of the last segment in the first itinerary
                 "price": price,
                 "currency": price_info.get("currency", "EUR"),
+                "travel_class": travel_class.upper(),
                 "source": "amadeus"
             }
 
@@ -222,7 +224,7 @@ class AmadeusService:
                 json_res = res.json()
                 data = json_res.get("data", [])
                 if data:
-                    return self._format_amadeus_response(data, json_res.get("dictionaries", {}).get("carriers", {}))
+                    return self._format_amadeus_response(data, json_res.get("dictionaries", {}).get("carriers", {}), travel_class)
         except requests.RequestException:
             pass
 
@@ -281,6 +283,7 @@ class AmadeusService:
                 "arrival_time": arrival_date.strftime("%Y-%m-%dT22:00:00"),
                 "price": float(air["price"] * multiplier * num_passengers),
                 "currency": "IDR",
+                "travel_class": travel_class.upper(),
                 "source": "generative_mock_multi"
             })
         

@@ -114,7 +114,7 @@ class SearchView(views.APIView):
                     status=status.HTTP_400_BAD_REQUEST
                 )
 
-            travel_class = request.query_params.get('class', 'ECONOMY')
+            travel_class = request.query_params.get('class', 'ECONOMY').upper()
             
             amadeus = AmadeusService()
             flights = amadeus.search_flights(origin, destination, date_str, passengers, travel_class)
@@ -132,7 +132,7 @@ class SearchView(views.APIView):
     def post(self, request):
         legs = request.data.get('legs', [])
         passengers = request.data.get('passengers', 1)
-        travel_class = request.data.get('class', 'ECONOMY')
+        travel_class = request.data.get('class', 'ECONOMY').upper()
 
         if not legs:
             return Response({'error': 'No legs provided for multi-city search'}, status=status.HTTP_400_BAD_REQUEST)
