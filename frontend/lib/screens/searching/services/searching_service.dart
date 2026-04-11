@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import '../../../../core/constants.dart';
+import '../../../../repositories/auth_repository.dart';
 import '../models/ride_option.dart';
 import '../models/detail_row.dart';
 import '../models/coupon_model.dart';
@@ -109,6 +110,28 @@ class SearchingService {
     };
 
     return mockData[category] ?? [];
+  }
+
+  /// Sends a coupon code to the backend to add it to the user's collection.
+  Future<bool> collectCoupon(String code) async {
+    try {
+      final dio = Dio();
+      final token = await AuthRepository().getToken();
+
+      final response = await dio.post(
+        '${Constants.promotionsUrl}collect/',
+        data: {'code': code},
+        options: Options(headers: {
+          if (token != null) 'Authorization': 'Bearer $token',
+        }),
+      );
+
+      return response.statusCode == 200;
+    } on DioException catch (_) {
+      return false;
+    } catch (_) {
+      return false;
+    }
   }
 
   // ── Flights ────────────────────────────────────────────────────────────────

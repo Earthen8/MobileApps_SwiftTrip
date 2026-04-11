@@ -124,7 +124,13 @@ class CartService {
   Future<List<Promotion>> fetchPromotions() async {
     try {
       final dio = Dio();
-      final response = await dio.get(Constants.promotionsUrl);
+      final token = await AuthRepository().getToken();
+      final response = await dio.get(
+        Constants.promotionsUrl,
+        options: Options(headers: {
+          if (token != null) 'Authorization': 'Bearer $token',
+        }),
+      );
       if (response.statusCode == 200) {
         final List<dynamic> data = response.data;
         return data.map((json) => Promotion.fromJson(json)).toList();

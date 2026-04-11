@@ -5,6 +5,7 @@ import 'coupon_overlay.dart';
 import '../services/searching_service.dart';
 import 'package:provider/provider.dart';
 import '../../../providers/language_provider.dart';
+import '../../../core/constants.dart';
 
 class CouponSection extends StatefulWidget {
   const CouponSection({super.key});
@@ -57,6 +58,36 @@ class _CouponSectionState extends State<CouponSection> {
     super.dispose();
   }
 
+  // ── Coupon collection logic ───────────────────────────────────────────────
+
+  Future<void> _collectCoupon(String code) async {
+    if (code.trim().isEmpty) return;
+
+    final langProvider = context.read<LanguageProvider>();
+    final success = await _service.collectCoupon(code.trim());
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        backgroundColor:
+            success ? Constants.popupSuccess : Constants.popupError,
+        content: Text(
+          langProvider.translate(
+            success ? 'coupon_collected' : 'coupon_collect_failed',
+          ),
+          style: const TextStyle(
+            fontFamily: 'Poppins',
+            fontSize: 13,
+            color: Colors.white,
+          ),
+        ),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        duration: const Duration(seconds: 2),
+      ),
+    );
+  }
+
   void _showCouponOverlay() {
     showModalBottomSheet(
       context: context,
@@ -66,9 +97,8 @@ class _CouponSectionState extends State<CouponSection> {
         controller: _couponController,
         onCancel: () => Navigator.pop(context),
         onUse: () {
-          // TODO: Validate and apply coupon code via backend
-          // TODO: Apply discount to current search session on success
           Navigator.pop(context);
+          _collectCoupon(_couponController.text);
         },
       ),
     );
@@ -147,14 +177,18 @@ class _CouponSectionState extends State<CouponSection> {
         const SizedBox(height: 16),
 
         // ── Coupon cards ───────────────────────────────────────────────
-        // TODO: Replace _activeCoupons with API response filtered by active category
         _isLoading
             ? const Center(child: CircularProgressIndicator())
             : SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: Row(
                   children: _activeCoupons
-                      .map((coupon) => CouponCard(coupon: coupon))
+                      .map(
+                        (coupon) => CouponCard(
+                          coupon: coupon,
+                          onCollect: () => _collectCoupon(coupon.code),
+                        ),
+                      )
                       .toList(),
                 ),
               ),
