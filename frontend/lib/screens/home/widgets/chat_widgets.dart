@@ -451,6 +451,7 @@ class ChatInputBar extends StatelessWidget {
                 ),
               ),
             ),
+            const SizedBox(width: 12),
             GestureDetector(
               onTap: onSend,
               child: SvgPicture.asset('assets/icons/magnifier.svg', height: 20),
