@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+import '../../providers/language_provider.dart';
 import '../../widgets/top_bar.dart';
 import '../customer_service/onboarding.dart';
 import 'widgets/destination_search_bar.dart';
@@ -35,6 +37,7 @@ class _DestinationPageState extends State<DestinationPage> {
 
   @override
   Widget build(BuildContext context) {
+    final langProvider = context.watch<LanguageProvider>();
     return Scaffold(
       backgroundColor: const Color(0xFFF6F6F6),
       body: Column(
@@ -160,17 +163,17 @@ class _DestinationPageState extends State<DestinationPage> {
                     children: [
                       if (discount.isNotEmpty)
                         DestinationSection(
-                          title: 'Discount',
+                          title: langProvider.translate('dest_discount'),
                           items: discount,
                         ),
                       if (favorite.isNotEmpty)
                         DestinationSection(
-                          title: 'People’s Favorites',
+                          title: langProvider.translate('dest_favorites'),
                           items: favorite,
                         ),
                       if (hot.isNotEmpty)
                         DestinationSection(
-                          title: 'Hot Destinations',
+                          title: langProvider.translate('dest_hot'),
                           items: hot,
                         ),
                       const SizedBox(height: 80),

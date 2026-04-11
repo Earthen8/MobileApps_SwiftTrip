@@ -61,6 +61,9 @@ class AppStrings {
       'use_button': 'Use',
       'copied_toast': 'copied!',
       'copy_button': 'COPY',
+      'dest_discount': 'Discount',
+      'dest_favorites': 'People’s Favorites',
+      'dest_hot': 'Hot Destinations',
     },
     'id': {
       'schedule': 'Jadwal Anda',
@@ -99,6 +102,9 @@ class AppStrings {
       'use_button': 'Gunakan',
       'copied_toast': 'tersalin!',
       'copy_button': 'SALIN',
+      'dest_discount': 'Diskon',
+      'dest_favorites': 'Favorit Orang',
+      'dest_hot': 'Destinasi Populer',
     },
   };
 }
