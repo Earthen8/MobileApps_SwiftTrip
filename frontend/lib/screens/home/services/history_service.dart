@@ -6,15 +6,22 @@ import '../../cart/models/cart_models.dart';
 
 class HistoryService {
   final _dio = Dio();
+  final _authRepo = AuthRepository();
 
   Future<List<CartTicket>> fetchHistory() async {
     try {
-      final token = await AuthRepository().getToken();
+      final token = await _authRepo.getToken();
       
+      if (token == null) {
+        debugPrint('HistoryService: No auth token found.');
+        return [];
+      }
+
       final response = await _dio.get(
         '${Constants.bookingsUrl}history/',
         options: Options(headers: {
-          if (token != null) 'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
         }),
       );
 
