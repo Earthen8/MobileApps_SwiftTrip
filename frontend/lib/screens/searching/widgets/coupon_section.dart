@@ -3,6 +3,8 @@ import '../models/coupon_model.dart';
 import 'coupon_card.dart';
 import 'coupon_overlay.dart';
 import '../services/searching_service.dart';
+import 'package:provider/provider.dart';
+import '../../../providers/language_provider.dart';
 
 class CouponSection extends StatefulWidget {
   const CouponSection({super.key});
@@ -39,7 +41,9 @@ class _CouponSectionState extends State<CouponSection> {
 
   Future<void> _fetchCoupons() async {
     setState(() => _isLoading = true);
-    final coupons = await _service.getCouponsByCategory(_categories[_activeCategory]);
+    final coupons = await _service.getCouponsByCategory(
+      _categories[_activeCategory],
+    );
     if (!mounted) return;
     setState(() {
       _activeCoupons = coupons;
@@ -72,15 +76,16 @@ class _CouponSectionState extends State<CouponSection> {
 
   @override
   Widget build(BuildContext context) {
+    final langProvider = context.watch<LanguageProvider>();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text(
-              'Limited Coupon',
-              style: TextStyle(
+            Text(
+              langProvider.translate('limited_coupon'),
+              style: const TextStyle(
                 fontFamily: 'Poppins',
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
@@ -88,9 +93,9 @@ class _CouponSectionState extends State<CouponSection> {
             ),
             GestureDetector(
               onTap: _showCouponOverlay,
-              child: const Text(
-                'Use Coupon?',
-                style: TextStyle(
+              child: Text(
+                langProvider.translate('use_coupon'),
+                style: const TextStyle(
                   fontFamily: 'Poppins',
                   fontSize: 12,
                   color: Color(0xFF2B99E3),

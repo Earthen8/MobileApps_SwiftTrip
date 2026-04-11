@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../models/coupon_model.dart';
+import 'package:provider/provider.dart';
+import '../../../providers/language_provider.dart';
 
 class CouponCard extends StatefulWidget {
   final CouponModel coupon;
@@ -14,7 +16,6 @@ class CouponCard extends StatefulWidget {
 class _CouponCardState extends State<CouponCard> {
   Future<void> _handleCopy() async {
     await Clipboard.setData(ClipboardData(text: widget.coupon.code));
-    // TODO: Optionally POST coupon usage log to backend
 
     if (!mounted) return;
     final overlay = Overlay.of(context);
@@ -35,7 +36,7 @@ class _CouponCardState extends State<CouponCard> {
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Text(
-                '"${widget.coupon.code}" copied!',
+                '"${widget.coupon.code}" ${context.read<LanguageProvider>().translate('copied_toast')}',
                 style: const TextStyle(
                   fontFamily: 'Poppins',
                   fontSize: 12,
@@ -150,9 +151,9 @@ class _CouponCardState extends State<CouponCard> {
                     color: const Color(0xFF5A9AE5),
                     borderRadius: BorderRadius.circular(20),
                   ),
-                  child: const Text(
-                    'COPY',
-                    style: TextStyle(
+                  child: Text(
+                    context.watch<LanguageProvider>().translate('copy_button'),
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: 10,
                       fontWeight: FontWeight.bold,

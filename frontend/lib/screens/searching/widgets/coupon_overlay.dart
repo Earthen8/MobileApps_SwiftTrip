@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../../providers/language_provider.dart';
 
 class CouponOverlay extends StatelessWidget {
   final TextEditingController controller;
@@ -14,6 +16,7 @@ class CouponOverlay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final langProvider = context.watch<LanguageProvider>();
     return Container(
       width: double.infinity,
       padding: EdgeInsets.fromLTRB(
@@ -36,10 +39,10 @@ class CouponOverlay extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // ── Title ──────────────────────────────────────────────────
-          const Center(
+          Center(
             child: Text(
-              'Use Coupon?',
-              style: TextStyle(
+              langProvider.translate('use_coupon'),
+              style: const TextStyle(
                 color: Colors.black,
                 fontSize: 16,
                 fontFamily: 'Poppins',
@@ -50,9 +53,9 @@ class CouponOverlay extends StatelessWidget {
           const SizedBox(height: 20),
 
           // ── Coupon label ────────────────────────────────────────────
-          const Text(
-            'Coupon',
-            style: TextStyle(
+          Text(
+            langProvider.translate('coupon_label'),
+            style: const TextStyle(
               color: Colors.black,
               fontSize: 12,
               fontFamily: 'Poppins',
@@ -79,11 +82,11 @@ class CouponOverlay extends StatelessWidget {
                     color: Colors.black,
                   ),
                   decoration: InputDecoration(
-                    hintText: 'Punya Kupon?',
-                    hintStyle: TextStyle(
+                    hintText: langProvider.translate('have_coupon_hint'),
+                    hintStyle: const TextStyle(
                       fontFamily: 'Poppins',
                       fontSize: 12,
-                      color: const Color(0x99999999),
+                      color: Color(0x99999999),
                     ),
                     border: InputBorder.none,
                     isDense: true,
@@ -122,7 +125,7 @@ class CouponOverlay extends StatelessWidget {
                     ],
                   ),
                   child: Text(
-                    'Cancel',
+                    langProvider.translate('cancel_button'),
                     style: TextStyle(
                       color: const Color(0xFF999999),
                       fontSize: 12,
@@ -159,9 +162,9 @@ class CouponOverlay extends StatelessWidget {
                     ],
                   ),
                   alignment: Alignment.center,
-                  child: const Text(
-                    'Use',
-                    style: TextStyle(
+                  child: Text(
+                    langProvider.translate('use_button'),
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: 12,
                       fontFamily: 'Poppins',
