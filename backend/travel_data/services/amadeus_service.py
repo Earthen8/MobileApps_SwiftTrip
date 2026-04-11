@@ -1,7 +1,8 @@
 import os
 import requests
 import logging
-from datetime import datetime
+from datetime import datetime, timedelta
+import random
 from django.core.cache import cache
 from travel_data.models import TransportRoute
 
@@ -46,10 +47,6 @@ class AmadeusService:
         return None
 
     def search_flights(self, origin, destination, date, passengers=1, travel_class="ECONOMY"):
-        """
-        Takes direct parameters and searches flights. 
-        Returns standard list. Fallback to Local DB on failure.
-        """
         token = self._get_token()
         if token:
             url = f"{self.BASE_URL}/v2/shopping/flight-offers"
@@ -69,12 +66,53 @@ class AmadeusService:
                     json_res = res.json()
                     data = json_res.get("data", [])
                     carriers = json_res.get("dictionaries", {}).get("carriers", {})
+                    
+                    # The Check: If Amadeus returns items, use them.
                     if data:
                         return self._format_amadeus_response(data, carriers)
             except requests.RequestException:
                 pass
 
-        return self._fallback_search(origin, destination, date)
+        # The Fallback: If data is empty or network fails, generate dynamic data.
+        return self._generative_fallback(origin, destination, date, passengers, travel_class)
+    
+    def _generative_fallback(self, origin, destination, date, passengers, travel_class):
+        flight_date = date if date else datetime.now().strftime("%Y-%m-%d")
+        num_passengers = max(1, int(passengers))
+        class_multiplier = 2.5 if travel_class.upper() in ["BUSINESS", "FIRST"] else 1.0
+
+        airlines = [
+            {"code": "GA", "name": "Garuda Indonesia", "base_price": 2500000},
+            {"code": "JT", "name": "Lion Air", "base_price": 950000},
+            {"code": "QZ", "name": "AirAsia", "base_price": 850000}
+        ]
+
+        try:
+            base_time = datetime.strptime(flight_date, "%Y-%m-%d")
+        except ValueError:
+            base_time = datetime.now()
+
+        generated_flights = []
+        for i, airline in enumerate(airlines):
+            # Generate staggered departure times throughout the day
+            departure_time = base_time + timedelta(hours=8 + (i * 4), minutes=random.randint(0, 45))
+            arrival_time = departure_time + timedelta(hours=2, minutes=random.randint(10, 50))
+
+            generated_flights.append({
+                "airline": airline["code"],
+                "airlineName": airline["name"],
+                "all_airlines": [airline["code"]],
+                "flight_number": f"{airline['code']} {random.randint(100, 999)}",
+                "origin": origin.upper(),
+                "destination": destination.upper(),
+                "departure_time": departure_time.strftime("%Y-%m-%dT%H:%M:%S"),
+                "arrival_time": arrival_time.strftime("%Y-%m-%dT%H:%M:%S"),
+                "price": float(airline["base_price"] * num_passengers * class_multiplier),
+                "currency": "IDR",
+                "source": "generative_fallback"
+            })
+
+        return generated_flights
 
     def _format_amadeus_response(self, data, carriers=None):
         carriers = carriers or {}
@@ -178,12 +216,71 @@ class AmadeusService:
                 data = json_res.get("data", [])
                 dictionaries = json_res.get("dictionaries", {})
                 carriers = dictionaries.get("carriers", {})
+                
+                # The Check: Only return if Amadeus actually found multi-city data
                 if data:
                     return self._format_amadeus_response(data, carriers)
         except requests.RequestException:
             pass
 
-        return []
+        # The Fallback: Intercept empty responses and generate multi-city data
+        return self._generative_fallback_multi_city(legs, passengers, travel_class)
+
+    def _generative_fallback_multi_city(self, legs, passengers, travel_class):
+        if not legs:
+            return []
+
+        # Extract the start and end points of the entire journey
+        first_leg = legs[0]
+        last_leg = legs[-1]
+        
+        origin = first_leg.get("origin", "")
+        destination = last_leg.get("destination", "")
+        departure_date_str = first_leg.get("date", datetime.now().strftime("%Y-%m-%d"))
+        arrival_date_str = last_leg.get("date", departure_date_str)
+
+        num_passengers = max(1, int(passengers))
+        class_multiplier = 2.5 if travel_class.upper() in ["BUSINESS", "FIRST"] else 1.0
+        leg_multiplier = len(legs) # Increase price based on number of stops
+
+        airlines = [
+            {"code": "GA", "name": "Garuda Indonesia", "base_price": 2500000},
+            {"code": "SQ", "name": "Singapore Airlines", "base_price": 3500000},
+            {"code": "MH", "name": "Malaysia Airlines", "base_price": 2100000}
+        ]
+
+        try:
+            departure_base_time = datetime.strptime(departure_date_str, "%Y-%m-%d")
+        except ValueError:
+            departure_base_time = datetime.now()
+            
+        try:
+            arrival_base_time = datetime.strptime(arrival_date_str, "%Y-%m-%d")
+        except ValueError:
+            arrival_base_time = departure_base_time
+
+        generated_flights = []
+        for i, airline in enumerate(airlines):
+            departure_time = departure_base_time + timedelta(hours=6 + (i * 3), minutes=random.randint(0, 45))
+            # Arrival time reflects the date of the final leg
+            arrival_time = arrival_base_time + timedelta(hours=14 + (i * 3), minutes=random.randint(10, 50))
+
+            generated_flights.append({
+                "airline": airline["code"],
+                "airlineName": airline["name"],
+                "all_airlines": [airline["code"]],
+                "flight_number": f"{airline['code']} {random.randint(100, 999)}",
+                "origin": origin.upper(),
+                "destination": destination.upper(),
+                "departure_time": departure_time.strftime("%Y-%m-%dT%H:%M:%S"),
+                "arrival_time": arrival_time.strftime("%Y-%m-%dT%H:%M:%S"),
+                # Calculate total cost for all legs combined
+                "price": float(airline["base_price"] * num_passengers * class_multiplier * leg_multiplier),
+                "currency": "IDR",
+                "source": "generative_fallback_multi_city"
+            })
+
+        return generated_flights
 
     def search_airports(self, keyword):
         """
