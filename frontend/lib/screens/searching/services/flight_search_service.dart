@@ -12,9 +12,7 @@ class FlightSearchService {
     required String flightClass,
     required bool isMultiCity,
   }) async {
-    // TODO: Replace with real backend call.
     await Future.delayed(const Duration(milliseconds: 1200));
     return true;
   }
 }
-
