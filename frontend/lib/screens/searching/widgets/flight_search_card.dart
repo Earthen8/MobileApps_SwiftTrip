@@ -39,7 +39,7 @@ class _PesanButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final langProvider = context.watch<LanguageProvider>();
     return GestureDetector(
-      onTap: () {
+      onTap: () async {
         if (selectedFlight == null) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -67,6 +67,8 @@ class _PesanButton extends StatelessWidget {
           flightClass: displayClass,
           priceRp: selectedFlight!.price.toInt(),
           flightRoute: flightRoute,
+          latitude: selectedFlight!.latitude,
+          longitude: selectedFlight!.longitude,
         );
 
         final details = CheckoutDetailsModel(
@@ -85,6 +87,9 @@ class _PesanButton extends StatelessWidget {
           discountTotal: 0,
         );
 
+        await context.read<CartProvider>().addTicket(ticket);
+
+        if (!context.mounted) return;
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -154,6 +159,8 @@ class _PesanButton extends StatelessWidget {
                       flightClass: displayClass,
                       priceRp: selectedFlight!.price.toInt(),
                       flightRoute: flightRoute,
+                      latitude: selectedFlight!.latitude,
+                      longitude: selectedFlight!.longitude,
                     );
                     context.read<CartProvider>().addTicket(ticket);
 

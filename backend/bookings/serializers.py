@@ -147,17 +147,52 @@ class CartTicketSerializer(serializers.ModelSerializer):
                 'Bali': (-8.4095, 115.1889),
                 'Yogyakarta': (-7.7970, 110.3705),
                 'Bandung': (-6.9175, 107.6191),
-                'Ngawi': (-7.3995, 111.4586),
-                'Ngawi Barat': (-7.3995, 111.4586),
-                'Surabaya': (-7.2504, 112.7688)
+                'Surabaya': (-7.2504, 112.7688),
+            }
+            iata_coords = {
+                'CGK': (-6.1256, 106.6560),
+                'DPS': (-8.7482, 115.1675),
+                'SUB': (-7.3797, 112.7875),
+                'KNO': (3.642, 98.885),
+                'UPG': (-5.062, 119.554),
+                'YIA': (-7.900, 110.050),
+                'BPN': (-1.268, 116.895),
+                'BTH': (1.121, 104.118),
+                'SRG': (-6.984, 110.375),
+                'PLM': (-2.897, 104.701),
+                'SIN': (1.3644, 103.9915),
+                'KUL': (2.7456, 101.7099),
+                'BKK': (13.6900, 100.7501),
+                'DXB': (25.2532, 55.3657),
+                'SYD': (-33.9399, 151.1753),
+                'LHR': (51.4700, -0.4543),
+                'CDG': (49.0097, 2.5479),
+                'AMS': (52.311, 4.768),
+                'FRA': (50.033, 8.571),
+                'JFK': (40.6413, -73.7781),
+                'LAX': (33.9416, -118.4085),
+                'HND': (35.5494, 139.7798),
+                'NRT': (35.7647, 140.3864),
+                'ICN': (37.4602, 126.4407),
+                'HKG': (22.3080, 113.9185),
             }
             target_loc = ret.get('to') or ret.get('location')
             if target_loc:
-                for key, (lat, lng) in destination_coords.items():
-                    if key.lower() in target_loc.lower():
-                        ret['latitude'] = lat
-                        ret['longitude'] = lng
-                        break
+                target_upper = target_loc.strip().upper()
+                if target_upper in iata_coords:
+                    ret['latitude'], ret['longitude'] = iata_coords[target_upper]
+                else:
+                    matched = False
+                    for key, (lat, lng) in destination_coords.items():
+                        if key.lower() in target_loc.lower():
+                            ret['latitude'] = lat
+                            ret['longitude'] = lng
+                            matched = True
+                            break
+                    
+                    if not matched:
+                        ret['latitude'] = -6.2088
+                        ret['longitude'] = 106.8456
                         
         return ret
 
@@ -197,17 +232,52 @@ class TicketModelSerializer(serializers.ModelSerializer):
                 'Bali': (-8.4095, 115.1889),
                 'Yogyakarta': (-7.7970, 110.3705),
                 'Bandung': (-6.9175, 107.6191),
-                'Ngawi': (-7.3995, 111.4586),
-                'Ngawi Barat': (-7.3995, 111.4586),
-                'Surabaya': (-7.2504, 112.7688)
+                'Surabaya': (-7.2504, 112.7688),
+            }
+            iata_coords = {
+                'CGK': (-6.1256, 106.6560),
+                'DPS': (-8.7482, 115.1675),
+                'SUB': (-7.3797, 112.7875),
+                'KNO': (3.642, 98.885),
+                'UPG': (-5.062, 119.554),
+                'YIA': (-7.900, 110.050),
+                'BPN': (-1.268, 116.895),
+                'BTH': (1.121, 104.118),
+                'SRG': (-6.984, 110.375),
+                'PLM': (-2.897, 104.701),
+                'SIN': (1.3644, 103.9915),
+                'KUL': (2.7456, 101.7099),
+                'BKK': (13.6900, 100.7501),
+                'DXB': (25.2532, 55.3657),
+                'SYD': (-33.9399, 151.1753),
+                'LHR': (51.4700, -0.4543),
+                'CDG': (49.0097, 2.5479),
+                'AMS': (52.311, 4.768),
+                'FRA': (50.033, 8.571),
+                'JFK': (40.6413, -73.7781),
+                'LAX': (33.9416, -118.4085),
+                'HND': (35.5494, 139.7798),
+                'NRT': (35.7647, 140.3864),
+                'ICN': (37.4602, 126.4407),
+                'HKG': (22.3080, 113.9185),
             }
             target_loc = ret.get('to') or ret.get('location')
             if target_loc:
-                for key, (lat, lng) in destination_coords.items():
-                    if key.lower() in target_loc.lower():
-                        ret['latitude'] = lat
-                        ret['longitude'] = lng
-                        break
+                target_upper = target_loc.strip().upper()
+                if target_upper in iata_coords:
+                    ret['latitude'], ret['longitude'] = iata_coords[target_upper]
+                else:
+                    matched = False
+                    for key, (lat, lng) in destination_coords.items():
+                        if key.lower() in target_loc.lower():
+                            ret['latitude'] = lat
+                            ret['longitude'] = lng
+                            matched = True
+                            break
+                    
+                    if not matched:
+                        ret['latitude'] = -6.2088
+                        ret['longitude'] = 106.8456
 
         return ret
 

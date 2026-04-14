@@ -9,6 +9,8 @@ class FlightOffer {
   final String arrivalTime;
   final double price;
   final String currency;
+  final double? latitude;
+  final double? longitude;
 
   const FlightOffer({
     required this.airlineCode,
@@ -21,6 +23,8 @@ class FlightOffer {
     required this.arrivalTime,
     required this.price,
     required this.currency,
+    this.latitude,
+    this.longitude,
   });
 
   factory FlightOffer.fromJson(Map<String, dynamic> json) {
@@ -35,6 +39,8 @@ class FlightOffer {
       arrivalTime: json['arrival_time']?.toString() ?? '',
       price: (json['price'] as num?)?.toDouble() ?? 0.0,
       currency: json['currency']?.toString() ?? 'IDR',
+      latitude: json['latitude'] != null ? (json['latitude'] as num).toDouble() : null,
+      longitude: json['longitude'] != null ? (json['longitude'] as num).toDouble() : null,
     );
   }
 }

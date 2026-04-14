@@ -182,6 +182,8 @@ class AmadeusService:
             {"code": "QR", "name": "Qatar Airways"},
         ]
 
+        dest_lat, dest_lng = self._get_airport_coordinates(destination)
+
         results = []
         for i, (start_h, end_h, dur_cat) in enumerate(windows):
             air = airlines[i]
@@ -217,7 +219,9 @@ class AmadeusService:
                 "price": float(final_price),
                 "currency": "IDR",
                 "travel_class": travel_class.upper(),
-                "source": "generative_mock"
+                "source": "generative_mock",
+                "latitude": dest_lat,
+                "longitude": dest_lng,
             })
         
         return results

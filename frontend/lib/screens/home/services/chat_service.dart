@@ -59,6 +59,8 @@ class ChatService {
               date: (f['departure_time'] as String).length >= 10 ? (f['departure_time'] as String).substring(0, 10) : '--',
               departure: (f['departure_time'] as String).length >= 16 ? (f['departure_time'] as String).substring(11, 16) : '--',
               arrive: (f['arrival_time'] as String).length >= 16 ? (f['arrival_time'] as String).substring(11, 16) : '--',
+              latitude: f['latitude'] != null ? (f['latitude'] as num).toDouble() : null,
+              longitude: f['longitude'] != null ? (f['longitude'] as num).toDouble() : null,
             );
             return ChatMessage.ticket(ticket: ticket);
             
