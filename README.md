@@ -87,8 +87,8 @@ swifttrip/
 ```
 
 ## 8. Team Members
-- **Lead Full Stack Developer:** Earthen | github.com/Earthen8
-- **UI Collaborator:** Hansel | github.com/hanselrichie
+- **Lead Full Stack Developer:** Earthen | [github.com/Earthen8](https://github.com/Earthen8)
+- **UI Collaborator:** Hansel | [github.com/hanselrichie](https://github.com/hanselrichie)
 
 ---
 *Created for the College Mobile App Development Project.*
