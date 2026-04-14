@@ -1,6 +1,6 @@
 # SwiftTrip
 
-**Tagline:** An AI powered travel companion for seamless booking and discovery.
+An AI powered travel companion for seamless booking and discovery.
 
 ---
 
