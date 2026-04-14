@@ -244,7 +244,8 @@ CRITICAL RULE: Strictly restrict all answers to travel contexts. If the user ask
                 origin = intent_data.get('origin', '')
                 destination = intent_data.get('destination', '')
                 date = intent_data.get('date', '')
-                travel_class = intent_data.get('class', 'ECONOMY').upper()
+                raw_class = intent_data.get('class')
+                travel_class = (raw_class or 'ECONOMY').upper()
 
                 has_required = all(
                     v and v.upper() != 'UNKNOWN'
