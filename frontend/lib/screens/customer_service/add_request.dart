@@ -88,7 +88,20 @@ class _AddRequestPageState extends State<AddRequestPage>
   }
 
   Future<void> _handleSendRequest() async {
-    // TODO: Validate all fields before submitting
+    if (_selectedProblemType == null ||
+        _selectedLocation == null ||
+        _selectedPublishType == null ||
+        _headerController.text.trim().isEmpty ||
+        _statementController.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please fill all mandatory fields marked with *'),
+          backgroundColor: Colors.redAccent,
+        ),
+      );
+      return;
+    }
+
     final request = CsRequest(
       problemType: _selectedProblemType,
       location: _selectedLocation,
@@ -194,7 +207,7 @@ class _AddRequestPageState extends State<AddRequestPage>
                       const SizedBox(height: 16),
 
                       // ── Dropdowns ──────────────────────────────────────────────
-                      const CsDropdownLabel(text: 'Problem Type'),
+                      const CsDropdownLabel(text: 'Problem Type', isRequired: true),
                       const SizedBox(height: 4),
                       CsDropdownField(
                         hint: '- - -',
@@ -204,7 +217,7 @@ class _AddRequestPageState extends State<AddRequestPage>
                             setState(() => _selectedProblemType = val),
                       ),
                       const SizedBox(height: 12),
-                      const CsDropdownLabel(text: 'Location'),
+                      const CsDropdownLabel(text: 'Location', isRequired: true),
                       const SizedBox(height: 4),
                       CsDropdownField(
                         hint: '- - -',
@@ -214,7 +227,7 @@ class _AddRequestPageState extends State<AddRequestPage>
                             setState(() => _selectedLocation = val),
                       ),
                       const SizedBox(height: 12),
-                      const CsDropdownLabel(text: 'Publish Type'),
+                      const CsDropdownLabel(text: 'Publish Type', isRequired: true),
                       const SizedBox(height: 4),
                       CsDropdownField(
                         hint: '- - -',
@@ -228,7 +241,7 @@ class _AddRequestPageState extends State<AddRequestPage>
                       const Divider(color: Color(0x4D000000), thickness: 1),
 
                       // ── Header Field ───────────────────────────────────────────
-                      const CsSectionLabel(text: 'Header'),
+                      const CsSectionLabel(text: 'Header', isRequired: true),
                       const SizedBox(height: 8),
                       CsInputField(
                         controller: _headerController,
@@ -240,7 +253,7 @@ class _AddRequestPageState extends State<AddRequestPage>
                       const SizedBox(height: 16),
 
                       // ── Main Statements Field ──────────────────────────────────
-                      const CsSectionLabel(text: 'Main Statements'),
+                      const CsSectionLabel(text: 'Main Statements', isRequired: true),
                       const SizedBox(height: 8),
                       CsInputField(
                         controller: _statementController,
